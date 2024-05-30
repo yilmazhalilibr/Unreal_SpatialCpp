@@ -17,7 +17,7 @@ class UNREAL_SPATIALCPP_API UInventoryGridWidget : public UUserWidget
 	GENERATED_BODY()
 
 protected:
-	virtual void NativeConstruct() override;
+	virtual void NativePreConstruct() override;
 
 	void OnPaint(FPaintContext& Context) const;
 
