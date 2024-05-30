@@ -18,6 +18,7 @@ class UNREAL_SPATIALCPP_API UInventoryGridWidget : public UUserWidget
 
 protected:
 	virtual void NativeConstruct() override;
+
 	void OnPaint(FPaintContext& Context) const;
 
 	UPROPERTY(BlueprintReadOnly, Category = "Inventory")
@@ -26,7 +27,7 @@ protected:
 	UPROPERTY(BlueprintReadOnly, Category = "Inventory")
 	UInventorySubsystem* InventorySubsystem;
 	UPROPERTY(BlueprintReadOnly, Category = "Inventory")
-	float TileSize;
+	float TileSize = 50;
 
 	UPROPERTY(BlueprintReadOnly, Category = "Inventory")
 	TArray<FSLine> Lines;
@@ -35,13 +36,13 @@ protected:
 private:
 	void InitializeInventoryGridWidget();
 
-	UPROPERTY(meta = (BindWidget))
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (BindWidget, AllowPrivateAccess = "true"))
 	class UCanvasPanel* CanvasPanel;
 
-	UPROPERTY(meta = (BindWidget))
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (BindWidget, AllowPrivateAccess = "true"))
 	class UBorder* GridBorder;
 
-	UPROPERTY(meta = (BindWidget))
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (BindWidget, AllowPrivateAccess = "true"))
 	class UCanvasPanel* GridCanvasPanel;
 
 	UFUNCTION()
@@ -49,6 +50,8 @@ private:
 
 public:
 
-	void InitializeGrid(UInventorySubsystem inventorySubSystem, float tileSize);
+	UFUNCTION(BlueprintCallable, Category = "Inventory")
+	void InitializeGrid(UInventorySubsystem* _inventorySubSystem, float _tileSize);
+
 
 };

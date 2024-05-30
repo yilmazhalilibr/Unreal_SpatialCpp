@@ -3,3 +3,9 @@
 
 #include "SpatialInventory/InventorySubsystem.h"
 
+void UInventorySubsystem::InventorySubsystem()
+{
+	Columns = 5;
+	Rows = 5;
+
+}

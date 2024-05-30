@@ -22,6 +22,12 @@ struct FSLine
 	float GetXEnd() const { return X.Y; }
 	float GetYStart() const { return Y.X; }
 	float GetYEnd() const { return Y.Y; }
+	// Setter fonksiyonlarý
+	void SetXStart(float Value) { X.X = Value; }
+	void SetXEnd(float Value) { X.Y = Value; }
+	void SetYStart(float Value) { Y.X = Value; }
+	void SetYEnd(float Value) { Y.Y = Value; }
+
 };
 
 USTRUCT(BlueprintType)
@@ -41,11 +47,14 @@ class UNREAL_SPATIALCPP_API UInventorySubsystem : public UGameInstanceSubsystem
 {
 	GENERATED_BODY()
 
-protected:
+	//Constructor
+	void InventorySubsystem();
+
+public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Inventory System")
-	int Columns;
+	int Columns = 5;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Inventory System")
-	int Rows;
+	int Rows = 5;
 
 public:
 	//Getters and Setters
@@ -53,6 +62,11 @@ public:
 	int GetColumns() const { return Columns; }
 	UFUNCTION(BlueprintCallable)
 	int GetRows() const { return Rows; }
+	UFUNCTION(BlueprintCallable)
+	void SetColumns(int Value) { Columns = Value; }
+	UFUNCTION(BlueprintCallable)
+	void SetRows(int Value) { Rows = Value; }
+
 };
 
 

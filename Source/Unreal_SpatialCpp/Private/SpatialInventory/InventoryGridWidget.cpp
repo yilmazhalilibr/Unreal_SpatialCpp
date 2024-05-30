@@ -17,9 +17,13 @@ void UInventoryGridWidget::NativeConstruct()
 
 }
 
+
+
 void UInventoryGridWidget::OnPaint(FPaintContext& Context) const
 {
 	Super::OnPaint(Context);
+
+	UE_LOG(LogTemp, Warning, TEXT("UInventoryGridWidget::OnPaint"));
 
 	for (const FSLine& Line : Lines)
 	{
@@ -28,12 +32,12 @@ void UInventoryGridWidget::OnPaint(FPaintContext& Context) const
 
 		FVector2D Start = LocalTopLeft + Line.X;
 		FVector2D End = LocalTopLeft + Line.Y;
+		FLinearColor LineColor = FLinearColor(0.5f, 0.5f, 0.5f, 0.5f);
 
-		//WidgetBlueprintLibraryInstance->DrawLine(Context, Start, End, FLinearColor::White, false);
+		//WidgetBlueprintLibraryInstance->DrawLine(Context, Start, End, LineColor, false);
 
 		  // Çizgi çizme iþlemi
 		//LineColor RGB deðeri 0.5 , A deðeri 1.0
-		FLinearColor LineColor = FLinearColor(0.5f, 0.5f, 0.5f, 0.5f);
 		TArray<FVector2D> Points;
 		Points.Add(Start);
 		Points.Add(End);
@@ -62,51 +66,51 @@ void UInventoryGridWidget::InitializeInventoryGridWidget()
 	UE_LOG(LogTemp, Warning, TEXT("UInventoryGridWidget::InitializeInventoryGridWidget"));
 	WidgetBlueprintLibraryInstance = NewObject<UWidgetBlueprintLibrary>();
 
-	if (WidgetTree)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("WidgetTree is valid"));
-		// Create and configure the CanvasPanel
-		CanvasPanel = WidgetTree->ConstructWidget<UCanvasPanel>(UCanvasPanel::StaticClass(), TEXT("CanvasPanel"));
-		WidgetTree->RootWidget = CanvasPanel;
+	//if (WidgetTree)
+	//{
+	//	UE_LOG(LogTemp, Warning, TEXT("WidgetTree is valid"));
+	//	// Create and configure the CanvasPanel
+	//	CanvasPanel = WidgetTree->ConstructWidget<UCanvasPanel>(UCanvasPanel::StaticClass(), TEXT("CanvasPanel"));
+	//	WidgetTree->RootWidget = CanvasPanel;
 
-		// Set up GridBorder
-		GridBorder = WidgetTree->ConstructWidget<UBorder>(UBorder::StaticClass(), TEXT("GridBorder"));
-		GridBorder->SetBrushColor(FLinearColor(1.0f, 0.0f, 0.0f, 0.25f));  // Renk kýrmýzý olarak ayarlandý
-		UCanvasPanelSlot* BorderSlot = Cast<UCanvasPanelSlot>(CanvasPanel->AddChildToCanvas(GridBorder));
-		BorderSlot->SetAnchors(FAnchors(0.5f, 0.5f, 0.5f, 0.5f));
-		BorderSlot->SetPosition(FVector2D(0.0f, 0.0f));
-		BorderSlot->SetSize(FVector2D(150.0f, 600.0f));
-		BorderSlot->SetAlignment(FVector2D(0.5f, 0.5f));
-		GridBorder->SetPadding(FMargin(0.0f));
+	//	// Set up GridBorder
+	//	GridBorder = WidgetTree->ConstructWidget<UBorder>(UBorder::StaticClass(), TEXT("GridBorder"));
+	//	GridBorder->SetBrushColor(FLinearColor(1.0f, 0.0f, 0.0f, 0.25f));  // Renk kýrmýzý olarak ayarlandý
+	//	UCanvasPanelSlot* BorderSlot = Cast<UCanvasPanelSlot>(CanvasPanel->AddChildToCanvas(GridBorder));
+	//	BorderSlot->SetAnchors(FAnchors(0.5f, 0.5f, 0.5f, 0.5f));
+	//	BorderSlot->SetPosition(FVector2D(0.0f, 0.0f));
+	//	BorderSlot->SetSize(FVector2D(150.0f, 600.0f));
+	//	BorderSlot->SetAlignment(FVector2D(0.5f, 0.5f));
+	//	GridBorder->SetPadding(FMargin(0.0f));
 
-		// Set up GridCanvasPanel
-		GridCanvasPanel = WidgetTree->ConstructWidget<UCanvasPanel>(UCanvasPanel::StaticClass(), TEXT("GridCanvasPanel"));
-		GridBorder->SetContent(GridCanvasPanel);
+	//	// Set up GridCanvasPanel
+	//	GridCanvasPanel = WidgetTree->ConstructWidget<UCanvasPanel>(UCanvasPanel::StaticClass(), TEXT("GridCanvasPanel"));
+	//	GridBorder->SetContent(GridCanvasPanel);
 
-		UBorderSlot* GridCanvasSlot = Cast<UBorderSlot>(GridCanvasPanel->Slot);
-		if (GridCanvasSlot)
-		{
-			UE_LOG(LogTemp, Warning, TEXT("GridCanvasSlot is valid"));
+	//	UBorderSlot* GridCanvasSlot = Cast<UBorderSlot>(GridCanvasPanel->Slot);
+	//	if (GridCanvasSlot)
+	//	{
+	//		UE_LOG(LogTemp, Warning, TEXT("GridCanvasSlot is valid"));
 
-			GridCanvasSlot->SetHorizontalAlignment(HAlign_Fill);
-			GridCanvasSlot->SetVerticalAlignment(VAlign_Fill);
-		}
-		else
-		{
-			UE_LOG(LogTemp, Warning, TEXT("Failed to cast BorderSlot for GridCanvasPanel"));
-		}
-	}
+	//		GridCanvasSlot->SetHorizontalAlignment(HAlign_Fill);
+	//		GridCanvasSlot->SetVerticalAlignment(VAlign_Fill);
+	//	}
+	//	else
+	//	{
+	//		UE_LOG(LogTemp, Warning, TEXT("Failed to cast BorderSlot for GridCanvasPanel"));
+	//	}
+	//}
 
 }
 
 
-void UInventoryGridWidget::InitializeGrid(UInventorySubsystem inventorySubSystem, float tileSize)
+void UInventoryGridWidget::InitializeGrid(UInventorySubsystem* _inventorySubSystem, float _tileSize)
 {
 	//Gridborder'n Size'ini ayarla
 	UCanvasPanelSlot* BorderSlot = Cast<UCanvasPanelSlot>(GridBorder->Slot);
 	if (BorderSlot)
 	{
-		BorderSlot->SetSize(FVector2D(inventorySubSystem.GetColumns() * tileSize, inventorySubSystem.GetRows() * tileSize));
+		BorderSlot->SetSize(FVector2D(_inventorySubSystem->GetColumns() * _tileSize, _inventorySubSystem->GetRows() * _tileSize));
 		CreateLineSegments();
 		UE_LOG(LogTemp, Warning, TEXT("GridBorder's size is set , Created line segments"));
 	}
@@ -117,10 +121,13 @@ void UInventoryGridWidget::InitializeGrid(UInventorySubsystem inventorySubSystem
 
 }
 
+
+
 void UInventoryGridWidget::CreateLineSegments()
 {
 	int x = 0;
 	int y = 0;
+
 	for (int i = 0; i < InventorySubsystem->GetColumns(); i++)
 	{
 		x = i * TileSize;
@@ -131,6 +138,7 @@ void UInventoryGridWidget::CreateLineSegments()
 		Lines.Add(FSLine(line));
 
 	}
+
 	for (int i = 0; i < InventorySubsystem->GetRows(); i++)
 	{
 		y = i * TileSize;

@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
+#include "InventorySubsystem.h"
 #include "InventoryWidget.generated.h"
 
 /**
@@ -15,20 +16,31 @@ class UNREAL_SPATIALCPP_API UInventoryWidget : public UUserWidget
 	GENERATED_BODY()
 
 protected:
-	virtual void NativeConstruct() override;
+	virtual void NativePreConstruct() override;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Inventory")
+	float TileSize;
 
 private:
+
+	UFUNCTION(BlueprintCallable, Category = "Inventory")
 	void InitializeInventoryWidget();
 
-	UPROPERTY(meta = (BindWidget))
+
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (BindWidget, AllowPrivateAccess = "true"))
 	class UCanvasPanel* CanvasPanel;
 
-	UPROPERTY(meta = (BindWidget))
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (BindWidget, AllowPrivateAccess = "true"))
 	class UBorder* BackgroundBorder;
 
-	UPROPERTY(meta = (BindWidget))
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (BindWidget, AllowPrivateAccess = "true"))
 	class UBackgroundBlur* BackgroundBlur;
 
-	UPROPERTY(meta = (BindWidget))
-	class UInventoryGridWidget* InventoryGridWidget;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (BindWidget, AllowPrivateAccess = "true"))
+	class UInventoryGridWidget* GridWidget;
+
+public:
+
+
 };
