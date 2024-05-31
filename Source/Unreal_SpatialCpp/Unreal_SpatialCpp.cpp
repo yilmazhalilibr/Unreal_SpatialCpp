@@ -4,4 +4,11 @@
 #include "Modules/ModuleManager.h"
 
 IMPLEMENT_PRIMARY_GAME_MODULE( FDefaultGameModuleImpl, Unreal_SpatialCpp, "Unreal_SpatialCpp" );
- 
+
+void FUnreal_SpatialCppModule::StartupModule()
+{
+}
+
+void FUnreal_SpatialCppModule::ShutdownModule()
+{
+}
