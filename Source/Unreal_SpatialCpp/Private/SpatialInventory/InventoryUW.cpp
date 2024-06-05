@@ -26,27 +26,41 @@ void UInventoryUW::NativeConstruct()
 	}
 }
 
+
 void UInventoryUW::CreateLineSegments()
 {
 	LineSegments.Empty();
 
+	FVector2D TopLeft = FVector2D::ZeroVector;
+
+
+	if (GridBorder)
+	{
+		if (UCanvasPanelSlot* CanvasSlot = Cast<UCanvasPanelSlot>(GridBorder->Slot))
+		{
+			TopLeft = CanvasSlot->GetPosition();
+		}
+	}
+
 	for (int32 i = 0; i <= Column; ++i)
 	{
-		float X = i * TileSize;
-		LineSegments.Add(FVector2D(X, 0));
-		LineSegments.Add(FVector2D(X, Row * TileSize));
+		UE_LOG(LogTemp, Warning, TEXT("Topleft: %f"), TopLeft.X);
+		float X = TopLeft.X + i * TileSize;
+		LineSegments.Add(FVector2D(X, TopLeft.Y));
+		LineSegments.Add(FVector2D(X, TopLeft.Y + Row * TileSize));
 	}
 
 	for (int32 j = 0; j <= Row; ++j)
 	{
-		float Y = j * TileSize;
-		LineSegments.Add(FVector2D(0, Y));
-		LineSegments.Add(FVector2D(Column * TileSize, Y));
+		float Y = TopLeft.Y + j * TileSize;
+		LineSegments.Add(FVector2D(TopLeft.X, Y));
+		LineSegments.Add(FVector2D(TopLeft.X + Column * TileSize, Y));
 	}
 
 	// Widget'ýn yeniden çizilmesini tetiklemek için
 	Invalidate(EInvalidateWidgetReason::Paint);
 }
+
 
 int32 UInventoryUW::NativePaint(const FPaintArgs& Args, const FGeometry& AllottedGeometry, const FSlateRect& MyCullingRect, FSlateWindowElementList& OutDrawElements, int32 LayerId, const FWidgetStyle& InWidgetStyle, bool bParentEnabled) const
 {
