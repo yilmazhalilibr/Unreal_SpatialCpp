@@ -25,7 +25,7 @@ public:
 	float TileSize;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Inventory")
-	FLinearColor LineColor; 
+	FLinearColor LineColor;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Inventory")
 	float LineTickness;
@@ -36,6 +36,33 @@ public:
 protected:
 	virtual void NativeConstruct() override;
 	virtual int32 NativePaint(const FPaintArgs& Args, const FGeometry& AllottedGeometry, const FSlateRect& MyCullingRect, FSlateWindowElementList& OutDrawElements, int32 LayerId, const FWidgetStyle& InWidgetStyle, bool bParentEnabled) const override;
+
+
+	//Getters and Setters
+public:
+
+	/*Avantajlarý FORCEINLINE
+					Performans: Küçük ve sýk kullanýlan iþlevlerin satýr içi olmasý, iþlev çaðrýsý sýrasýnda oluþan yükü azaltarak performansý artýrýr.
+					Okunabilirlik: Küçük iþlevleri satýr içi yaparak, kodun okunabilirliðini artýrýr.
+	Dezavantajlarý
+					Kod Þiþkinliði: Çok büyük veya nadiren kullanýlan iþlevler satýr içi yapýlýrsa, bu kodun þiþmesine ve ikili dosyanýn büyümesine neden olabilir.
+					Derleyici Kararlarý: Derleyici her zaman FORCEINLINE direktifini dikkate almaz ve bu iþlevi satýr içi yapmayabilir.*/
+
+	FORCEINLINE void SetColumn(int32 InColumn) { Column = InColumn; }
+	FORCEINLINE int32 GetColumn() const { return Column; }
+
+	FORCEINLINE void SetRow(int32 InRow) { Row = InRow; }
+	FORCEINLINE int32 GetRow() const { return Row; }
+
+	FORCEINLINE void SetTileSize(float InTileSize) { TileSize = InTileSize; }
+	FORCEINLINE float GetTileSize() const { return TileSize; }
+
+	FORCEINLINE void SetLineColor(FLinearColor InLineColor) { LineColor = InLineColor; }
+	FORCEINLINE FLinearColor GetLineColor() const { return LineColor; }
+
+	FORCEINLINE void SetLineTickness(float InLineTickness) { LineTickness = InLineTickness; }
+	FORCEINLINE float GetLineTickness() const { return LineTickness; }
+
 
 private:
 	UPROPERTY(meta = (BindWidget))
