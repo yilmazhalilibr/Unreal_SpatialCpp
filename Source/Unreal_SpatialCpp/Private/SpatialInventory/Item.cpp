@@ -58,7 +58,9 @@ void AItem::OnComponentBeginOverlap(UPrimitiveComponent* OverlappedComponent, AA
 
 		if (InventorySubsystem->TryAddItemToInventory(ItemObject->GetInventoryData().InventoryKey, ItemObject, 1))
 		{
+			UE_LOG(LogTemp, Warning, TEXT("Item added to inventory!"));
 			Destroy();
+			return;
 		}
 		else
 		{

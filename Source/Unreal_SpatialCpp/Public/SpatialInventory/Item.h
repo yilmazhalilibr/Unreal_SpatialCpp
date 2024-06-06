@@ -63,6 +63,6 @@ public:
 
 	virtual UItemObject* GetDefaultItemObject();
 
-	UFUNCTION(BlueprintImplementableEvent, Category = "Item Class", meta = (DisplayName = "GetDefaultItemObject"))
+	UFUNCTION(BlueprintImplementableEvent, Category = "Item Class", meta = (DisplayName = "GetDefaultItemObject"), BlueprintCallable)
 	UItemObject* GetDefaultItemObject_Implementation();
 };
