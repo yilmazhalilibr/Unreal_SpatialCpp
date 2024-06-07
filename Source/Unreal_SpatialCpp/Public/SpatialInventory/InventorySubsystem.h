@@ -4,11 +4,10 @@
 
 #include "CoreMinimal.h"
 #include "Subsystems/GameInstanceSubsystem.h"
-
 #include "InventorySubsystem.generated.h"
 
 class ItemObject;
-
+class AItem;
 
 //Tile Structure
 USTRUCT(BlueprintType)
@@ -57,9 +56,6 @@ struct FItemData
 	int32 Level;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	UTexture2D* ItemIcon;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FVector2D Size;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
@@ -73,6 +69,21 @@ struct FItemData
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TArray<FStat> StatsArray;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool Rotated;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TSubclassOf<AItem> ItemClass;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UMaterialInterface* Icon;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UMaterialInterface* IconRotated;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FIntPoint Dimensions;
 };
 
 USTRUCT(BlueprintType)
@@ -95,14 +106,14 @@ struct FInventoryData
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FName InventoryKey;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	int32 Row;
+	//UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	//int32 Row;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	int32 Column;
+	//UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	//int32 Column;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	int32 GridSize;
+	//UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	//int32 GridSize;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TArray<FInventorySlot> InventorySlots;
@@ -142,10 +153,10 @@ public:
 	bool AddItemToInventory(FName InventoryID, FInventoryData InventoryData, int32 Amount);
 
 	UFUNCTION(BlueprintCallable, Category = "Inventory")
-	bool TryAddItemToInventory(FName InventoryID, UItemObject* ItemObject, int32 Amount);
+	bool TryAddItemToInventory(FName InventoryName, UItemObject* ItemObject, int32 Amount);
 
 	UFUNCTION(BlueprintCallable, Category = "Inventory")
-	bool IsRoomAvailable(UItemObject* ItemObject, int32 TopLeftIndex);
+	bool IsRoomAvailable(FName InventoryName, UItemObject* ItemObject, int32 TopLeftIndex);
 
 	UFUNCTION(BlueprintCallable, Category = "Inventory")
 	FTile IndexToTile(int32 Index, UItemObject* ItemObject);
@@ -160,6 +171,6 @@ public:
 	FItemData GetItemAtIndex(int32 Index, FName InventoryKey);
 
 	UFUNCTION(BlueprintCallable, Category = "Inventory")
-	void AddItemAt(UItemObject* ItemObject, int32 TopLeftIndex);
+	void AddItemAt(FName InventoryName, UItemObject* ItemObject, int32 TopLeftIndex);
 
 };

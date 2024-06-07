@@ -3,16 +3,15 @@
 
 #include "SpatialInventory/InventorySubsystem.h"
 #include "SpatialInventory/ItemObject.h"
+#include "SpatialInventory/Item.h"
 
 void UInventorySubsystem::Initialize(FSubsystemCollectionBase& Collection)
 {
 	Super::Initialize(Collection);
 
-	FInventoryData _inventoryData{ "PlayerInventory",5,10,50 };
 
-	AddInventory(_inventoryData.InventoryKey, _inventoryData);
+	Inventories.Add("PlayerInventory", FInventoryData());
 
-	int _invenSize = _inventoryData.Column * _inventoryData.Row;
 
 }
 
@@ -60,13 +59,13 @@ bool UInventorySubsystem::AddItemToInventory(FName InventoryID, FInventoryData I
 	return false;
 }
 
-bool UInventorySubsystem::TryAddItemToInventory(FName InventoryID, UItemObject* ItemObject, int32 Amount)
+bool UInventorySubsystem::TryAddItemToInventory(FName InventoryName, UItemObject* ItemObject, int32 Amount)
 {
-	if (Inventories.Contains(InventoryID))
+	if (Inventories.Contains(InventoryName))
 	{
 		int _tempIndex = 0;
 
-		FInventoryData* _inventory = &Inventories[InventoryID];
+		FInventoryData* _inventory = &Inventories[InventoryName];
 		if (_inventory == nullptr)
 		{
 			UE_LOG(LogTemp, Warning, TEXT("Inventory is null"));
@@ -74,10 +73,10 @@ bool UInventorySubsystem::TryAddItemToInventory(FName InventoryID, UItemObject* 
 		}
 		for (FInventorySlot slot; _inventory;)
 		{
-			if (IsRoomAvailable(ItemObject, _tempIndex))
+			if (IsRoomAvailable(InventoryName, ItemObject, _tempIndex))
 			{
 				UE_LOG(LogTemp, Warning, TEXT("room available"));
-				AddItemAt(ItemObject, _tempIndex);
+				AddItemAt(InventoryName, ItemObject, _tempIndex);
 				return true;
 
 			}
@@ -94,7 +93,7 @@ bool UInventorySubsystem::TryAddItemToInventory(FName InventoryID, UItemObject* 
 	return false;
 }
 
-bool UInventorySubsystem::IsRoomAvailable(UItemObject* ItemObject, int32 TopLeftIndex)
+bool UInventorySubsystem::IsRoomAvailable(FName InventoryName, UItemObject* ItemObject, int32 TopLeftIndex)
 {
 
 	auto tile = IndexToTile(TopLeftIndex, ItemObject);
@@ -107,9 +106,9 @@ bool UInventorySubsystem::IsRoomAvailable(UItemObject* ItemObject, int32 TopLeft
 		for (int32 j = tile.Y; j < last2; j++)
 		{
 			//Ileride burda deðiþiklik yapýlacak HATALI IF BLOGU YAPTI
-			if (i >= 0 && j >= 0 && i < 0 && j < 0)
+			if (i >= 0 && j >= 0 && i < ItemObject->GetItemData().Dimensions.X && j < ItemObject->GetItemData().Dimensions.Y)
 			{
-				auto itemData = GetItemAtIndex(TileToIndex(FTile(i, j), ItemObject), ItemObject->GetInventoryData().InventoryKey);
+				auto itemData = GetItemAtIndex(TileToIndex(FTile(i, j), ItemObject), InventoryName);
 
 
 			}
@@ -123,7 +122,6 @@ bool UInventorySubsystem::IsRoomAvailable(UItemObject* ItemObject, int32 TopLeft
 
 
 
-
 	return true;
 }
 
@@ -132,8 +130,8 @@ bool UInventorySubsystem::IsRoomAvailable(UItemObject* ItemObject, int32 TopLeft
 FTile UInventorySubsystem::IndexToTile(int32 Index, UItemObject* ItemObject)
 {
 
-	float result = Index % ItemObject->GetInventoryData().Column;
-	float result2 = Index / ItemObject->GetInventoryData().Column;
+	float result = Index % ItemObject->GetDimensions().X;
+	float result2 = Index / ItemObject->GetDimensions().X;
 
 	return FTile(result, result2);
 
@@ -141,8 +139,77 @@ FTile UInventorySubsystem::IndexToTile(int32 Index, UItemObject* ItemObject)
 
 int32 UInventorySubsystem::TileToIndex(FTile Tile, UItemObject* ItemObject)
 {
-	return Tile.X + (Tile.Y * ItemObject->GetInventoryData().Column);
+	return Tile.X + (Tile.Y * ItemObject->GetDimensions().X);
 }
+
+FItemData UInventorySubsystem::GetItemAtIndex(int32 Index, FName InventoryKey)
+{
+	if (Inventories.Contains(InventoryKey))
+	{
+		FInventoryData* inventory = &Inventories[InventoryKey];
+		if (inventory == nullptr || inventory->InventorySlots.IsValidIndex(Index))
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Inventory is null"));
+			return FItemData();
+		}
+
+
+		//return inventory->InventorySlots[Index].ItemData; bu kodda ItemData için null kontrolü yapýlmalý
+		if (inventory->InventoryKey != "")
+		{
+			return inventory->InventorySlots[Index].ItemData;
+		}
+		else
+		{
+			return FItemData();
+		}
+
+
+
+	}
+	else
+	{
+		return FItemData();
+	}
+
+}
+
+void UInventorySubsystem::AddItemAt(FName InventoryName, UItemObject* ItemObject, int32 TopLeftIndex)
+{
+
+	auto tile = IndexToTile(TopLeftIndex, ItemObject);
+	auto dimension = ItemObject->GetDimensions();
+	int32 last = ((dimension.X - 1) + tile.X);
+
+	for (int32 i = tile.X; i < last; i++)
+	{
+		int32 last2 = ((dimension.Y - 1) + tile.Y);
+		for (int32 j = tile.Y; j < last2; j++)
+		{
+			//			TileToIndex(FTile(i, j), ItemObject);
+			/*if (Inventories.Contains(ItemObject->GetInventoryData().InventoryKey))
+			{*/
+
+			auto _inven = Inventories.Find(InventoryName);
+			_inven->InventorySlots.Add(FInventorySlot(ItemObject->GetItemData(), 1));
+
+
+			//}
+
+		}
+
+	}
+	IsDirty = true;
+
+
+}
+
+
+
+
+
+
+
 
 //FTile UInventorySubsystem::ForEachIndex(UItemObject* ItemObject, int32 TopLeftIndex)
 //{
@@ -170,61 +237,3 @@ int32 UInventorySubsystem::TileToIndex(FTile Tile, UItemObject* ItemObject)
 //
 //
 //}
-
-FItemData UInventorySubsystem::GetItemAtIndex(int32 Index, FName InventoryKey)
-{
-	if (Inventories.Contains(InventoryKey))
-	{
-		FInventoryData* inventory = &Inventories[InventoryKey];
-		if (inventory == nullptr)
-		{
-			UE_LOG(LogTemp, Warning, TEXT("Inventory is null"));
-			return FItemData();
-		}
-
-		return inventory->InventorySlots[Index].ItemData;
-
-	}
-	else
-	{
-		return FItemData();
-	}
-
-}
-
-void UInventorySubsystem::AddItemAt(UItemObject* ItemObject, int32 TopLeftIndex)
-{
-
-	auto tile = IndexToTile(TopLeftIndex, ItemObject);
-	auto dimension = ItemObject->GetDimensions();
-	int32 last = ((dimension.X - 1) + tile.X);
-
-	for (int32 i = tile.X; i < last; i++)
-	{
-		int32 last2 = ((dimension.Y - 1) + tile.Y);
-		for (int32 j = tile.Y; j < last2; j++)
-		{
-			//			TileToIndex(FTile(i, j), ItemObject);
-			if (Inventories.Contains(ItemObject->GetInventoryData().InventoryKey))
-			{
-				auto _inven = Inventories.Find(ItemObject->GetInventoryData().InventoryKey);
-
-				_inven->InventorySlots.Add(FInventorySlot(ItemObject->GetInventoryData().InventorySlots[0].ItemData, 1));
-
-
-			}
-
-		}
-
-	}
-	IsDirty = true;
-
-
-}
-
-
-
-
-
-
-

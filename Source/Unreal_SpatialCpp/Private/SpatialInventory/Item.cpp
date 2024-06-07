@@ -39,11 +39,11 @@ void AItem::BeginPlay()
 	Super::BeginPlay();
 
 
-	if (ItemObject == nullptr)
+	/*if (ItemObject == nullptr)
 	{
 		auto item = GetDefaultItemObject();
 		SetItemObject(item);
-	}
+	}*/
 
 	InventorySubsystem = GetWorld()->GetGameInstance()->GetSubsystem<UInventorySubsystem>();
 
@@ -55,8 +55,8 @@ void AItem::OnComponentBeginOverlap(UPrimitiveComponent* OverlappedComponent, AA
 	if (OtherActor->ActorHasTag("Player"))
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Item DATA BOÞ DONUYOR"));
-
-		if (InventorySubsystem->TryAddItemToInventory(ItemObject->GetInventoryData().InventoryKey, ItemObject, 1))
+		//BURASI ILERIDE DEÐÝÞECEK ÇÜNKÜ PLAYER INVENTORY NAME SABÝT OLARAK KALMAYACAK
+		if (InventorySubsystem->TryAddItemToInventory("PlayerInventory", ItemObject, 1))
 		{
 			UE_LOG(LogTemp, Warning, TEXT("Item added to inventory!"));
 			Destroy();
@@ -83,10 +83,10 @@ void AItem::SetItemObject(UItemObject* NewItemObject)
 	ItemObject = NewItemObject;
 }
 
-UItemObject* AItem::GetDefaultItemObject()
-{
-	return nullptr;
-}
+//UItemObject* AItem::GetDefaultItemObject()
+//{
+//	return nullptr;
+//}
 
 
 

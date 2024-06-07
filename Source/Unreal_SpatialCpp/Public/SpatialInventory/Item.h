@@ -40,7 +40,7 @@ protected:
 	USphereComponent* CollisionComponent;
 
 	//Add ItemObject reference
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Components")
 	UItemObject* ItemObject;
 
 	UPROPERTY()
@@ -61,8 +61,8 @@ public:
 	//get the ItemObject reference
 	UItemObject* GetItemObject() { return ItemObject; }
 
-	virtual UItemObject* GetDefaultItemObject();
+	//virtual UItemObject* GetDefaultItemObject();
 
-	UFUNCTION(BlueprintImplementableEvent, Category = "Item Class", meta = (DisplayName = "GetDefaultItemObject"), BlueprintCallable)
+	UFUNCTION(BlueprintImplementableEvent, Category = "Item Class", meta = (DisplayName = "GetDefaultItemObject"),BlueprintCallable)
 	UItemObject* GetDefaultItemObject_Implementation();
 };

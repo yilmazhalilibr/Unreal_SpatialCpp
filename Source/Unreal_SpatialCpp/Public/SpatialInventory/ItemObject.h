@@ -17,32 +17,19 @@ class UNREAL_SPATIALCPP_API UItemObject : public UObject
 
 protected:
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item Data")
-	FInventoryData InventoryData;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ExposeOnSpawn = "true"), Category = "Item Data")
-	FIntPoint Dimensions;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ExposeOnSpawn = "true"), Category = "Item Data")
-	UMaterialInterface* Icon;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ExposeOnSpawn = "true"), Category = "Item Data")
-	UMaterialInterface* IconRotated;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ExposeOnSpawn = "true"), Category = "Item Data")
-	TSubclassOf<AItem> ItemClass;
-	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ExposeOnSpawn = "true"), Category = "Item Data")
-	bool Rotated;
+	FItemData ItemData;
 
 public:
 	//Constructor
 	UItemObject();
 
 	UFUNCTION(BlueprintCallable, Category = "Item Data")
-	FInventoryData GetInventoryData() { return InventoryData; }
+	FIntPoint GetDimensions() { return ItemData.Dimensions; }
 
 	UFUNCTION(BlueprintCallable, Category = "Item Data")
-	FIntPoint GetDimensions() { return Dimensions; }
+	FItemData GetItemData() { return ItemData; }
+
 
 };
