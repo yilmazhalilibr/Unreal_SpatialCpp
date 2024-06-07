@@ -31,5 +31,7 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Item Data")
 	FItemData GetItemData() { return ItemData; }
 
+	UFUNCTION(BlueprintCallable, Category = "Item Data")
+	void SetItemData(FItemData NewItemData) { ItemData = NewItemData; }
 
 };

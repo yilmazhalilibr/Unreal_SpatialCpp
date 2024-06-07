@@ -4,9 +4,9 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
-
 #include "InventoryUW.generated.h"
 
+class UInventorySubsystem;
 
 UCLASS()
 class UNREAL_SPATIALCPP_API UInventoryUW : public UUserWidget
@@ -74,7 +74,7 @@ public:
 
 
 	UFUNCTION(BlueprintCallable, Category = "Widget Initialize")
-	TArray<UItemObject*> GetAllItems();
+	TMap<UItemObject*, FTile> GetAllItems(FName InventoryName);
 
 private:
 	UPROPERTY(meta = (BindWidget))
@@ -87,8 +87,10 @@ private:
 	TArray<FVector2D> LineSegments;
 
 	UFUNCTION()
-	void Refresh();
+	void Refresh(FName InventoryName);
 
+	UPROPERTY()
+	UInventorySubsystem* InventorySubsystem;
 
 
 };

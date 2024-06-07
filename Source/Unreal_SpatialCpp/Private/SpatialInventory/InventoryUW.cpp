@@ -10,11 +10,15 @@
 #include "SlateBasics.h"
 #include "SlateExtras.h"
 #include "SpatialInventory/ItemObject.h"
-
+#include "SpatialInventory/InventorySubsystem.h"
+#include "Subsystems/GameInstanceSubsystem.h"
 
 void UInventoryUW::NativeConstruct()
 {
 	Super::NativeConstruct();
+
+	// Alt sistem sýnýfýný almak
+	InventorySubsystem = GetWorld()->GetGameInstance()->GetSubsystem<UInventorySubsystem>();
 
 
 	if (GridBorder && GridCanvasPanel)
@@ -94,16 +98,67 @@ int32 UInventoryUW::NativePaint(const FPaintArgs& Args, const FGeometry& Allotte
 
 
 
-TArray<UItemObject*> UInventoryUW::GetAllItems()
+TMap<UItemObject*, FTile> UInventoryUW::GetAllItems(FName InventoryName)
 {
-	//ItemObject
-	//TArray<UItemObject>
+	TMap<UItemObject*, FTile> _items;
+
+	if (InventorySubsystem)
+	{
+		auto inventory = InventorySubsystem->GetInventories().Find(InventoryName);
+		if (inventory)
+		{
+			int localIndex = 0;
+			for (auto items : inventory->InventorySlots)
+			{
+				FItemData _currentItemData = items.ItemData;
+				UItemObject* _itemObject = NewObject<UItemObject>();
+				_itemObject->SetItemData(_currentItemData);
+
+				if (!_items.Contains(_itemObject))
+				{
+					auto tile = InventorySubsystem->IndexToTile(localIndex, _itemObject);
+
+					_items.Add(_itemObject, tile);
 
 
-	return TArray<UItemObject*>();
+				}
+
+				localIndex++;
+			}
+
+			return _items;
+		}
+
+
+	}
+
+
+	return TMap<UItemObject*, FTile>();
 }
 
-void UInventoryUW::Refresh()
+void UInventoryUW::Refresh(FName InventoryName)
 {
 	GridCanvasPanel->ClearChildren();
+
+	auto _allitems = GetAllItems(InventoryName);
+
+	//For ile itemlerin key'ini dön ve itemleri yerleþtir
+	for (auto& item : _allitems)
+	{
+		auto& _itemKey = item.Key;
+		FTile _topleftTile = item.Value;
+
+		if (_allitems.Find(_itemKey))
+		{
+			//Create a new widget
+
+
+
+
+		}
+
+	}
+
+
 }
+

@@ -9,7 +9,7 @@ void UInventorySubsystem::Initialize(FSubsystemCollectionBase& Collection)
 {
 	Super::Initialize(Collection);
 
-
+	//Envanterler ileride buradan otomatik eklenecek
 	//Inventories.Add("PlayerInventory", FInventoryData());
 
 
