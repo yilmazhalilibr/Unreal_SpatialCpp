@@ -69,7 +69,7 @@ struct FItemData
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TArray<FStat> StatsArray;
-	
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool Rotated;
 
@@ -106,14 +106,14 @@ struct FInventoryData
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FName InventoryKey;
 
-	//UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	//int32 Row;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int32 InventoryRow;
 
-	//UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	//int32 Column;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int32 InventoryColumn;
 
-	//UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	//int32 GridSize;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int32 InventoryGridSize;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TArray<FInventorySlot> InventorySlots;

@@ -10,7 +10,7 @@ void UInventorySubsystem::Initialize(FSubsystemCollectionBase& Collection)
 	Super::Initialize(Collection);
 
 
-	Inventories.Add("PlayerInventory", FInventoryData());
+	//Inventories.Add("PlayerInventory", FInventoryData());
 
 
 }
@@ -155,7 +155,7 @@ FItemData UInventorySubsystem::GetItemAtIndex(int32 Index, FName InventoryKey)
 
 
 		//return inventory->InventorySlots[Index].ItemData; bu kodda ItemData için null kontrolü yapýlmalý
-		if (inventory->InventoryKey != "")
+		if (inventory->InventorySlots[0].Amount != 0)
 		{
 			return inventory->InventorySlots[Index].ItemData;
 		}

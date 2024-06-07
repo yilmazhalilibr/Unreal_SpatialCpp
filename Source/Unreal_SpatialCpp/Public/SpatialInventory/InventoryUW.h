@@ -15,19 +15,19 @@ class UNREAL_SPATIALCPP_API UInventoryUW : public UUserWidget
 	GENERATED_BODY()
 
 public:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Inventory")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ExposeOnSpawn = "true"), Category = "Widget Initialize")
 	int32 Column;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Inventory")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ExposeOnSpawn = "true"), Category = "Widget Initialize")
 	int32 Row;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Inventory")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ExposeOnSpawn = "true"), Category = "Widget Initialize")
 	float TileSize;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Inventory")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ExposeOnSpawn = "true"), Category = "Widget Initialize")
 	FLinearColor LineColor;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Inventory")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ExposeOnSpawn = "true"), Category = "Widget Initialize")
 	float LineTickness;
 
 	UFUNCTION(BlueprintCallable, Category = "Inventory")
@@ -63,6 +63,15 @@ public:
 	FORCEINLINE void SetLineTickness(float InLineTickness) { LineTickness = InLineTickness; }
 	FORCEINLINE float GetLineTickness() const { return LineTickness; }
 
+	UFUNCTION(BlueprintCallable, Category = "Widget Initialize")
+	FORCEINLINE void Initialize(int32 InColumn, int32 InRow, float InTileSize, FLinearColor InLineColor, float InLineTickness)
+	{
+		Column = InColumn;
+		Row = InRow;
+		TileSize = InTileSize;
+		LineColor = InLineColor;
+		LineTickness = InLineTickness;
+	}
 
 private:
 	UPROPERTY(meta = (BindWidget))
@@ -71,6 +80,8 @@ private:
 	UPROPERTY(meta = (BindWidget))
 	class UCanvasPanel* GridCanvasPanel;
 
+	UPROPERTY()
 	TArray<FVector2D> LineSegments;
+
 
 };
