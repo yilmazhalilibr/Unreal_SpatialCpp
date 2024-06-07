@@ -9,11 +9,13 @@
 #include "Engine/World.h"
 #include "SlateBasics.h"
 #include "SlateExtras.h"
+#include "SpatialInventory/ItemObject.h"
 
 
 void UInventoryUW::NativeConstruct()
 {
 	Super::NativeConstruct();
+
 
 	if (GridBorder && GridCanvasPanel)
 	{
@@ -86,4 +88,22 @@ int32 UInventoryUW::NativePaint(const FPaintArgs& Args, const FGeometry& Allotte
 	}
 
 	return Super::NativePaint(Args, AllottedGeometry, MyCullingRect, OutDrawElements, CurrentLayer, InWidgetStyle, bParentEnabled);
+}
+
+
+
+
+
+TArray<UItemObject*> UInventoryUW::GetAllItems()
+{
+	//ItemObject
+	//TArray<UItemObject>
+
+
+	return TArray<UItemObject*>();
+}
+
+void UInventoryUW::Refresh()
+{
+	GridCanvasPanel->ClearChildren();
 }

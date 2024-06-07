@@ -4,11 +4,10 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
+
 #include "InventoryUW.generated.h"
 
-/**
- *
- */
+
 UCLASS()
 class UNREAL_SPATIALCPP_API UInventoryUW : public UUserWidget
 {
@@ -64,7 +63,7 @@ public:
 	FORCEINLINE float GetLineTickness() const { return LineTickness; }
 
 	UFUNCTION(BlueprintCallable, Category = "Widget Initialize")
-	FORCEINLINE void Initialize(int32 InColumn, int32 InRow, float InTileSize, FLinearColor InLineColor, float InLineTickness)
+	FORCEINLINE void InitializeWD(int32 InColumn, int32 InRow, float InTileSize, FLinearColor InLineColor, float InLineTickness)
 	{
 		Column = InColumn;
 		Row = InRow;
@@ -72,6 +71,10 @@ public:
 		LineColor = InLineColor;
 		LineTickness = InLineTickness;
 	}
+
+
+	UFUNCTION(BlueprintCallable, Category = "Widget Initialize")
+	TArray<UItemObject*> GetAllItems();
 
 private:
 	UPROPERTY(meta = (BindWidget))
@@ -82,6 +85,10 @@ private:
 
 	UPROPERTY()
 	TArray<FVector2D> LineSegments;
+
+	UFUNCTION()
+	void Refresh();
+
 
 
 };

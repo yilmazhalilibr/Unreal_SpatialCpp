@@ -155,7 +155,7 @@ FItemData UInventorySubsystem::GetItemAtIndex(int32 Index, FName InventoryKey)
 
 
 		//return inventory->InventorySlots[Index].ItemData; bu kodda ItemData için null kontrolü yapýlmalý
-		if (inventory->InventorySlots[0].Amount != 0)
+		if (!inventory->InventorySlots.IsEmpty())
 		{
 			return inventory->InventorySlots[Index].ItemData;
 		}
