@@ -6,6 +6,9 @@
 #include "Blueprint/UserWidget.h"
 #include "InventoryUW.generated.h"
 
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnRemoved, UItemObject*, Item);
+
 class UInventorySubsystem;
 
 UCLASS()
@@ -29,8 +32,17 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ExposeOnSpawn = "true"), Category = "Widget Initialize")
 	float LineTickness;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ExposeOnSpawn = "true"), Category = "Widget Initialize")
+	FName InventoryName;
+
 	UFUNCTION(BlueprintCallable, Category = "Inventory")
 	void CreateLineSegments();
+
+	UPROPERTY(BlueprintAssignable, Category = "Events")
+	FOnRemoved OnRemoved;
+
+	UFUNCTION(BlueprintCallable, Category = "Inventory")
+	void EventOnRemoved(UItemObject* Item);
 
 protected:
 	virtual void NativeConstruct() override;

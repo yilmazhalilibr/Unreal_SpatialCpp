@@ -52,6 +52,19 @@ bool UInventorySubsystem::RemoveInventory(FName InventoryID)
 	return false;
 }
 
+bool UInventorySubsystem::RemoveItemFromInventory(FName InventoryID, UItemObject* ItemObj)
+{
+	if (auto _inven = Inventories.Find(InventoryID))
+	{
+		//Hangi slot oldugunu bilmiyoruz
+		return true;
+	}
+
+
+
+	return false;
+}
+
 bool UInventorySubsystem::AddItemToInventory(FName InventoryID, FInventoryData InventoryData, int32 Amount)
 {
 
