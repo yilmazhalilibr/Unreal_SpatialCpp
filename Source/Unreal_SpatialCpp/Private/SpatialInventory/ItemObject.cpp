@@ -7,12 +7,3 @@ UItemObject::UItemObject()
 {
 
 }
-
-UMaterialInterface* UItemObject::GetIconImage()
-{
-	if (ItemData.Rotated)
-	{
-		return ItemData.IconRotated;
-	}
-	return ItemData.Icon;
-}

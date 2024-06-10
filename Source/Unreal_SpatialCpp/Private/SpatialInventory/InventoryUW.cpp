@@ -12,8 +12,6 @@
 #include "SpatialInventory/ItemObject.h"
 #include "SpatialInventory/InventorySubsystem.h"
 #include "Subsystems/GameInstanceSubsystem.h"
-#include <SpatialInventory/ItemUW.h>
-
 
 void UInventoryUW::NativeConstruct()
 {
@@ -153,9 +151,6 @@ void UInventoryUW::Refresh(FName InventoryName)
 		if (_allitems.Find(_itemKey))
 		{
 			//Create a new widget
-			UItemUW* _itemWidget = CreateWidget<UItemUW>(GetWorld());
-			_itemWidget->TileSize = TileSize;
-			_itemWidget->ItemObject = _itemKey;
 
 
 
@@ -167,11 +162,3 @@ void UInventoryUW::Refresh(FName InventoryName)
 
 }
 
-void UInventoryUW::EventOnRemoved(UItemObject* Item)
-{
-	if (Item)
-	{
-		OnRemoved.Broadcast(Item);
-		InventorySubsystem->RemoveItemFromInventory(InventoryName, Item);
-	}
-}

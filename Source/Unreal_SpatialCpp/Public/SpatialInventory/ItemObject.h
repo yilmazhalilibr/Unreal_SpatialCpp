@@ -34,7 +34,4 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Item Data")
 	void SetItemData(FItemData NewItemData) { ItemData = NewItemData; }
 
-	UFUNCTION(BlueprintCallable, Category = "Item Data")
-	UMaterialInterface* GetIconImage();
-
 };

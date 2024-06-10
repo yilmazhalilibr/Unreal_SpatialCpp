@@ -150,9 +150,6 @@ public:
 	bool RemoveInventory(FName InventoryID);
 
 	UFUNCTION(BlueprintCallable, Category = "Inventory")
-	bool RemoveItemFromInventory(FName InventoryID, UItemObject* ItemObj);
-
-	UFUNCTION(BlueprintCallable, Category = "Inventory")
 	bool AddItemToInventory(FName InventoryID, FInventoryData InventoryData, int32 Amount);
 
 	UFUNCTION(BlueprintCallable, Category = "Inventory")
