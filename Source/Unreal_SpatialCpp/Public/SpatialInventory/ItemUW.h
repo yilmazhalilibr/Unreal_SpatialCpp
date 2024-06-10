@@ -8,9 +8,11 @@
 
 #include "ItemUW.generated.h"
 
-/**
- *
- */
+class UCanvasPanel;
+class USizeBox;
+class UBorder;
+class UImage;
+
 UCLASS()
 class UNREAL_SPATIALCPP_API UItemUW : public UUserWidget
 {
@@ -22,16 +24,16 @@ protected:
 
 public:
 	UPROPERTY(EditAnywhere, meta = (BindWidget))
-	class UCanvasPanel* CanvasPanel;
+	UCanvasPanel* CanvasPanel;
 
 	UPROPERTY(EditAnywhere, meta = (BindWidget))
-	class USizeBox* BackgroundSizeBox;
+	USizeBox* BackgroundSizeBox;
 
 	UPROPERTY(EditAnywhere, meta = (BindWidget))
-	class UBorder* BackgroundBorder;
+	UBorder* BackgroundBorder;
 
 	UPROPERTY(EditAnywhere, meta = (BindWidget))
-	class UImage* ItemImage;
+	UImage* ItemImage;
 
 
 
@@ -41,5 +43,9 @@ public:
 	UItemObject* ItemObject;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ExposeOnSpawn = "true"), Category = "Widget Initialize")
 	FVector2D Size;
+
+
+	UFUNCTION()
+	UMaterialInterface* GetIconImage();
 
 };
