@@ -4,7 +4,13 @@
 
 #include "CoreMinimal.h"
 #include "Subsystems/GameInstanceSubsystem.h"
+#include "Tickable.h"
+//add timer handle
+#include "TimerManager.h"
 #include "InventorySubsystem.generated.h"
+
+//On event dispatcher for inventory
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnInventoryChanged);
 
 class ItemObject;
 class AItem;
@@ -127,6 +133,16 @@ class UNREAL_SPATIALCPP_API UInventorySubsystem : public UGameInstanceSubsystem
 {
 	GENERATED_BODY()
 
+
+public:
+	// Tick fonksiyonunu tanýmlayýn
+	void CustomTick();
+	// Tick fonksiyonunu düzenli olarak çaðýrmak için bir zamanlayýcý
+	FTimerHandle CustomTimerHandle;
+	// Tick zaman aralýðý
+	float CustomTickInterval = 0.1f;  // Her 0.1 saniyede bir tick
+
+
 protected:
 	virtual void Initialize(FSubsystemCollectionBase& Collection) override;
 	virtual void Deinitialize() override;
@@ -139,6 +155,9 @@ protected:
 
 public:
 
+	UPROPERTY(BlueprintAssignable, Category = "Inventory")
+	FOnInventoryChanged OnInventoryChanged;
+
 	//Get Inventory Data
 	UFUNCTION(BlueprintCallable, Category = "Inventory")
 	TMap<FName, FInventoryData> GetInventories();
@@ -148,6 +167,9 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Inventory")
 	bool RemoveInventory(FName InventoryID);
+
+	UFUNCTION(BlueprintCallable, Category = "Inventory")
+	bool RemoveItemFromInventory(FName InventoryID, UItemObject* ItemObj);
 
 	UFUNCTION(BlueprintCallable, Category = "Inventory")
 	bool AddItemToInventory(FName InventoryID, FInventoryData InventoryData, int32 Amount);

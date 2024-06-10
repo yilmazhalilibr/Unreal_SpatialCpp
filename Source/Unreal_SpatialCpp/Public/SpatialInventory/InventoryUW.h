@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "ItemUW.h"  
 #include "Blueprint/UserWidget.h"
 #include "InventoryUW.generated.h"
 
@@ -32,11 +33,16 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Inventory")
 	void CreateLineSegments();
 
+	UFUNCTION()
+	void EventOnItemRemoved(UItemObject* Item);
+
+
 protected:
 	virtual void NativeConstruct() override;
 	virtual int32 NativePaint(const FPaintArgs& Args, const FGeometry& AllottedGeometry, const FSlateRect& MyCullingRect, FSlateWindowElementList& OutDrawElements, int32 LayerId, const FWidgetStyle& InWidgetStyle, bool bParentEnabled) const override;
 
-
+	UFUNCTION()
+	void OnRefresh();
 	//Getters and Setters
 public:
 

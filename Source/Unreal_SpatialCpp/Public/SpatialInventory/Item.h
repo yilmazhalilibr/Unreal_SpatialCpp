@@ -59,10 +59,10 @@ public:
 	//Function to set the ItemObject reference
 	void SetItemObject(UItemObject* NewItemObject);
 	//get the ItemObject reference
-	UItemObject* GetItemObject() { return ItemObject; }
+	UItemObject*& GetItemObject();
 
 	//virtual UItemObject* GetDefaultItemObject();
 
-	UFUNCTION(BlueprintImplementableEvent, Category = "Item Class", meta = (DisplayName = "GetDefaultItemObject"),BlueprintCallable)
-	UItemObject* GetDefaultItemObject_Implementation();
+	UFUNCTION(BlueprintImplementableEvent, Category = "Item Class", meta = (DisplayName = "GetDefaultItemObject"), BlueprintCallable)
+	bool GetDefaultItemObject_Implementation(UItemObject*& item);
 };

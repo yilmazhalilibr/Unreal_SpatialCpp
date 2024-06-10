@@ -8,9 +8,15 @@
 
 #include "ItemUW.generated.h"
 
-/**
- *
- */
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnRemoved, UItemObject*, Item);
+
+class UCanvasPanel;
+class USizeBox;
+class UBorder;
+class UImage;
+
+
 UCLASS()
 class UNREAL_SPATIALCPP_API UItemUW : public UUserWidget
 {
@@ -22,18 +28,22 @@ protected:
 
 public:
 	UPROPERTY(EditAnywhere, meta = (BindWidget))
-	class UCanvasPanel* CanvasPanel;
+	UCanvasPanel* CanvasPanel;
 
 	UPROPERTY(EditAnywhere, meta = (BindWidget))
-	class USizeBox* BackgroundSizeBox;
+	USizeBox* BackgroundSizeBox;
 
 	UPROPERTY(EditAnywhere, meta = (BindWidget))
-	class UBorder* BackgroundBorder;
+	UBorder* BackgroundBorder;
 
 	UPROPERTY(EditAnywhere, meta = (BindWidget))
-	class UImage* ItemImage;
+	UImage* ItemImage;
 
+	UPROPERTY(BlueprintAssignable, Category = "Item")
+	FOnRemoved OnRemoved;
 
+	UFUNCTION(BlueprintCallable, Category = "Item")
+	void OnItemRemoved();
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ExposeOnSpawn = "true"), Category = "Widget Initialize")
 	float TileSize;
@@ -42,4 +52,6 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ExposeOnSpawn = "true"), Category = "Widget Initialize")
 	FVector2D Size;
 
+	UFUNCTION()
+	UMaterialInterface* GetIconImage();
 };

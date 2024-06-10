@@ -94,6 +94,14 @@ void AItem::SetItemObject(UItemObject* NewItemObject)
 	ItemObject = NewItemObject;
 }
 
+UItemObject*& AItem::GetItemObject()
+{
+	return ItemObject;
+
+}
+
+
+
 //UItemObject* AItem::GetDefaultItemObject()
 //{
 //	return nullptr;

@@ -12,6 +12,7 @@
 #include "SpatialInventory/ItemObject.h"
 #include "SpatialInventory/InventorySubsystem.h"
 #include "Subsystems/GameInstanceSubsystem.h"
+#include <SpatialInventory/ItemUW.h>
 
 void UInventoryUW::NativeConstruct()
 {
@@ -30,6 +31,10 @@ void UInventoryUW::NativeConstruct()
 		}
 		CreateLineSegments();
 	}
+
+	Refresh("PlayerInventory");
+	InventorySubsystem->OnInventoryChanged.AddDynamic(this, &UInventoryUW::OnRefresh);
+
 }
 
 
@@ -67,6 +72,16 @@ void UInventoryUW::CreateLineSegments()
 	Invalidate(EInvalidateWidgetReason::Paint);
 }
 
+void UInventoryUW::EventOnItemRemoved(UItemObject* Item)
+{
+	if (Item)
+	{
+		//UE_LOG(LogTemp, Warning, TEXT("Item removed: %s"), *Item->GetName());
+		//ILERIDE BU DEGISECEK DINAMIK OLARAK NERDEYSE O OLACAK
+		InventorySubsystem->RemoveItemFromInventory("PlayerInventory", Item);
+	}
+}
+
 
 int32 UInventoryUW::NativePaint(const FPaintArgs& Args, const FGeometry& AllottedGeometry, const FSlateRect& MyCullingRect, FSlateWindowElementList& OutDrawElements, int32 LayerId, const FWidgetStyle& InWidgetStyle, bool bParentEnabled) const
 {
@@ -92,6 +107,12 @@ int32 UInventoryUW::NativePaint(const FPaintArgs& Args, const FGeometry& Allotte
 	}
 
 	return Super::NativePaint(Args, AllottedGeometry, MyCullingRect, OutDrawElements, CurrentLayer, InWidgetStyle, bParentEnabled);
+}
+
+void UInventoryUW::OnRefresh()
+{
+	Refresh("PlayerInventory");
+
 }
 
 
@@ -151,9 +172,13 @@ void UInventoryUW::Refresh(FName InventoryName)
 		if (_allitems.Find(_itemKey))
 		{
 			//Create a new widget
-
-
-
+			UItemUW* _itemWidget = CreateWidget<UItemUW>(GetWorld(), UItemUW::StaticClass());
+			_itemWidget->TileSize = TileSize;
+			_itemWidget->ItemObject = _itemKey;
+			_itemWidget->OnRemoved.AddDynamic(this, &UInventoryUW::EventOnItemRemoved);
+			UCanvasPanelSlot* CanvasSlot = Cast<UCanvasPanelSlot>(GridCanvasPanel->AddChild(_itemWidget));
+			CanvasSlot->SetAutoSize(true);
+			CanvasSlot->SetPosition(FVector2D(_topleftTile.X * TileSize, _topleftTile.Y * TileSize));
 
 		}
 

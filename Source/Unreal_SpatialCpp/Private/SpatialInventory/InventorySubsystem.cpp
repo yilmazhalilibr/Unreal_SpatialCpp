@@ -13,12 +13,34 @@ void UInventorySubsystem::Initialize(FSubsystemCollectionBase& Collection)
 	//Inventories.Add("PlayerInventory", FInventoryData());
 
 
+	UWorld* World = GetWorld();
+	if (World)
+	{
+		World->GetTimerManager().SetTimer(CustomTimerHandle, this, &UInventorySubsystem::CustomTick, CustomTickInterval, true, 2.0f);
+	}
+
+
 }
 
 void UInventorySubsystem::Deinitialize()
 {
 	Super::Deinitialize();
+
 }
+
+void UInventorySubsystem::CustomTick()
+{
+	// Tick iþlemlerinizi burada gerçekleþtirin
+
+	if (IsDirty)
+	{
+		IsDirty = false;
+		OnInventoryChanged.Broadcast();
+
+	}
+
+}
+
 
 TMap<FName, FInventoryData> UInventorySubsystem::GetInventories()
 {
@@ -49,6 +71,26 @@ bool UInventorySubsystem::RemoveInventory(FName InventoryID)
 		Inventories.Remove(InventoryID);
 		return true;
 	}
+	return false;
+}
+
+bool UInventorySubsystem::RemoveItemFromInventory(FName InventoryID, UItemObject* ItemObj)
+{
+	if (auto _inv = Inventories.Find(InventoryID))
+	{
+		for (int i = 0; i < _inv->InventorySlots.Num(); i++)
+		{
+			if (_inv->InventorySlots[i].ItemData.Dimensions == ItemObj->GetItemData().Dimensions)
+			{
+				_inv->InventorySlots.RemoveAt(i);
+				return true;
+			}
+		}
+
+		return true;
+	}
+
+
 	return false;
 }
 
