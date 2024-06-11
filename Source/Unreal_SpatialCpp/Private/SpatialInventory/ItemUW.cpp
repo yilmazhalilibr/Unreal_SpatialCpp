@@ -12,6 +12,22 @@ void UItemUW::NativeOnInitialized()
 {
 	Super::NativeOnInitialized();
 
+
+
+
+}
+
+void UItemUW::SetParameters(UItemObject* _item, float _tileSize, FVector2D _size)
+{
+	ItemObject = _item;
+	TileSize = _tileSize;
+	Size = _size;
+	if (_item->GetIconImage())
+	{
+		ItemImage->SetBrushFromMaterial(_item->GetIconImage());
+	}
+
+
 	float DimeX = ItemObject->GetDimensions().X * TileSize;
 	float DimeY = ItemObject->GetDimensions().Y * TileSize;
 
@@ -22,16 +38,22 @@ void UItemUW::NativeOnInitialized()
 		BackgroundSizeBox->SetWidthOverride(DimeX);
 		BackgroundSizeBox->SetHeightOverride(DimeY);
 	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("BackgroundSizeBox is not valid"));
+	}
 	if (ItemImage)
 	{
 
 		UCanvasPanelSlot* ItemCanvasSlot = Cast<UCanvasPanelSlot>(ItemImage->Slot);
 		ItemCanvasSlot->SetSize(FVector2D(DimeX, DimeY));
+		ItemImage->BrushDelegate.BindUFunction(this, FName("GetIconImage"));
 
 	}
-
-	ItemImage->BrushDelegate.BindUFunction(this, FName("GetIconImage"));
-
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("ItemImage is not valid"));
+	}
 
 
 }
@@ -62,3 +84,5 @@ UMaterialInterface* UItemUW::GetIconImage()
 
 	return nullptr;
 }
+
+

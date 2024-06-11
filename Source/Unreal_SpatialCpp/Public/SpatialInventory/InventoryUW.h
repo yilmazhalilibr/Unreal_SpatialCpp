@@ -15,6 +15,10 @@ class UNREAL_SPATIALCPP_API UInventoryUW : public UUserWidget
 	GENERATED_BODY()
 
 public:
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ExposeOnSpawn = "true"), Category = "Widget Initialize")
+	FName InventoryNameID;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ExposeOnSpawn = "true"), Category = "Widget Initialize")
 	int32 Column;
 

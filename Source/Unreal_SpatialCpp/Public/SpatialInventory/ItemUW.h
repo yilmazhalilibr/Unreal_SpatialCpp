@@ -54,4 +54,7 @@ public:
 
 	UFUNCTION()
 	UMaterialInterface* GetIconImage();
+
+	UFUNCTION()
+	void SetParameters(UItemObject* _item, float _tileSize, FVector2D _size);
 };

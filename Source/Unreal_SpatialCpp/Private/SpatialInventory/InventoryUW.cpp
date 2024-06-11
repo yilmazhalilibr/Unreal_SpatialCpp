@@ -131,16 +131,20 @@ TMap<UItemObject*, FTile> UInventoryUW::GetAllItems(FName InventoryName)
 			int localIndex = 0;
 			for (auto items : inventory->InventorySlots)
 			{
-				FItemData _currentItemData = items.ItemData;
-				UItemObject* _itemObject = NewObject<UItemObject>();
-				_itemObject->SetItemData(_currentItemData);
-
-				if (!_items.Contains(_itemObject))
+				if (items.Amount == 0)
 				{
-					auto tile = InventorySubsystem->IndexToTile(localIndex, _itemObject);
+					FItemData _currentItemData = items.ItemData;
+					UItemObject* _itemObject = NewObject<UItemObject>();
+					_itemObject->SetItemData(_currentItemData);
 
-					_items.Add(_itemObject, tile);
+					if (!_items.Contains(_itemObject))
+					{
+						auto tile = InventorySubsystem->IndexToTile(localIndex, _itemObject);
 
+						_items.Add(_itemObject, tile);
+
+
+					}
 
 				}
 
@@ -173,9 +177,9 @@ void UInventoryUW::Refresh(FName InventoryName)
 		{
 			//Create a new widget
 			UItemUW* _itemWidget = CreateWidget<UItemUW>(GetWorld(), UItemUW::StaticClass());
-			_itemWidget->TileSize = TileSize;
-			_itemWidget->ItemObject = _itemKey;
+			_itemWidget->SetParameters(_itemKey, TileSize, _itemKey->GetDimensions());
 			_itemWidget->OnRemoved.AddDynamic(this, &UInventoryUW::EventOnItemRemoved);
+
 			UCanvasPanelSlot* CanvasSlot = Cast<UCanvasPanelSlot>(GridCanvasPanel->AddChild(_itemWidget));
 			CanvasSlot->SetAutoSize(true);
 			CanvasSlot->SetPosition(FVector2D(_topleftTile.X * TileSize, _topleftTile.Y * TileSize));

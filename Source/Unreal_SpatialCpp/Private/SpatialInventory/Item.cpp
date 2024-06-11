@@ -54,21 +54,28 @@ void AItem::OnComponentBeginOverlap(UPrimitiveComponent* OverlappedComponent, AA
 	//Check if the OtherActor is a player
 	if (OtherActor->ActorHasTag("Player"))
 	{
-		if (ItemObject->GetItemData().Dimensions.X <= InventorySubsystem->GetInventories().Find("PlayerInventory")->InventoryColumn)
+		if (ItemObject)
 		{
-			//BURASI ILERIDE DEÐÝÞECEK ÇÜNKÜ PLAYER INVENTORY NAME SABÝT OLARAK KALMAYACAK
-			if (InventorySubsystem->TryAddItemToInventory("PlayerInventory", ItemObject, 1))
+			float DimeX = ItemObject->GetItemData().Dimensions.X;
+			UE_LOG(LogTemp, Warning, TEXT("DIMENSON: %f"), DimeX);
+			int InColumn = InventorySubsystem->GetInventories().Find("PlayerInventory")->InventoryColumn;
+
+			if (InColumn >= DimeX)
 			{
-				UE_LOG(LogTemp, Warning, TEXT("Item added to inventory!"));
+				//BURASI ILERIDE DEÐÝÞECEK ÇÜNKÜ PLAYER INVENTORY NAME SABÝT OLARAK KALMAYACAK
+				if (InventorySubsystem->TryAddItemToInventory("PlayerInventory", ItemObject, 1))
+				{
+					UE_LOG(LogTemp, Warning, TEXT("Item added to inventory!"));
+					Destroy();
+					return;
+				}
+				else
+				{
+					UE_LOG(LogTemp, Warning, TEXT("Inventory is full!"));
+				}
+				//Destroy the item
 				Destroy();
-				return;
 			}
-			else
-			{
-				UE_LOG(LogTemp, Warning, TEXT("Inventory is full!"));
-			}
-			//Destroy the item
-			Destroy();
 		}
 		else
 		{
