@@ -13,7 +13,14 @@ void UItemUW::NativeOnInitialized()
 	Super::NativeOnInitialized();
 
 
-
+	if (BackgroundBorder)
+	{
+		BackgroundBorder->SetBrushColor(FLinearColor::Red);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("BackgroundBorder is not valid"));
+	}
 
 }
 

@@ -61,7 +61,6 @@ void AItem::OnComponentBeginOverlap(UPrimitiveComponent* OverlappedComponent, AA
 				//BURASI ILERIDE DEÐÝÞECEK ÇÜNKÜ PLAYER INVENTORY NAME SABÝT OLARAK KALMAYACAK
 				if (InventorySubsystem->TryAddItemToInventory("PlayerInventory", ItemObject, 1))
 				{
-					UE_LOG(LogTemp, Warning, TEXT("Item added to inventory!"));
 					Destroy();
 					return;
 				}

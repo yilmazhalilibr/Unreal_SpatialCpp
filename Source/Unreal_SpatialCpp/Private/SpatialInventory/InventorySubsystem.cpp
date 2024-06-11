@@ -19,6 +19,15 @@ void UInventorySubsystem::Initialize(FSubsystemCollectionBase& Collection)
 		World->GetTimerManager().SetTimer(CustomTimerHandle, this, &UInventorySubsystem::CustomTick, CustomTickInterval, true, 2.0f);
 	}
 
+	//3 saniye sonra Inventories daki tüm envanterleri print ile yazdýrýr
+	FTimerHandle TimerHandle;
+	World->GetTimerManager().SetTimer(TimerHandle, [this]()
+		{
+			for (auto& Inventory : Inventories)
+			{
+				UE_LOG(LogTemp, Warning, TEXT("Inventories: %s"), *Inventory.Key.ToString());
+			}
+		}, 3.0f, false);
 
 }
 
@@ -78,10 +87,14 @@ bool UInventorySubsystem::RemoveItemFromInventory(FName InventoryID, UItemObject
 {
 	if (auto _inv = Inventories.Find(InventoryID))
 	{
-		if (_inv->InventorySlots[i].ItemData.Dimensions == ItemObj->GetItemData().Dimensions)
+		for (int i = 0; i < _inv->InventorySlots.Num(); i++)
 		{
-			_inv->InventorySlots.RemoveAt(i);
-			return true;
+
+			if (_inv->InventorySlots[i].ItemData.Dimensions == ItemObj->GetItemData().Dimensions)
+			{
+				_inv->InventorySlots.RemoveAt(i);
+				return true;
+			}
 		}
 
 	}
@@ -101,7 +114,6 @@ bool UInventorySubsystem::TryAddItemToInventory(FName InventoryName, UItemObject
 {
 	if (Inventories.Contains(InventoryName))
 	{
-		int _tempIndex = 0;
 
 		FInventoryData* _inventory = &Inventories[InventoryName];
 		if (_inventory == nullptr)
@@ -109,45 +121,51 @@ bool UInventorySubsystem::TryAddItemToInventory(FName InventoryName, UItemObject
 			UE_LOG(LogTemp, Warning, TEXT("Inventory is null"));
 			return false;
 		}
-		for (FInventorySlot slot; _inventory;)
+		else
 		{
-			if (IsRoomAvailable(InventoryName, ItemObject, _tempIndex))
-			{
-				UE_LOG(LogTemp, Warning, TEXT("room available"));
-				AddItemAt(InventoryName, ItemObject, _tempIndex);
-				return true;
+			
 
-			}
-			else
-			{
-				UE_LOG(LogTemp, Warning, TEXT("room not available"));
-			}
-			_tempIndex++;
+			_inventory->InventorySlots.Add(FInventorySlot(ItemObject->GetItemData(), Amount));
+			UE_LOG(LogTemp, Warning, TEXT("Item added to inventory!"));
+
+			return true;
 
 		}
 
-		return false;
-	}
+		/*for (int i = 0; i < _inventory->InventoryColumn * _inventory->InventoryRow; i++)
+		{
+			if (IsRoomAvailable(InventoryName, ItemObject, i))
+			{
+				UE_LOG(LogTemp, Warning, TEXT("room available"));
+				AddItemAt(InventoryName, ItemObject, i);
+				return true;
+
+			}
+		}*/
+
+
+	};
+
 	return false;
-}
+};
 
 bool UInventorySubsystem::IsRoomAvailable(FName InventoryName, UItemObject* ItemObject, int32 TopLeftIndex)
 {
 
 	auto tile = IndexToTile(TopLeftIndex, ItemObject);
 	auto dimension = ItemObject->GetDimensions();
+
 	int32 last = ((dimension.X - 1) + tile.X);
 
 	for (int32 i = tile.X; i < last; i++)
 	{
 		int32 last2 = ((dimension.Y - 1) + tile.Y);
+
 		for (int32 j = tile.Y; j < last2; j++)
 		{
-			//Ileride burda deðiþiklik yapýlacak HATALI IF BLOGU YAPTI
 			if (i >= 0 && j >= 0 && i < ItemObject->GetItemData().Dimensions.X && j < ItemObject->GetItemData().Dimensions.Y)
 			{
 				auto itemData = GetItemAtIndex(TileToIndex(FTile(i, j), ItemObject), InventoryName);
-
 
 			}
 			else
@@ -185,7 +203,7 @@ FItemData UInventorySubsystem::GetItemAtIndex(int32 Index, FName InventoryKey)
 	if (Inventories.Contains(InventoryKey))
 	{
 		FInventoryData* inventory = &Inventories[InventoryKey];
-		if (inventory == nullptr || inventory->InventorySlots.IsValidIndex(Index))
+		if (inventory == nullptr)
 		{
 			UE_LOG(LogTemp, Warning, TEXT("Inventory is null"));
 			return FItemData();
