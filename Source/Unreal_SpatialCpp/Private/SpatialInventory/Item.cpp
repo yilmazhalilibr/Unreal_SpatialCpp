@@ -39,13 +39,9 @@ void AItem::BeginPlay()
 	Super::BeginPlay();
 
 
-	/*if (ItemObject == nullptr)
-	{
-		auto item = GetDefaultItemObject();
-		SetItemObject(item);
-	}*/
-
 	InventorySubsystem = GetWorld()->GetGameInstance()->GetSubsystem<UInventorySubsystem>();
+
+	UE_LOG(LogTemp, Warning, TEXT("ItemObject: %s"), *ItemObject->GetItemData().ItemName.ToString());
 
 }
 
@@ -73,8 +69,7 @@ void AItem::OnComponentBeginOverlap(UPrimitiveComponent* OverlappedComponent, AA
 				{
 					UE_LOG(LogTemp, Warning, TEXT("Inventory is full!"));
 				}
-				//Destroy the item
-				Destroy();
+
 			}
 		}
 		else

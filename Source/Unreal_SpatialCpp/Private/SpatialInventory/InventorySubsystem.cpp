@@ -78,16 +78,12 @@ bool UInventorySubsystem::RemoveItemFromInventory(FName InventoryID, UItemObject
 {
 	if (auto _inv = Inventories.Find(InventoryID))
 	{
-		for (int i = 0; i < _inv->InventorySlots.Num(); i++)
+		if (_inv->InventorySlots[i].ItemData.Dimensions == ItemObj->GetItemData().Dimensions)
 		{
-			if (_inv->InventorySlots[i].ItemData.Dimensions == ItemObj->GetItemData().Dimensions)
-			{
-				_inv->InventorySlots.RemoveAt(i);
-				return true;
-			}
+			_inv->InventorySlots.RemoveAt(i);
+			return true;
 		}
 
-		return true;
 	}
 
 
