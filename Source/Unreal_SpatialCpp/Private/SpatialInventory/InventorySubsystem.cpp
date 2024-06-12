@@ -78,11 +78,15 @@ bool UInventorySubsystem::RemoveItemFromInventory(FName InventoryID, UItemObject
 {
 	if (auto _inv = Inventories.Find(InventoryID))
 	{
-		if (_inv->InventorySlots[i].ItemData.Dimensions == ItemObj->GetItemData().Dimensions)
+		for (int i = 0; i < _inv->InventoryColumn * _inv->InventoryRow; i++)
 		{
-			_inv->InventorySlots.RemoveAt(i);
-			return true;
+			if (_inv->InventorySlots[i].ItemData.Dimensions == ItemObj->GetItemData().Dimensions)
+			{
+				_inv->InventorySlots.RemoveAt(i);
+				return true;
+			}
 		}
+		
 
 	}
 
@@ -93,7 +97,7 @@ bool UInventorySubsystem::RemoveItemFromInventory(FName InventoryID, UItemObject
 bool UInventorySubsystem::AddItemToInventory(FName InventoryID, FInventoryData InventoryData, int32 Amount)
 {
 
-
+	
 	return false;
 }
 

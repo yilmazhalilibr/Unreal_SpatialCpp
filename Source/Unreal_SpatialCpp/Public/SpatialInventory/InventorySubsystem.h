@@ -122,7 +122,7 @@ struct FInventoryData
 	int32 InventoryGridSize;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TArray<FInventorySlot> InventorySlots;
+	TArray<FInventorySlot> InventorySlots = TArray<FInventorySlot>();
 };
 
 
