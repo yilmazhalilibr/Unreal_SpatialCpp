@@ -30,21 +30,14 @@ public:
 	UPROPERTY()
 	UInventorySubsystem* InventorySubsystem;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ExposeOnSpawn = "true"), Category = "Widget Initialize")
-	float TileSize;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ExposeOnSpawn = "true"), Category = "Widget Initialize")
-	FLinearColor LineColor;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ExposeOnSpawn = "true"), Category = "Widget Initialize")
-	float LineThickness = 1.0f;
-
 	//Getter Inventory Grid Widget
 	UFUNCTION(BlueprintCallable)
 	UInventoryGridWidget* GetGrid() { return InventoryGrid; }
 
-		UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
-	UInventoryGridWidget* InventoryGrid;  // UInventoryGridWidget türünü kullanýn
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
+	UInventoryGridWidget* InventoryGrid;  
+
+
 private:
 
 	//Bind Canvas panel

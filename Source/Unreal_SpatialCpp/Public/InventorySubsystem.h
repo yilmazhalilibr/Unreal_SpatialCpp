@@ -15,6 +15,16 @@ class UNREAL_SPATIALCPP_API UInventorySubsystem : public UGameInstanceSubsystem
 	GENERATED_BODY()
 
 public:
+	
+	UFUNCTION(BlueprintCallable)
+	void SetupInventory(int _columns, int _rows, float _tileSize, FLinearColor _lineColor, float _lineThickness)
+	{
+		Columns = _columns;
+		Rows = _rows;
+		TileSize = _tileSize;
+		LineColor = _lineColor;
+		LineThickness = _lineThickness;
+	}
 
 
 	UFUNCTION(BlueprintCallable)
@@ -29,6 +39,24 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void SetRows(int _rows) { Rows = _rows; }
 
+	UFUNCTION(BlueprintCallable)
+	void SetTileSize(float _tileSize) { TileSize = _tileSize; }
+
+	UFUNCTION(BlueprintCallable)
+	void SetLineColor(FLinearColor _lineColor) { LineColor = _lineColor; }
+
+	UFUNCTION(BlueprintCallable)
+	void SetLineThickness(float _lineThickness) { LineThickness = _lineThickness; }
+
+	UFUNCTION(BlueprintCallable)
+	float GetTileSize() { return TileSize; }
+
+	UFUNCTION(BlueprintCallable)
+	FLinearColor GetLineColor() { return LineColor; }
+
+	UFUNCTION(BlueprintCallable)
+	float GetLineThickness() { return LineThickness; }
+
 
 protected:
 
@@ -38,5 +66,13 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ExposeOnSpawn = "true"), Category = "Widget Initialize")
 	int32 Rows;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ExposeOnSpawn = "true"), Category = "Widget Initialize")
+	float TileSize;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ExposeOnSpawn = "true"), Category = "Widget Initialize")
+	FLinearColor LineColor;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ExposeOnSpawn = "true"), Category = "Widget Initialize")
+	float LineThickness = 1.0f;
 
 };

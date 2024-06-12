@@ -29,7 +29,7 @@ protected:
 public:
 
 	UFUNCTION(BlueprintCallable)
-	void InitializeGrids(UInventorySubsystem* _inventorySubsystem, float _tileSize);
+	void InitializeGrids();
 
 	UFUNCTION()
 	void CreateLineSegments();

@@ -8,12 +8,15 @@ void UInventoryWidget::NativeOnInitialized()
 
 	// InventorySubsystem'u kontrol edin
 	InventorySubsystem = GetGameInstance()->GetSubsystem<UInventorySubsystem>();
-
+	if (!InventorySubsystem)
+	{
+		UE_LOG(LogTemp, Error, TEXT("InventorySubsystem not found."));
+	}
 	// BorderGrid ve InventoryGridWidget'ýn doðru þekilde baðlandýðýný kontrol edin
 	if (GetGrid() && InventorySubsystem)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("InventoryGridWidget successfully bound."));
-		GetGrid()->InitializeGrids(InventorySubsystem, TileSize);
+		GetGrid()->InitializeGrids();
 	}
 	else
 	{

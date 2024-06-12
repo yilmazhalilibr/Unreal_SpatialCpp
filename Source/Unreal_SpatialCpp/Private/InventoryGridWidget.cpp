@@ -15,11 +15,22 @@ void UInventoryGridWidget::NativeConstruct()
 	InventorySubsystem = GetGameInstance()->GetSubsystem<UInventorySubsystem>();
 }
 
-void UInventoryGridWidget::InitializeGrids(UInventorySubsystem* _inventorySubsystem, float _tileSize)
+void UInventoryGridWidget::InitializeGrids()
 {
 	// GRIDLER BASLAR VE PARAMETRELER ALINIR
-	InventorySubsystem = _inventorySubsystem;
-	TileSize = _tileSize;
+	if (InventorySubsystem)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("InventorySubsystem found."));
+	}
+	else
+	{
+		return;
+	}
+
+	TileSize = InventorySubsystem->GetTileSize();
+	LineColor = InventorySubsystem->GetLineColor();
+	LineThickness = InventorySubsystem->GetLineThickness();
+
 
 	//GRÝD'ÝN BÜYÜKLÜÐÜ BELÝRLENÝR
 	UCanvasPanelSlot* GridBorderSlot = Cast<UCanvasPanelSlot>(GridBorder->Slot);
