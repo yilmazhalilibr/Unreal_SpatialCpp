@@ -6,14 +6,38 @@
 #include "GameFramework/Actor.h"
 #include "ItemObject.generated.h"
 
-UCLASS()
+class AItem;
+
+
+UCLASS(Blueprintable)
 class UNREAL_SPATIALCPP_API AItemObject : public AActor
 {
 	GENERATED_BODY()
-	
-public:	
+
+public:
 	// Sets default values for this actor's properties
 	AItemObject();
+
+	//Get dimensions of the item
+	UFUNCTION(BlueprintCallable)
+	FIntPoint GetDimensions() { return Dimensions; }
+
+protected:
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ExposeOnSpawn = "true"), Category = "Item Properties")
+	FIntPoint Dimensions;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ExposeOnSpawn = "true"), Category = "Item Properties")
+	UMaterialInterface* Icon;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ExposeOnSpawn = "true"), Category = "Item Properties")
+	UMaterialInterface* IconRotated;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ExposeOnSpawn = "true"), Category = "Item Properties")
+	TSubclassOf<AItem> ItemClass;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item Properties")
+	bool Rotated;
 
 
 };

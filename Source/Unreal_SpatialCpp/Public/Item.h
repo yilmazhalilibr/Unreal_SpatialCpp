@@ -49,7 +49,7 @@ public:
 
 
 	UFUNCTION(BlueprintImplementableEvent, Category = "Item Class", meta = (DisplayName = "GetDefaultItemObject"), BlueprintCallable)
-	bool GetDefaultItemObject_Implementation(AItemObject*& item);
+	void GetDefaultItemObject_Implementation(AItemObject*& _itemObject);
 
 	UPROPERTY(BlueprintReadWrite, Category = "Inventory")
 	UInventorySubsystem* InventorySubsystem;

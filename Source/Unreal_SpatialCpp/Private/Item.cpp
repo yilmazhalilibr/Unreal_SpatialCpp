@@ -26,6 +26,7 @@ AItem::AItem()
 	StaticMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
 
+
 }
 
 // Called when the game starts or when spawned
@@ -33,10 +34,19 @@ void AItem::BeginPlay()
 {
 	Super::BeginPlay();
 
+	SphereCollision->OnComponentBeginOverlap.AddDynamic(this, &AItem::OnComponentBeginOverlap);
+
+
 	if (!ItemObject)
 	{
 		//GetDefaultItemObject
 		GetDefaultItemObject_Implementation(ItemObject);
+		UE_LOG(LogTemp, Warning, TEXT("ItemObject - GetDefaultItemObject"));
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("ItemObject is not null(Item.cpp)"));
+
 	}
 	if (!InventorySubsystem)
 	{
@@ -53,6 +63,20 @@ void AItem::OnComponentBeginOverlap(UPrimitiveComponent* OverlappedComponent, AA
 	{
 		if (ItemObject)
 		{
+			bool success;
+			InventorySubsystem->TryAddItem(ItemObject, success);
+
+			if (success)
+			{
+				UE_LOG(LogTemp, Warning, TEXT("Item Added"));
+				Destroy();
+
+			}
+			else
+			{
+				UE_LOG(LogTemp, Warning, TEXT("Item Not Added"));
+			}
+
 
 		}
 		else

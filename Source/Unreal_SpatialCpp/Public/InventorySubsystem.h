@@ -11,6 +11,7 @@
  */
 
 class AItemObject;
+class AInventoryStructures;
 
 
 UCLASS()
@@ -19,6 +20,9 @@ class UNREAL_SPATIALCPP_API UInventorySubsystem : public UGameInstanceSubsystem
 	GENERATED_BODY()
 
 public:
+	//Initialize method
+	virtual void Initialize(FSubsystemCollectionBase& Collection) override;
+
 
 	UFUNCTION(BlueprintCallable)
 	void SetupInventory(int _columns, int _rows, float _tileSize, FLinearColor _lineColor, float _lineThickness)
@@ -81,5 +85,29 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ExposeOnSpawn = "true"), Category = "Widget Initialize")
 	float LineThickness = 1.0f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Inventory")
+	bool IsDirty;
+
+	//Items list 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Inventory")
+	TArray<AItemObject*> Items;
+
+	//Function IsRoomAvailable
+	UFUNCTION(BlueprintCallable)
+	void IsRoomAvailable(AItemObject*& _itemObject, int& _topleftIndex, bool& _roomEmpty);
+
+	UFUNCTION(BlueprintCallable)
+	void IndexToTile(int& _index, FTile& _tile);
+
+	UFUNCTION(BlueprintCallable)
+	void GetItemAtIndex(int _index, AItemObject*& _itemObject, bool& _isValid);
+
+	UFUNCTION(BlueprintCallable)
+	void TileToIndex(FTile& _tile, int& _index);
+
+	UFUNCTION(BlueprintCallable)
+	void AddItemAt(AItemObject*& _itemObject, int& _topleftIndex);
+
 
 };
