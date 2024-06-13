@@ -64,7 +64,7 @@ void AItem::OnComponentBeginOverlap(UPrimitiveComponent* OverlappedComponent, AA
 	{
 		if (ItemObject)
 		{
-			bool success;
+			bool success ;
 			InventorySubsystem->TryAddItem(ItemObject, success);
 
 			if (success)
@@ -86,6 +86,19 @@ void AItem::OnComponentBeginOverlap(UPrimitiveComponent* OverlappedComponent, AA
 		}
 
 		//GetDefaultItemObject
+	}
+
+	//For loop for check the items array
+	for (int i = 0; i < InventorySubsystem->GetItems().Num(); i++)
+	{
+		if (InventorySubsystem->GetItems()[i] != nullptr)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Item: %s"), *InventorySubsystem->GetItems()[i]->GetName());
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Item is null No: %d"), i);
+		}
 	}
 
 

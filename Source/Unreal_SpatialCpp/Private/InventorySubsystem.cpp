@@ -12,7 +12,7 @@
 void UInventorySubsystem::Initialize(FSubsystemCollectionBase& Collection)
 {
 	//Items array make Resize with Columns and Rows
-	Items.SetNum(Columns * Rows);
+	//Items.SetNum(Columns * Rows);
 
 }
 
@@ -25,7 +25,7 @@ void UInventorySubsystem::TryAddItem(AItemObject* _itemObject, bool& _success)
 
 		for (int i = 0; i < Items.Num(); i++)
 		{
-			if (Items[i] != nullptr)
+			if (Items[i] == nullptr)
 			{
 				bool _isRoomAvailableBool;
 				IsRoomAvailable(_itemObject, i, _isRoomAvailableBool);
@@ -58,73 +58,53 @@ void UInventorySubsystem::TryAddItem(AItemObject* _itemObject, bool& _success)
 
 void UInventorySubsystem::IsRoomAvailable(AItemObject*& _itemObject, int& _topleftIndex, bool& _roomEmpty)
 {
-
 	//ForEachIndex
 	FTile _tile;
 	IndexToTile(_topleftIndex, _tile);
 	FIntPoint _dimensions = _itemObject->GetDimensions();
 
 	int _startIndexJ = _tile.X;
-	int _lastIndexJ = _tile.X - (_dimensions.X - 1);
+	int _lastIndexJ = _tile.X + (_dimensions.X - 1);
 
-	for (int j = _startIndexJ; j < _lastIndexJ; j++)
+	for (int j = _startIndexJ; j <= _lastIndexJ; j++)
 	{
 		int _startIndexK = _tile.Y;
 		int _lastIndexK = _tile.Y + (_dimensions.Y - 1);
 
-		for (int k = _startIndexK; k < _lastIndexK; k++)
+		for (int k = _startIndexK; k <= _lastIndexK; k++)
 		{
 			FTile _currentTile;
 			_currentTile.X = j;
 			_currentTile.Y = k;
 
-			//IS TILE VALID
-
+			// IS TILE VALID
 			if (_currentTile.X >= 0 && _currentTile.Y >= 0 && _currentTile.X < GetColumns() && _currentTile.Y < GetRows())
 			{
-				bool _isValid;
-				int _tileToIndex;
+				bool _isValid = false;
+				int _tileToIndex = -1;
 
 				TileToIndex(_currentTile, _tileToIndex);
-				GetItemAtIndex(_tileToIndex, _itemObject, _isValid);
+				AItemObject* _tempItemObject = nullptr;
+				GetItemAtIndex(_tileToIndex, _tempItemObject, _isValid);
 
-				if (!_isValid)
+				if (!_isValid || _tempItemObject)
 				{
 					_roomEmpty = false;
+					return;
 				}
-				else
-				{
-					if (_itemObject)
-					{
-						_roomEmpty = false;
-						return;
-					}
-					else
-					{
-						_roomEmpty = true;
-						return;
-					}
-
-				}
-
 			}
 			else
 			{
-
 				_roomEmpty = false;
 				return;
-
 			}
-
-
 		}
-
-
 	}
-	//Here can will be a bug because if _isValid condition will be false then _roomEmpty will be false but here return to true
-	_roomEmpty = true;
 
+	// If we exit the loops without finding an invalid tile or an occupied one, the room is empty
+	_roomEmpty = true;
 }
+
 
 void UInventorySubsystem::IndexToTile(int& _index, FTile& _tile)
 {
@@ -137,14 +117,12 @@ void UInventorySubsystem::GetItemAtIndex(int _index, AItemObject*& _itemObject, 
 {
 	if (Items.IsValidIndex(_index))
 	{
-		_itemObject = Items[_index];
+		Items[_index] = _itemObject;
 		_isValid = true;
-		return;
 	}
 	else
 	{
 		_isValid = false;
-		return;
 	}
 
 }
@@ -156,20 +134,19 @@ void UInventorySubsystem::TileToIndex(FTile& _tile, int& _index)
 
 void UInventorySubsystem::AddItemAt(AItemObject*& _itemObject, int& _topleftIndex)
 {
-
 	FTile _tile;
 	IndexToTile(_topleftIndex, _tile);
 	FIntPoint _dimensions = _itemObject->GetDimensions();
 
 	int _startIndexJ = _tile.X;
-	int _lastIndexJ = _tile.X - (_dimensions.X - 1);
+	int _lastIndexJ = _tile.X + (_dimensions.X - 1); // Düzeltildi: - yerine + kullanýldý
 
-	for (int j = _startIndexJ; j < _lastIndexJ; j++)
+	for (int j = _startIndexJ; j <= _lastIndexJ; j++) // Döngü koþulu <= olarak güncellendi
 	{
 		int _startIndexK = _tile.Y;
-		int _lastIndexK = _tile.Y + (_dimensions.Y - 1);
+		int _lastIndexK = _tile.Y + (_dimensions.Y - 1); // Düzeltildi: - yerine + kullanýldý
 
-		for (int k = _startIndexK; k < _lastIndexK; k++)
+		for (int k = _startIndexK; k <= _lastIndexK; k++) // Döngü koþulu <= olarak güncellendi
 		{
 			FTile _currentTile;
 			_currentTile.X = j;
@@ -178,13 +155,13 @@ void UInventorySubsystem::AddItemAt(AItemObject*& _itemObject, int& _topleftInde
 			int _tileToIndex;
 			TileToIndex(_currentTile, _tileToIndex);
 
-			//Items set array elements 
-			Items[_tileToIndex] = _itemObject;
-
-
+			// Items set array elements 
+			if (Items.IsValidIndex(_tileToIndex))
+			{
+				Items[_tileToIndex] = _itemObject;
+			}
 		}
-
 	}
 	IsDirty = true;
-
 }
+

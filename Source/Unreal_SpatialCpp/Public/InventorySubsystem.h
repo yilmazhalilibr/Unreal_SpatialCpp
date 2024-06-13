@@ -68,6 +68,8 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void TryAddItem(AItemObject* _itemObject, bool& _success);
 
+	UFUNCTION(BlueprintCallable)
+	TArray<AItemObject*> GetItems() { return Items; }
 
 protected:
 
