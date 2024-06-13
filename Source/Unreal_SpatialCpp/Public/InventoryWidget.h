@@ -35,20 +35,21 @@ public:
 	UInventoryGridWidget* GetGrid() { return InventoryGrid; }
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
-	UInventoryGridWidget* InventoryGrid;  
+	UInventoryGridWidget* InventoryGrid;
 
 
-private:
+protected:
+	virtual void NativeConstruct() override;
 
 	//Bind Canvas panel
-	UPROPERTY(meta = (BindWidget))
-	UCanvasPanel* CanvasPanel;
+	UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
+	TObjectPtr<UCanvasPanel> CanvasPanel;
 
-	UPROPERTY(meta = (BindWidget))
-	UBorder* BackgroundBorder;
+	UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
+	TObjectPtr<UBorder> BackgroundBorder;
 
-	UPROPERTY(meta = (BindWidget))
-	UBackgroundBlur* BackgroundBlur;
+	UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
+	TObjectPtr<UBackgroundBlur> BackgroundBlur;
 
 
 

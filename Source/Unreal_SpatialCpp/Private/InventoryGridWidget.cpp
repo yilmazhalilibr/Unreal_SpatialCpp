@@ -31,14 +31,22 @@ void UInventoryGridWidget::InitializeGrids()
 	LineColor = InventorySubsystem->GetLineColor();
 	LineThickness = InventorySubsystem->GetLineThickness();
 
+	if (GridBorder)
+	{
 
-	//GRÝD'ÝN BÜYÜKLÜÐÜ BELÝRLENÝR
-	UCanvasPanelSlot* GridBorderSlot = Cast<UCanvasPanelSlot>(GridBorder->Slot);
-	GridBorderSlot->SetSize(FVector2D(InventorySubsystem->GetColumns() * TileSize, InventorySubsystem->GetRows() * TileSize));
+		//GRÝD'ÝN BÜYÜKLÜÐÜ BELÝRLENÝR
+		UCanvasPanelSlot* GridBorderSlot = Cast<UCanvasPanelSlot>(GridBorder->Slot);
+		GridBorderSlot->SetSize(FVector2D(InventorySubsystem->GetColumns() * TileSize, InventorySubsystem->GetRows() * TileSize));
 
-	//GRID'ÝN KENARLARI ÇÝZÝLÝR
-	CreateLineSegments();
+		//GRID'ÝN KENARLARI ÇÝZÝLÝR
+		CreateLineSegments();
 
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("GridBorder is not bound.(GRID-WIDGET)"));
+
+	}
 }
 
 void UInventoryGridWidget::CreateLineSegments()
