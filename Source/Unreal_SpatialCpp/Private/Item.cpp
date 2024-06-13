@@ -37,17 +37,18 @@ void AItem::BeginPlay()
 	SphereCollision->OnComponentBeginOverlap.AddDynamic(this, &AItem::OnComponentBeginOverlap);
 
 
-	if (!ItemObject)
-	{
-		//GetDefaultItemObject
-		GetDefaultItemObject_Implementation(ItemObject);
-		UE_LOG(LogTemp, Warning, TEXT("ItemObject - GetDefaultItemObject"));
-	}
-	else
-	{
-		UE_LOG(LogTemp, Warning, TEXT("ItemObject is not null(Item.cpp)"));
+	//if (!ItemObject)
+	//{
+	//	//GetDefaultItemObject
+	//	GetDefaultItemObject_Implementation(ItemObject);
+	//	UE_LOG(LogTemp, Warning, TEXT("ItemObject - GetDefaultItemObject"));
+	//}
+	//else
+	//{
+	//	UE_LOG(LogTemp, Warning, TEXT("ItemObject is not null(Item.cpp)"));
 
-	}
+	//}
+
 	if (!InventorySubsystem)
 	{
 		InventorySubsystem = GetWorld()->GetGameInstance()->GetSubsystem<UInventorySubsystem>();
