@@ -9,13 +9,17 @@
 /**
  *
  */
+
+class AItemObject;
+
+
 UCLASS()
 class UNREAL_SPATIALCPP_API UInventorySubsystem : public UGameInstanceSubsystem
 {
 	GENERATED_BODY()
 
 public:
-	
+
 	UFUNCTION(BlueprintCallable)
 	void SetupInventory(int _columns, int _rows, float _tileSize, FLinearColor _lineColor, float _lineThickness)
 	{
@@ -56,6 +60,9 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	float GetLineThickness() { return LineThickness; }
+
+	UFUNCTION(BlueprintCallable)
+	void TryAddItem(AItemObject* _itemObject, bool& _success);
 
 
 protected:

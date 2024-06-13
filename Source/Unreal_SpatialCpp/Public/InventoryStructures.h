@@ -26,6 +26,8 @@ struct FTile
 };
 
 
+
+
 UCLASS()
 class UNREAL_SPATIALCPP_API AInventoryStructures : public AActor
 {
