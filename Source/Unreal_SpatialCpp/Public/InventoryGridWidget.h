@@ -59,7 +59,6 @@ public:
 	UPROPERTY()
 	FLinearColor LineColor;
 
-
 	UPROPERTY()
 	TArray<FLine> Lines;
 

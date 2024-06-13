@@ -54,18 +54,39 @@ void UInventoryGridWidget::CreateLineSegments()
 	//GRID'ÝN KENARLARI ÇÝZÝLÝR VE LÝNES ARRAYINE EKLENÝR
 	// 
 	// DÝKEY ÇÝZGÝLER ÇÝZÝLÝR VE LÝNES ARRAYINE EKLENÝR
-	for (int i = 0; i < InventorySubsystem->GetColumns(); i++)
+	Lines.Empty();
+
+	FVector2D TopLeft = FVector2D::ZeroVector;
+
+	int32 Columns = InventorySubsystem->GetColumns();
+	int32 Rows = InventorySubsystem->GetRows();
+
+	UE_LOG(LogTemp, Warning, TEXT("Columns: %d, Rows: %d"), Columns, Rows);
+
+	if (GridBorder)
 	{
-		float xlocal = TileSize * i;
-		Lines.Add(FLine(FVector2D(xlocal, 0), FVector2D(xlocal, InventorySubsystem->GetRows() * TileSize)));
-	}
-	// YATAY ÇÝZGÝLER ÇÝZÝLÝR VE LÝNES ARRAYINE EKLENÝR
-	for (int i = 0; i < InventorySubsystem->GetRows(); i++)
-	{
-		float ylocal = TileSize * i;
-		Lines.Add(FLine(FVector2D(0, ylocal), FVector2D(InventorySubsystem->GetColumns() * TileSize, ylocal)));
+		if (UCanvasPanelSlot* CanvasSlot = Cast<UCanvasPanelSlot>(GridBorder->Slot))
+		{
+			TopLeft = CanvasSlot->GetPosition();
+		}
 	}
 
+
+	for (int32 i = 0; i <= Columns; ++i)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Topleft: %f"), TopLeft.X);
+		float X = TopLeft.X + i * TileSize;
+		Lines.Add(FLine(FVector2D(X, (float)TopLeft.Y), FVector2D(X, TopLeft.Y + Rows * TileSize)));
+	}
+
+	for (int32 j = 0; j <= Rows; ++j)
+	{
+		float Y = TopLeft.Y + j * TileSize;
+		Lines.Add(FLine(FVector2D((float)TopLeft.X, Y), FVector2D(TopLeft.X + Columns * TileSize, Y)));
+	}
+
+	// Trigger a repaint
+	Invalidate(EInvalidateWidgetReason::Paint);
 
 
 }
@@ -76,7 +97,7 @@ int32 UInventoryGridWidget::NativePaint(const FPaintArgs& Args, const FGeometry&
 
 	int32 CurrentLayer = LayerId;
 
-	for (int32 i = 0; i < Lines.Num(); i += 2)
+	for (int32 i = 0; i < Lines.Num(); i++)
 	{
 		FVector2D Start = Lines[i].Start;
 		FVector2D End = Lines[i].End;
