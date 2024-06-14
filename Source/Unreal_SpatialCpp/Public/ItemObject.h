@@ -22,6 +22,9 @@ public:
 	UFUNCTION(BlueprintCallable)
 	FIntPoint GetDimensions() { return Dimensions; }
 
+	UFUNCTION(BlueprintCallable)
+	void GetIcon(UMaterialInterface*& _icon);
+
 protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ExposeOnSpawn = "true"), Category = "Item Properties")

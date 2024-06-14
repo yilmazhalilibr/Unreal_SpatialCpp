@@ -61,7 +61,7 @@ void UInventoryWidget::NativeConstruct()
 	if (InventoryGrid)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("InventoryGrid found."));
-		InventoryGrid->InitializeGrids();
+		InventoryGrid->InitializeGrids(this);
 
 	}
 	else

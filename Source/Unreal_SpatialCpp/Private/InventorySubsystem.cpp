@@ -14,6 +14,33 @@ void UInventorySubsystem::Initialize(FSubsystemCollectionBase& Collection)
 	//Items array make Resize with Columns and Rows
 	//Items.SetNum(Columns * Rows);
 
+
+	//Timer for testing and use lambda function
+	GetWorld()->GetTimerManager().SetTimer(TimerHandleTick, [this]()
+		{
+			CustomTick(0.05);
+		}, 0.05f, true);
+
+
+}
+
+void UInventorySubsystem::Deinitialize()
+{
+	//Clear Timer
+	GetWorld()->GetTimerManager().ClearTimer(TimerHandleTick);
+
+}
+
+void UInventorySubsystem::CustomTick(float DeltaTime)
+{
+	//UE_LOG(LogTemp, Warning, TEXT("CustomTick"));
+
+	if (IsDirty)
+	{
+		IsDirty = false;
+		OnInventoryChanged.Broadcast();
+	}
+
 }
 
 void UInventorySubsystem::TryAddItem(AItemObject* _itemObject, bool& _success)
@@ -53,6 +80,35 @@ void UInventorySubsystem::TryAddItem(AItemObject* _itemObject, bool& _success)
 		UE_LOG(LogTemp, Warning, TEXT("ItemObject is null(InventorySubSystem::TryAddItem fail)"));
 		_success = false;
 	}
+
+}
+
+void UInventorySubsystem::GetAllItems(TMap<AItemObject*, FTile>& _allItems)
+{
+	_allItems.Empty();
+	AItemObject* _currentItemObject;
+	FTile _currentTile;
+
+	for (int i = 0; i < Items.Num(); i++)
+	{
+		if (Items[i] != nullptr)
+		{
+			if (!_allItems.Contains(Items[i]))
+			{
+				_currentItemObject = Items[i];
+				IndexToTile(i, _currentTile);
+				_allItems.Add(_currentItemObject, _currentTile);
+
+			}
+
+		}
+	}
+
+}
+
+void UInventorySubsystem::RemoveItem(AItemObject* _itemObject)
+{
+	Items.Remove(_itemObject);
 
 }
 

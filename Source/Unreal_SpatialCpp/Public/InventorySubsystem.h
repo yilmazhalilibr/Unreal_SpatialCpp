@@ -14,6 +14,10 @@ class AItemObject;
 class AInventoryStructures;
 
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnInventoryChanged);
+
+
+
 UCLASS()
 class UNREAL_SPATIALCPP_API UInventorySubsystem : public UGameInstanceSubsystem
 {
@@ -22,7 +26,17 @@ class UNREAL_SPATIALCPP_API UInventorySubsystem : public UGameInstanceSubsystem
 public:
 	//Initialize method
 	virtual void Initialize(FSubsystemCollectionBase& Collection) override;
+	//Destructor
+	virtual void Deinitialize() override;
 
+	UFUNCTION()
+	void CustomTick(float DeltaTime);
+
+	UPROPERTY(BlueprintAssignable, Category = "Inventory")
+	FOnInventoryChanged OnInventoryChanged;
+
+	UFUNCTION()
+	void OnInventoryChangedBroadcast() { OnInventoryChanged.Broadcast(); }
 
 	UFUNCTION(BlueprintCallable)
 	void SetupInventory(int _columns, int _rows, float _tileSize, FLinearColor _lineColor, float _lineThickness)
@@ -70,6 +84,16 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	TArray<AItemObject*> GetItems() { return Items; }
+
+	UFUNCTION(BlueprintCallable)
+	void GetAllItems(TMap<AItemObject*, FTile>& _allItems);
+
+	UFUNCTION(BlueprintCallable)
+	void RemoveItem(AItemObject* _itemObject);
+
+	UPROPERTY()
+	FTimerHandle TimerHandleTick;
+
 
 protected:
 

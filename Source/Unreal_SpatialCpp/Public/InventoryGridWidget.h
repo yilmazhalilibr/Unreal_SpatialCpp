@@ -13,6 +13,13 @@
 class UInventorySubsystem;
 class UCanvasPanel;
 class UBorder;
+class UCanvasPanelSlot;
+class UItemWidget;
+class UItemObject;
+class UItem;
+class UInventoryWidget;
+class AItemObject;
+
 
 
 
@@ -26,15 +33,22 @@ protected:
 	virtual void NativeConstruct() override;
 	virtual int32 NativePaint(const FPaintArgs& Args, const FGeometry& AllottedGeometry, const FSlateRect& MyCullingRect, FSlateWindowElementList& OutDrawElements, int32 LayerId, const FWidgetStyle& InWidgetStyle, bool bParentEnabled) const override;
 
+	//Descructor
+	virtual void NativeDestruct() override;
+
+	TSubclassOf<UItemWidget> BPItemWidget;
+
 public:
 
 	UFUNCTION(BlueprintCallable)
-	void InitializeGrids();
+	void InitializeGrids(UInventoryWidget* _inventoryWidget);
 
 	UFUNCTION()
 	void CreateLineSegments();
 
 private:
+
+
 	//bind canvas panel
 	UPROPERTY(meta = (BindWidget))
 	UCanvasPanel* CanvasPanel;
@@ -44,6 +58,14 @@ private:
 
 	UPROPERTY(meta = (BindWidget))
 	UCanvasPanel* GridCanvasPanel;
+
+	UFUNCTION()
+	void Refresh();
+
+
+
+	UFUNCTION()
+	void OnItemRemoved(AItemObject* _itemObject);
 
 public:
 
@@ -62,4 +84,11 @@ public:
 	UPROPERTY()
 	TArray<FLine> Lines;
 
+	UPROPERTY()
+	TSubclassOf<AItemObject> BP_ItemObject;
+
+
+	//crea Refresh Implementation function
+	UFUNCTION(BlueprintImplementableEvent, Category = "InventoryGridWidget", meta = (DisplayName = "Refresh"))
+	void Refresh_Implementation();
 };

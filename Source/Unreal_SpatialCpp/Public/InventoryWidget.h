@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
 #include "InventoryStructures.h"
+#include "ItemWidget.h"
 #include "InventoryWidget.generated.h"
 
 /**
@@ -37,6 +38,12 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
 	UInventoryGridWidget* InventoryGrid;
 
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ExposeOnSpawn = "true"))
+	TSubclassOf<UItemWidget> BP_ItemWidget;
+
+	UFUNCTION(BlueprintCallable)
+	TSubclassOf<UItemWidget> GetItemWidget() { return BP_ItemWidget; }
 
 protected:
 	virtual void NativeConstruct() override;

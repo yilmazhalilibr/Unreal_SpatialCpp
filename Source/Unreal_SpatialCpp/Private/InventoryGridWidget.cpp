@@ -5,7 +5,12 @@
 #include "InventorySubsystem.h"
 #include "Components/CanvasPanel.h"
 #include "Components/Border.h"
+#include "ItemWidget.h"
 #include "Components/CanvasPanelSlot.h"
+#include "InventoryWidget.h"
+
+#include "ItemObject.h"
+
 
 void UInventoryGridWidget::NativeConstruct()
 {
@@ -15,8 +20,19 @@ void UInventoryGridWidget::NativeConstruct()
 	InventorySubsystem = GetGameInstance()->GetSubsystem<UInventorySubsystem>();
 }
 
-void UInventoryGridWidget::InitializeGrids()
+void UInventoryGridWidget::NativeDestruct()
 {
+
+	Super::NativeDestruct();
+
+	InventorySubsystem->OnInventoryChanged.RemoveDynamic(this, &UInventoryGridWidget::Refresh);
+
+}
+
+void UInventoryGridWidget::InitializeGrids(UInventoryWidget* _inventoryWidget)
+{
+	BPItemWidget = _inventoryWidget->GetItemWidget();
+
 	// GRIDLER BASLAR VE PARAMETRELER ALINIR
 	if (InventorySubsystem)
 	{
@@ -40,6 +56,12 @@ void UInventoryGridWidget::InitializeGrids()
 
 		//GRID'ÝN KENARLARI ÇÝZÝLÝR
 		CreateLineSegments();
+		//GRID'ÝN ÝÇÝNÝ DOLDURMAK ÝÇÝN REFRESH FONKSÝYONU ÇAÐIRILIR
+		Refresh();
+
+
+		//Bind event OnInventoryChanged
+		InventorySubsystem->OnInventoryChanged.AddDynamic(this, &UInventoryGridWidget::Refresh);
 
 	}
 	else
@@ -91,6 +113,67 @@ void UInventoryGridWidget::CreateLineSegments()
 
 }
 
+void UInventoryGridWidget::Refresh()
+{
+	//GRID TEMÝZLENÝR
+	GridCanvasPanel->ClearChildren();
+
+	if (!InventorySubsystem)
+	{
+		InventorySubsystem = GetGameInstance()->GetSubsystem<UInventorySubsystem>();
+	}
+
+	//TÜM ÝTEMLAR ALINIR
+	TMap<AItemObject*, FTile> _items;
+	InventorySubsystem->GetAllItems(_items);
+
+	//Her bir item'i ve tile'i bir for loop ile çizilir
+	for (auto& Item : _items)
+	{
+		AItemObject* _itemObject = Item.Key;
+		FTile _topLeftTile = Item.Value;
+
+		//Create a new item widget
+
+		auto _itemWidget = Cast<UItemWidget>(CreateWidget(GetWorld(), BPItemWidget));
+
+		/*UMaterialInterface* _icon;
+		_itemObject->GetIcon(_icon);*/
+
+		_itemWidget->InitializeWidget(_itemObject, TileSize);
+
+
+		//Bind event FRemoved
+		_itemWidget->OnRemoved.AddDynamic(this, &UInventoryGridWidget::OnItemRemoved);
+
+		//Set the size of the item widget
+		auto slot = GridCanvasPanel->AddChild(_itemWidget);
+
+		//cast to canvaspanelslot to slot
+		if (UCanvasPanelSlot* _canvasSlotCast = Cast<UCanvasPanelSlot>(slot))
+		{
+			_canvasSlotCast->SetAutoSize(true);
+			_canvasSlotCast->SetPosition(FVector2D(_topLeftTile.X * TileSize, _topLeftTile.Y * TileSize));
+
+
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("CanvasSlot is not casted"));
+		}
+
+	}
+
+
+}
+
+void UInventoryGridWidget::OnItemRemoved(AItemObject* _itemObject)
+{
+	//Item silinir
+	InventorySubsystem->RemoveItem(_itemObject);
+	//Refresh();
+}
+
 int32 UInventoryGridWidget::NativePaint(const FPaintArgs& Args, const FGeometry& AllottedGeometry, const FSlateRect& MyCullingRect, FSlateWindowElementList& OutDrawElements, int32 LayerId, const FWidgetStyle& InWidgetStyle, bool bParentEnabled) const
 {
 	//FOR loop ile Lines arrayindeki her bir eleman çizilir
@@ -120,3 +203,5 @@ int32 UInventoryGridWidget::NativePaint(const FPaintArgs& Args, const FGeometry&
 
 	return Super::NativePaint(Args, AllottedGeometry, MyCullingRect, OutDrawElements, CurrentLayer, InWidgetStyle, bParentEnabled);
 }
+
+
