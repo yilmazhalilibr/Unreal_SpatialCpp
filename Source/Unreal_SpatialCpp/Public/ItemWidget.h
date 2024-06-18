@@ -61,6 +61,7 @@ public:
 	UPROPERTY()
 	UMaterialInterface* IconMaterial;
 
+	
 
 protected:
 
@@ -75,5 +76,7 @@ protected:
 
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<UImage> ItemImage;
+
+
 
 };

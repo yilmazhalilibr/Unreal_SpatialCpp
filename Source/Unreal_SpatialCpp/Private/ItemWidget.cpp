@@ -21,7 +21,6 @@ void UItemWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
 
-
 	Refresh.AddDynamic(this, &UItemWidget::OnRefreshHandle);
 
 }
@@ -30,7 +29,7 @@ void UItemWidget::NativeDestruct()
 {
 	Super::NativeDestruct();
 
-	ItemImage->BrushDelegate.Unbind();
+	//ItemImage->BrushDelegate.Unbind();
 	Refresh.Clear();
 }
 
@@ -51,7 +50,8 @@ void UItemWidget::InitializeWidget(AItemObject* _itemObject, float _tileSize)
 	if (ItemImage)
 	{
 		//ItemImage->SetBrushFromTexture(nullptr); // Ýlk baþta boþ bir texture atayabilirsiniz
-		ItemImage->BrushDelegate.BindUFunction(this, "GetIconImage");
+		//ItemImage->BrushDelegate.BindUFunction(this, "GetIconImage");
+		GetIconImage();
 	}
 	else
 	{
@@ -112,16 +112,21 @@ void UItemWidget::GetIconImage()
 		ItemObject->GetIcon(Material);
 
 		//Materil'in ismini ve dosya olunu LOG'a yazdýrýr
-		UE_LOG(LogTemp, Warning, TEXT("Material Name : %s"), *Material->GetName());
-		UE_LOG(LogTemp, Warning, TEXT("Material Path : %s"), *Material->GetPathName());
+		/*UE_LOG(LogTemp, Warning, TEXT("Material Name : %s"), *Material->GetName());
+		UE_LOG(LogTemp, Warning, TEXT("Material Path : %s"), *Material->GetPathName());*/
 
 		if (Material)
 		{
 			UMaterialInstanceDynamic* DynamicMaterial = UMaterialInstanceDynamic::Create(Material, this);
 
+			if (DynamicMaterial)
+			{
+				UE_LOG(LogTemp, Warning, TEXT("DynamicMaterial is created"));
+			}
+
 			FSlateBrush Brush;
 			Brush.SetResourceObject(DynamicMaterial);
-			Brush.DrawAs = ESlateBrushDrawType::Image;
+			//Brush.DrawAs = ESlateBrushDrawType::Image;
 			Brush.ImageSize = FVector2D(Size.X, Size.Y);
 
 
