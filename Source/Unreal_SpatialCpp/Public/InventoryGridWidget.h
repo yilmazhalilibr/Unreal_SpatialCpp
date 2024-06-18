@@ -36,7 +36,9 @@ protected:
 	//Descructor
 	virtual void NativeDestruct() override;
 
+	UPROPERTY()
 	TSubclassOf<UItemWidget> BPItemWidget;
+
 
 public:
 
@@ -91,4 +93,11 @@ public:
 	//crea Refresh Implementation function
 	UFUNCTION(BlueprintImplementableEvent, Category = "InventoryGridWidget", meta = (DisplayName = "Refresh"))
 	void Refresh_Implementation();
+
+
+	//OnMouseButtonDownEvent for GridBorder
+	UFUNCTION()
+	void OnGridBorderMouseDown(FGeometry MyGeometry, const FPointerEvent& MouseEvent);
+
+
 };

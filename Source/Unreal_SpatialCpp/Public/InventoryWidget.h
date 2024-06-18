@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
@@ -6,6 +6,7 @@
 #include "Blueprint/UserWidget.h"
 #include "InventoryStructures.h"
 #include "ItemWidget.h"
+#include "/Unreal Engine (Engine)/UE_5.4/Engine/Source/Runtime/SlateCore/Public/Input/Reply.h"
 #include "InventoryWidget.generated.h"
 
 /**
@@ -18,15 +19,19 @@ class UBackgroundBlur;
 class UInventoryGridWidget;
 class UInventorySubsystem;
 
+
 UCLASS()
 class UNREAL_SPATIALCPP_API UInventoryWidget : public UUserWidget
 {
 	GENERATED_BODY()
 
 	//Event On Initialized Widget
-	virtual void NativeOnInitialized() override;
 
 public:
+	virtual void NativeConstruct() override;
+	virtual void NativeOnInitialized() override;
+	virtual void NativeDestruct() override;
+
 
 	UPROPERTY()
 	UInventorySubsystem* InventorySubsystem;
@@ -45,8 +50,17 @@ public:
 	UFUNCTION(BlueprintCallable)
 	TSubclassOf<UItemWidget> GetItemWidget() { return BP_ItemWidget; }
 
+	//Bind backgrund border mouse down event
+
+
+
 protected:
-	virtual void NativeConstruct() override;
+
+	UFUNCTION()
+	FReply OnBackgroundBorderMouseDown(const FGeometry& MyGeometry, const FPointerEvent& MouseEvent);
+
+	virtual FReply NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) override;
+	
 
 	//Bind Canvas panel
 	UPROPERTY(BlueprintReadWrite, meta = (BindWidget))

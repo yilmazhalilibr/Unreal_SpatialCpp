@@ -18,6 +18,9 @@ void UInventoryGridWidget::NativeConstruct()
 
 	//Inventorysubsystem'i gameInstance dan çekmek için kullanýlýr
 	InventorySubsystem = GetGameInstance()->GetSubsystem<UInventorySubsystem>();
+
+	GridBorder->OnMouseButtonDownEvent.BindUFunction(this, FName("OnGridBorderMouseDown"));
+
 }
 
 void UInventoryGridWidget::NativeDestruct()
@@ -26,6 +29,8 @@ void UInventoryGridWidget::NativeDestruct()
 	Super::NativeDestruct();
 
 	InventorySubsystem->OnInventoryChanged.RemoveDynamic(this, &UInventoryGridWidget::Refresh);
+
+	GridBorder->OnMouseButtonDownEvent.Unbind();
 
 }
 
@@ -175,6 +180,8 @@ void UInventoryGridWidget::OnItemRemoved(AItemObject* _itemObject)
 	//Refresh();
 }
 
+
+
 int32 UInventoryGridWidget::NativePaint(const FPaintArgs& Args, const FGeometry& AllottedGeometry, const FSlateRect& MyCullingRect, FSlateWindowElementList& OutDrawElements, int32 LayerId, const FWidgetStyle& InWidgetStyle, bool bParentEnabled) const
 {
 	//FOR loop ile Lines arrayindeki her bir eleman çizilir
@@ -205,4 +212,8 @@ int32 UInventoryGridWidget::NativePaint(const FPaintArgs& Args, const FGeometry&
 	return Super::NativePaint(Args, AllottedGeometry, MyCullingRect, OutDrawElements, CurrentLayer, InWidgetStyle, bParentEnabled);
 }
 
-
+void UInventoryGridWidget::OnGridBorderMouseDown(FGeometry MyGeometry, const FPointerEvent& MouseEvent)
+{
+	//GRID BORDER'A TIKLANDIÐINDA ÇALIÞACAK FONKSÝYON
+	UE_LOG(LogTemp, Warning, TEXT("Grid Border Mouse Down"));
+}
