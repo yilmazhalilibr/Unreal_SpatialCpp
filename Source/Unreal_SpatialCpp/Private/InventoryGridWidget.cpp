@@ -130,6 +130,7 @@ void UInventoryGridWidget::Refresh()
 	//Her bir item'i ve tile'i bir for loop ile çizilir
 	for (auto& Item : _items)
 	{
+		//Item ve tile alýnýr
 		AItemObject* _itemObject = Item.Key;
 		FTile _topLeftTile = Item.Value;
 

@@ -89,7 +89,7 @@ void AItem::OnComponentBeginOverlap(UPrimitiveComponent* OverlappedComponent, AA
 	}
 
 	//For loop for check the items array
-	for (int i = 0; i < InventorySubsystem->GetItems().Num(); i++)
+	/*for (int i = 0; i < InventorySubsystem->GetItems().Num(); i++)
 	{
 		if (InventorySubsystem->GetItems()[i] != nullptr)
 		{
@@ -99,7 +99,7 @@ void AItem::OnComponentBeginOverlap(UPrimitiveComponent* OverlappedComponent, AA
 		{
 			UE_LOG(LogTemp, Warning, TEXT("Item is null No: %d"), i);
 		}
-	}
+	}*/
 
 
 }

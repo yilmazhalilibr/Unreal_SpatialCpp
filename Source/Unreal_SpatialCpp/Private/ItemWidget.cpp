@@ -52,7 +52,7 @@ void UItemWidget::InitializeWidget(AItemObject* _itemObject, float _tileSize)
 	}
 	else
 	{
-		UE_LOG(LogTemp, Warning, TEXT("ItemImage is nullptr(ItemWidget.cpp) Satýr:47"));
+		UE_LOG(LogTemp, Warning, TEXT("ItemImage is nullptr(ItemWidget.cpp) ...InitializeWidget"));
 	}
 
 }
@@ -105,20 +105,21 @@ void UItemWidget::GetIconImage()
 {
 	if (ItemObject)
 	{
-		UMaterialInterface* _icon;
-		ItemObject->GetIcon(_icon);
+		UMaterialInterface* Material = nullptr;
+		ItemObject->GetIcon(Material);
 
-		if (_icon)
+		if (Material)
 		{
-			// Material kullanarak FSlateBrush oluþturma
-			FSlateBrush* _brush = new FSlateBrush();
-			_brush->SetResourceObject(_icon);
-			_brush->ImageSize = FVector2D(Size.X, Size.Y);
-			// _brush->TintColor = FSlateColor(FLinearColor::White); // Gerekirse renk tonu ekleyin
+			UMaterialInstanceDynamic* DynamicMaterial = UMaterialInstanceDynamic::Create(Material, this);
+
+			FSlateBrush Brush;
+			Brush.SetResourceObject(DynamicMaterial);
+			Brush.DrawAs = ESlateBrushDrawType::Image;
+			Brush.ImageSize = FVector2D(Size.X, Size.Y);
 
 			if (ItemImage)
 			{
-				ItemImage->SetBrush(*_brush);
+				ItemImage->SetBrush(Brush);
 			}
 			else
 			{
@@ -134,5 +135,5 @@ void UItemWidget::GetIconImage()
 	{
 		UE_LOG(LogTemp, Warning, TEXT("ItemObject is nullptr(ItemWidget.cpp)"));
 	}
-
 }
+
