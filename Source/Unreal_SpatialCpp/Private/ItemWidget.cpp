@@ -39,6 +39,8 @@ void UItemWidget::InitializeWidget(AItemObject* _itemObject, float _tileSize)
 	TileSize = _tileSize;
 	_itemObject->GetIcon(IconMaterial);
 
+	//ILERIDE BURAYA ENVANTER YUKLENIRKEN - YUKLENMEYI BELLI EDEN BIR HAREKETLI IKON KOYALIM
+
 
 	//.1 saniye sonra refresh eventini tetikle ve tetiklerken Lambda kullan ve delegate i tetikle
 	FTimerHandle TimerHandle;
@@ -106,33 +108,65 @@ void UItemWidget::OnRefreshHandle()
 
 void UItemWidget::GetIconImage()
 {
+	//if (ItemObject)
+	//{
+	//	UMaterialInterface* Material = nullptr;
+	//	ItemObject->GetIcon(Material);
+
+	//	//Materil'in ismini ve dosya olunu LOG'a yazdýrýr
+	//	/*UE_LOG(LogTemp, Warning, TEXT("Material Name : %s"), *Material->GetName());
+	//	UE_LOG(LogTemp, Warning, TEXT("Material Path : %s"), *Material->GetPathName());*/
+
+	//	if (Material)
+	//	{
+	//		UMaterialInstanceDynamic* DynamicMaterial = UMaterialInstanceDynamic::Create(Material, this);
+
+	//		if (DynamicMaterial)
+	//		{
+	//			UE_LOG(LogTemp, Warning, TEXT("DynamicMaterial is created"));
+	//		}
+
+	//		FSlateBrush Brush;
+	//		Brush.SetResourceObject(DynamicMaterial);
+	//		Brush.DrawAs = ESlateBrushDrawType::Image;
+	//		Brush.ImageSize = FVector2D(Size.X, Size.Y);
+
+
+	//		if (ItemImage)
+	//		{
+	//			ItemImage->SetBrush(Brush);
+	//		}
+	//		else
+	//		{
+	//			UE_LOG(LogTemp, Warning, TEXT("ItemImage is nullptr(ItemWidget.cpp)"));
+	//		}
+	//	}
+	//	else
+	//	{
+	//		UE_LOG(LogTemp, Warning, TEXT("Icon is nullptr(ItemWidget.cpp)"));
+	//	}
+	//}
+	//else
+	//{
+	//	UE_LOG(LogTemp, Warning, TEXT("ItemObject is nullptr(ItemWidget.cpp)"));
+	//}
+
 	if (ItemObject)
 	{
-		UMaterialInterface* Material = nullptr;
-		ItemObject->GetIcon(Material);
+		UMaterialInterface* _icon;
+		ItemObject->GetIcon(_icon);
 
-		//Materil'in ismini ve dosya olunu LOG'a yazdýrýr
-		/*UE_LOG(LogTemp, Warning, TEXT("Material Name : %s"), *Material->GetName());
-		UE_LOG(LogTemp, Warning, TEXT("Material Path : %s"), *Material->GetPathName());*/
-
-		if (Material)
+		if (_icon)
 		{
-			UMaterialInstanceDynamic* DynamicMaterial = UMaterialInstanceDynamic::Create(Material, this);
-
-			if (DynamicMaterial)
-			{
-				UE_LOG(LogTemp, Warning, TEXT("DynamicMaterial is created"));
-			}
-
-			FSlateBrush Brush;
-			Brush.SetResourceObject(DynamicMaterial);
-			//Brush.DrawAs = ESlateBrushDrawType::Image;
-			Brush.ImageSize = FVector2D(Size.X, Size.Y);
-
+			// Material kullanarak FSlateBrush olu�turma
+			FSlateBrush* _brush = new FSlateBrush();
+			_brush->SetResourceObject(_icon);
+			_brush->ImageSize = FVector2D(Size.X, Size.Y);
+			// _brush->TintColor = FSlateColor(FLinearColor::White); // Gerekirse renk tonu ekleyin
 
 			if (ItemImage)
 			{
-				ItemImage->SetBrush(Brush);
+				ItemImage->SetBrush(*_brush);
 			}
 			else
 			{
@@ -148,8 +182,6 @@ void UItemWidget::GetIconImage()
 	{
 		UE_LOG(LogTemp, Warning, TEXT("ItemObject is nullptr(ItemWidget.cpp)"));
 	}
-
-
 
 }
 
