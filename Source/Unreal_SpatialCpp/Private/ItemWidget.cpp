@@ -15,6 +15,9 @@
 #include "Engine/AssetManager.h"
 #include "Materials/MaterialInstanceDynamic.h"
 #include "Materials/MaterialInterface.h"
+#include "Materials/Material.h"
+#include "Materials/MaterialInstance.h"	
+
 
 
 void UItemWidget::NativeConstruct()
@@ -113,43 +116,47 @@ void UItemWidget::GetIconImage()
 	//	UMaterialInterface* Material = nullptr;
 	//	ItemObject->GetIcon(Material);
 
-	//	//Materil'in ismini ve dosya olunu LOG'a yazdýrýr
+	//	Materil'in ismini ve dosya olunu LOG'a yazdýrýr
 	//	/*UE_LOG(LogTemp, Warning, TEXT("Material Name : %s"), *Material->GetName());
 	//	UE_LOG(LogTemp, Warning, TEXT("Material Path : %s"), *Material->GetPathName());*/
 
-	//	if (Material)
-	//	{
-	//		UMaterialInstanceDynamic* DynamicMaterial = UMaterialInstanceDynamic::Create(Material, this);
-
-	//		if (DynamicMaterial)
+	//		if (Material)
 	//		{
-	//			UE_LOG(LogTemp, Warning, TEXT("DynamicMaterial is created"));
-	//		}
+	//			UMaterialInstanceDynamic* DynamicMaterial = UMaterialInstanceDynamic::Create(Material, this);
 
-	//		FSlateBrush Brush;
-	//		Brush.SetResourceObject(DynamicMaterial);
-	//		Brush.DrawAs = ESlateBrushDrawType::Image;
-	//		Brush.ImageSize = FVector2D(Size.X, Size.Y);
+	//			if (DynamicMaterial)
+	//			{
+	//				UE_LOG(LogTemp, Warning, TEXT("DynamicMaterial is created"));
+	//			}
 
+	//			FSlateBrush Brush;
+	//			Brush.SetResourceObject(DynamicMaterial);
+	//			Brush.DrawAs = ESlateBrushDrawType::Image;
+	//			Brush.ImageSize = FVector2D(Size.X, Size.Y);
 
-	//		if (ItemImage)
-	//		{
-	//			ItemImage->SetBrush(Brush);
+	//			if (ItemImage)
+	//			{
+	//				//ItemImage->SetBrush(Brush);
+	//				ItemImage->SetBrushFromMaterial(DynamicMaterial);
+
+	//				//Ekrana ColorAndOpacity ve Tint color değerlerini yazdırır
+	//				UE_LOG(LogTemp, Warning, TEXT("ColorAndOpacity : %s"), *ItemImage->ColorAndOpacity.ToString());
+
+	//			}
+	//			else
+	//			{
+	//				UE_LOG(LogTemp, Warning, TEXT("ItemImage is nullptr(ItemWidget.cpp)"));
+	//			}
 	//		}
 	//		else
 	//		{
-	//			UE_LOG(LogTemp, Warning, TEXT("ItemImage is nullptr(ItemWidget.cpp)"));
+	//			UE_LOG(LogTemp, Warning, TEXT("Icon is nullptr(ItemWidget.cpp)"));
 	//		}
 	//	}
 	//	else
 	//	{
-	//		UE_LOG(LogTemp, Warning, TEXT("Icon is nullptr(ItemWidget.cpp)"));
+	//		UE_LOG(LogTemp, Warning, TEXT("ItemObject is nullptr(ItemWidget.cpp)"));
 	//	}
-	//}
-	//else
-	//{
-	//	UE_LOG(LogTemp, Warning, TEXT("ItemObject is nullptr(ItemWidget.cpp)"));
-	//}
 
 	if (ItemObject)
 	{
@@ -162,11 +169,11 @@ void UItemWidget::GetIconImage()
 			FSlateBrush* _brush = new FSlateBrush();
 			_brush->SetResourceObject(_icon);
 			_brush->ImageSize = FVector2D(Size.X, Size.Y);
-			// _brush->TintColor = FSlateColor(FLinearColor::White); // Gerekirse renk tonu ekleyin
 
 			if (ItemImage)
 			{
 				ItemImage->SetBrush(*_brush);
+
 			}
 			else
 			{

@@ -62,7 +62,6 @@ public:
 	UMaterialInterface* IconMaterial;
 
 	
-
 protected:
 
 	UPROPERTY(meta = (BindWidget))
@@ -71,10 +70,10 @@ protected:
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<USizeBox> BackgroundSizeBox;
 
-	UPROPERTY(meta = (BindWidget))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
 	TObjectPtr<UBorder> BackgroundBorder;
 
-	UPROPERTY(meta = (BindWidget))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
 	TObjectPtr<UImage> ItemImage;
 
 
