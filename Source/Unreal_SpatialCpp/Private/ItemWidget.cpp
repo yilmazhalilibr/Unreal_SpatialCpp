@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+ï»¿// Fill out your copyright notice in the Description page of Project Settings.
 
 
 #include "ItemWidget.h"
@@ -11,7 +11,10 @@
 #include "Components/CanvasPanelSlot.h"
 #include "Engine/Texture2D.h"
 #include "Brushes/SlateImageBrush.h"
-
+#include "Engine/StreamableManager.h"
+#include "Engine/AssetManager.h"
+#include "Materials/MaterialInstanceDynamic.h"
+#include "Materials/MaterialInterface.h"
 
 
 void UItemWidget::NativeConstruct()
@@ -47,7 +50,7 @@ void UItemWidget::InitializeWidget(AItemObject* _itemObject, float _tileSize)
 
 	if (ItemImage)
 	{
-		//ItemImage->SetBrushFromTexture(nullptr); // Ýlk baþta boþ bir texture atayabilirsiniz
+		//ItemImage->SetBrushFromTexture(nullptr); // Ãlk baÃ¾ta boÃ¾ bir texture atayabilirsiniz
 		ItemImage->BrushDelegate.BindUFunction(this, "GetIconImage");
 	}
 	else
@@ -92,12 +95,12 @@ void UItemWidget::OnRefreshHandle()
 		}
 		else
 		{
-			UE_LOG(LogTemp, Warning, TEXT("ItemImage is nullptr. Satýr : 87"));
+			UE_LOG(LogTemp, Warning, TEXT("ItemImage is nullptr. SatÃ½r : 87"));
 		}
 	}
 	else
 	{
-		UE_LOG(LogTemp, Warning, TEXT("ItemObject is nullptr (ItemWidget.cpp) : Satýr 92"));
+		UE_LOG(LogTemp, Warning, TEXT("ItemObject is nullptr (ItemWidget.cpp) : SatÃ½r 92"));
 	}
 }
 
@@ -108,6 +111,10 @@ void UItemWidget::GetIconImage()
 		UMaterialInterface* Material = nullptr;
 		ItemObject->GetIcon(Material);
 
+		//Materil'in ismini ve dosya olunu LOG'a yazdÃ½rÃ½r
+		UE_LOG(LogTemp, Warning, TEXT("Material Name : %s"), *Material->GetName());
+		UE_LOG(LogTemp, Warning, TEXT("Material Path : %s"), *Material->GetPathName());
+
 		if (Material)
 		{
 			UMaterialInstanceDynamic* DynamicMaterial = UMaterialInstanceDynamic::Create(Material, this);
@@ -116,6 +123,7 @@ void UItemWidget::GetIconImage()
 			Brush.SetResourceObject(DynamicMaterial);
 			Brush.DrawAs = ESlateBrushDrawType::Image;
 			Brush.ImageSize = FVector2D(Size.X, Size.Y);
+
 
 			if (ItemImage)
 			{
@@ -135,5 +143,8 @@ void UItemWidget::GetIconImage()
 	{
 		UE_LOG(LogTemp, Warning, TEXT("ItemObject is nullptr(ItemWidget.cpp)"));
 	}
+
+
+
 }
 
