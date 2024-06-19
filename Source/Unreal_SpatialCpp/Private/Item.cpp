@@ -52,7 +52,7 @@ void AItem::BeginPlay()
 	if (!InventorySubsystem)
 	{
 		InventorySubsystem = GetWorld()->GetGameInstance()->GetSubsystem<UInventorySubsystem>();
-		UE_LOG(LogTemp, Warning, TEXT("InventorySubsystem is get it"));
+		//UE_LOG(LogTemp, Warning, TEXT("InventorySubsystem is get it"));
 	}
 
 }
@@ -103,11 +103,3 @@ void AItem::OnComponentBeginOverlap(UPrimitiveComponent* OverlappedComponent, AA
 
 
 }
-
-// Called every frame
-void AItem::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-
-}
-

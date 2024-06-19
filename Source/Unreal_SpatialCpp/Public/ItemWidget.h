@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
+
 #include "ItemWidget.generated.h"
 
 /**
@@ -15,6 +16,7 @@ class USizeBox;
 class UImage;
 class UBorder;
 class AItemObject;
+class FReply;
 
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FRefresh);
@@ -34,6 +36,8 @@ public:
 	//Descructor
 	virtual void NativeDestruct() override;
 
+
+	UFUNCTION()
 	void InitializeWidget(AItemObject* _itemObject, float _tileSize);
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ExposeOnSpawn = "true"), Category = "ItemWidget")
@@ -61,8 +65,20 @@ public:
 	UPROPERTY()
 	UMaterialInterface* IconMaterial;
 
-	
+
 protected:
+
+	virtual FReply NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) override;
+
+	//OnMouseLeave
+	virtual void NativeOnMouseLeave(const FPointerEvent& InMouseEvent) override;
+
+	//OnMouseEnter
+	virtual void NativeOnMouseEnter(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) override;
+
+	// OnDragDetected
+	virtual void NativeOnDragDetected(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent, UDragDropOperation*& OutOperation) override;
+
 
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<UCanvasPanel> CanvasPanel;

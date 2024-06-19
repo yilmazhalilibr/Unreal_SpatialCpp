@@ -44,8 +44,6 @@ protected:
 
 
 public:
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
 
 
 	UFUNCTION(BlueprintImplementableEvent, Category = "Item Class", meta = (DisplayName = "GetDefaultItemObject"), BlueprintCallable)

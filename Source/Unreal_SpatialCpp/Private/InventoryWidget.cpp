@@ -1,26 +1,16 @@
-#include "InventoryWidget.h"
+ï»¿#include "InventoryWidget.h"
 #include "InventorySubsystem.h"
 #include "InventoryGridWidget.h"
 #include "Components/CanvasPanel.h"
-#include "Blueprint/WidgetTree.h" // UWidgetTree için gerekli baþlýk dosyasý
+#include "Blueprint/WidgetTree.h" // UWidgetTree iÃ§in gerekli baÃ¾lÃ½k dosyasÃ½
 #include "Components/Border.h"
 #include "Components/BackgroundBlur.h"
 #include "Components/CanvasPanelSlot.h"
 #include "Input/Events.h"
+#include "Input/Reply.h"
 #include "Blueprint/WidgetBlueprintLibrary.h"
 
 
-
-void UInventoryWidget::NativeOnInitialized()
-{
-	Super::NativeOnInitialized();
-
-}
-
-void UInventoryWidget::NativeDestruct()
-{
-	Super::NativeDestruct();
-}
 
 
 void UInventoryWidget::NativeConstruct()
@@ -39,32 +29,27 @@ void UInventoryWidget::NativeConstruct()
 		UE_LOG(LogTemp, Error, TEXT("InventoryGrid is not bound."));
 	}
 
-	////BackgorundBorder'i valid et ve sonra mouse button down eventini baðla
-	//if (BackgroundBorder)
-	//{
-	//	BackgroundBorder->OnMouseButtonDownEvent.BindUFunction(this, FName("OnBackgroundBorderMouseDown"));
+	//BackgorundBorder'i valid et ve sonra mouse button down eventini baÃ°la
+	if (BackgroundBorder)
+	{
+		BackgroundBorder->OnMouseButtonDownEvent.BindUFunction(this, FName("OnBackgroundBorderMouseDown"));
 
-	//}
+	}
 
 
 }
 
-//
-//FReply UInventoryWidget::OnBackgroundBorderMouseDown(const FGeometry& MyGeometry, const FPointerEvent& MouseEvent)
-//{
-//	UE_LOG(LogTemp, Warning, TEXT("BackgroundBorder Mouse Down"));
-//
-//	return FReply::Handled();
-//}
-//
-//FReply UInventoryWidget::NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)
-//{
-//
-//	if (BackgroundBorder && InMouseEvent.GetEffectingButton() == EKeys::LeftMouseButton)
-//	{
-//		OnBackgroundBorderMouseDown(InGeometry, InMouseEvent);
-//		return FReply::Handled();
-//	}
-//
-//	return FReply::Unhandled();
-//}
+
+
+FReply UInventoryWidget::NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)
+{
+	UE_LOG(LogTemp, Warning, TEXT("NativeOnMouseButtonDown"));
+
+	if (BackgroundBorder && InMouseEvent.GetEffectingButton() == EKeys::LeftMouseButton)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("NativeOnMouseButtonDown LeftMouseButton"));
+		return FReply::Handled();
+	}
+
+	return FReply::Unhandled();
+}

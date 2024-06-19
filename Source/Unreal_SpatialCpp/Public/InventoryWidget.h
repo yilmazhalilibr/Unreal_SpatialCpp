@@ -6,7 +6,6 @@
 #include "Blueprint/UserWidget.h"
 #include "InventoryStructures.h"
 #include "ItemWidget.h"
-#include "/Unreal Engine (Engine)/UE_5.4/Engine/Source/Runtime/SlateCore/Public/Input/Reply.h"
 #include "InventoryWidget.generated.h"
 
 /**
@@ -18,6 +17,7 @@ class UBorder;
 class UBackgroundBlur;
 class UInventoryGridWidget;
 class UInventorySubsystem;
+class FReply;
 
 
 UCLASS()
@@ -29,8 +29,9 @@ class UNREAL_SPATIALCPP_API UInventoryWidget : public UUserWidget
 
 public:
 	virtual void NativeConstruct() override;
-	virtual void NativeOnInitialized() override;
-	virtual void NativeDestruct() override;
+
+	
+
 
 
 	UPROPERTY()
@@ -56,11 +57,8 @@ public:
 
 protected:
 
-	UFUNCTION()
-	FReply OnBackgroundBorderMouseDown(const FGeometry& MyGeometry, const FPointerEvent& MouseEvent);
-
 	virtual FReply NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) override;
-	
+
 
 	//Bind Canvas panel
 	UPROPERTY(BlueprintReadWrite, meta = (BindWidget))

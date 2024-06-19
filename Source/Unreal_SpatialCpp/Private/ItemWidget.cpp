@@ -17,6 +17,12 @@
 #include "Materials/MaterialInterface.h"
 #include "Materials/Material.h"
 #include "Materials/MaterialInstance.h"	
+#include "Input/Reply.h"
+#include "Input/Events.h"
+//UDragDropOperation Header
+#include "Blueprint/DragDropOperation.h"
+#include <Blueprint/WidgetBlueprintLibrary.h>
+
 
 
 
@@ -35,6 +41,67 @@ void UItemWidget::NativeDestruct()
 	//ItemImage->BrushDelegate.Unbind();
 	Refresh.Clear();
 }
+
+
+FReply UItemWidget::NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)
+{
+	Super::NativeOnMouseButtonDown(InGeometry, InMouseEvent);
+	//UE_LOG(LogTemp, Warning, TEXT("NativeOnMouseButtonDown - ItemWidget"));
+
+	if (InMouseEvent.GetEffectingButton() == EKeys::LeftMouseButton)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("NativeOnMouseButtonDown LeftMouseButton - ItemWidget"));
+
+		// Drag detect işlemi başlat
+		FEventReply EventReply = UWidgetBlueprintLibrary::DetectDragIfPressed(InMouseEvent, this, EKeys::LeftMouseButton);
+		return EventReply.NativeReply;
+
+		return FReply::Handled();
+	}
+
+	return FReply::Unhandled();
+}
+
+void UItemWidget::NativeOnMouseLeave(const FPointerEvent& InMouseEvent)
+{
+	Super::NativeOnMouseLeave(InMouseEvent);
+	if (BackgroundBorder)
+	{
+		BackgroundBorder->SetBrushColor(FLinearColor(0, 0, 0, 0.5f));
+	}
+
+}
+
+void UItemWidget::NativeOnMouseEnter(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)
+{
+	Super::NativeOnMouseEnter(InGeometry, InMouseEvent);
+
+	if (BackgroundBorder)
+	{
+		BackgroundBorder->SetBrushColor(FLinearColor(0.5f, 0.5f, 0.5f, 0.2f));
+	}
+}
+
+void UItemWidget::NativeOnDragDetected(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent, UDragDropOperation*& OutOperation)
+{
+	Super::NativeOnDragDetected(InGeometry, InMouseEvent, OutOperation);
+
+	// DragDropOperation yarat
+	UDragDropOperation* Operation = NewObject<UDragDropOperation>();
+	Operation->Payload = ItemObject;
+	Operation->DefaultDragVisual = this;
+	Operation->Pivot = EDragPivot::CenterCenter;
+
+	UE_LOG(LogTemp, Warning, TEXT("NativeOnDragDetected - ItemWidget@"));
+
+	// Parent'ten kaldır
+	RemoveFromParent();
+
+	OutOperation = Operation;
+}
+
+
+
 
 void UItemWidget::InitializeWidget(AItemObject* _itemObject, float _tileSize)
 {
