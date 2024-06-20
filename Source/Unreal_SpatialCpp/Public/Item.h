@@ -52,4 +52,5 @@ public:
 	UPROPERTY(BlueprintReadWrite, Category = "Inventory")
 	UInventorySubsystem* InventorySubsystem;
 
+
 };

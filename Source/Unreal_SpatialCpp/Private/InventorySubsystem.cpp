@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+ï»¿// Fill out your copyright notice in the Description page of Project Settings.
 
 
 #include "InventorySubsystem.h"
@@ -108,7 +108,69 @@ void UInventorySubsystem::GetAllItems(TMap<AItemObject*, FTile>& _allItems)
 
 void UInventorySubsystem::RemoveItem(AItemObject* _itemObject)
 {
-	Items.Remove(_itemObject);
+	//Items.Remove(_itemObject);
+	if (Items.Contains(_itemObject))
+	{
+
+		for (int i = 0; i < Items.Num(); i++)
+		{
+			if (Items[i] == _itemObject)
+			{
+				Items[i] = nullptr;
+			}
+		}
+
+	}
+
+}
+
+void UInventorySubsystem::SpawnItemFromActor(AItemObject* _itemObject, AActor* _actor, bool _groundClamp)
+{
+
+	auto _location = (_actor->GetActorForwardVector() * 150) + _actor->GetActorLocation();
+
+	if (_groundClamp)
+	{
+
+		FHitResult _hitResult;
+		FVector _start = _location;
+		FVector _end = _location - FVector(0, 0, 1000);
+
+		FCollisionQueryParams _collisionQueryParams;
+		//_collisionQueryParams.AddIgnoredActor(nullptr);
+
+		if (GetWorld()->LineTraceSingleByChannel(_hitResult, _start, _end, ECollisionChannel::ECC_Visibility, _collisionQueryParams))
+		{
+			_location = _hitResult.Location;
+		}
+		else
+		{
+			_location = _location - FVector(0, 0, 1000);
+		}
+
+	}
+	else
+	{
+
+	}
+
+	//ItemObject'i _location'a spawn et
+	FActorSpawnParameters _spawnParameters;
+	_spawnParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
+	//AItemObject* _spawnedItemObject = GetWorld()->SpawnActor<AItemObject>(_itemObject->GetClass(), _location, FRotator::ZeroRotator, _spawnParameters);
+	AItem* _spawnedItem = GetWorld()->SpawnActor<AItem>(_itemObject->GetItemClass(), _location, FRotator::ZeroRotator, _spawnParameters);
+
+	FIntPoint _dimensions;
+	UMaterialInterface* _icon;
+	UMaterialInterface* _iconRotated;
+	TSubclassOf<AItem> _itemClass;
+	bool _rotated;
+
+	_itemObject->GetAllSettings(_dimensions, _icon, _iconRotated, _itemClass, _rotated);
+
+
+
+
 
 }
 
@@ -195,14 +257,14 @@ void UInventorySubsystem::AddItemAt(AItemObject*& _itemObject, int& _topleftInde
 	FIntPoint _dimensions = _itemObject->GetDimensions();
 
 	int _startIndexJ = _tile.X;
-	int _lastIndexJ = _tile.X + (_dimensions.X - 1); // Düzeltildi: - yerine + kullanýldý
+	int _lastIndexJ = _tile.X + (_dimensions.X - 1); // DÃ¼zeltildi: - yerine + kullanÃ½ldÃ½
 
-	for (int j = _startIndexJ; j <= _lastIndexJ; j++) // Döngü koþulu <= olarak güncellendi
+	for (int j = _startIndexJ; j <= _lastIndexJ; j++) // DÃ¶ngÃ¼ koÃ¾ulu <= olarak gÃ¼ncellendi
 	{
 		int _startIndexK = _tile.Y;
-		int _lastIndexK = _tile.Y + (_dimensions.Y - 1); // Düzeltildi: - yerine + kullanýldý
+		int _lastIndexK = _tile.Y + (_dimensions.Y - 1); // DÃ¼zeltildi: - yerine + kullanÃ½ldÃ½
 
-		for (int k = _startIndexK; k <= _lastIndexK; k++) // Döngü koþulu <= olarak güncellendi
+		for (int k = _startIndexK; k <= _lastIndexK; k++) // DÃ¶ngÃ¼ koÃ¾ulu <= olarak gÃ¼ncellendi
 		{
 			FTile _currentTile;
 			_currentTile.X = j;

@@ -64,7 +64,7 @@ void AItem::OnComponentBeginOverlap(UPrimitiveComponent* OverlappedComponent, AA
 	{
 		if (ItemObject)
 		{
-			bool success ;
+			bool success;
 			InventorySubsystem->TryAddItem(ItemObject, success);
 
 			if (success)
@@ -103,3 +103,4 @@ void AItem::OnComponentBeginOverlap(UPrimitiveComponent* OverlappedComponent, AA
 
 
 }
+

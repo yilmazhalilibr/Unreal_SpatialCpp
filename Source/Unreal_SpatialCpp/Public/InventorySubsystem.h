@@ -94,6 +94,8 @@ public:
 	UPROPERTY()
 	FTimerHandle TimerHandleTick;
 
+	UFUNCTION(BlueprintCallable)
+	void SpawnItemFromActor(AItemObject* _itemObject, AActor* _actor, bool _groundClamp);
 
 protected:
 

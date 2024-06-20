@@ -10,6 +10,7 @@
 #include "Input/Reply.h"
 #include "Blueprint/WidgetBlueprintLibrary.h"
 #include "Blueprint/DragDropOperation.h"
+#include "ItemObject.h"
 
 
 
@@ -57,7 +58,26 @@ FReply UInventoryWidget::NativeOnMouseButtonDown(const FGeometry& InGeometry, co
 
 bool UInventoryWidget::NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation)
 {
+	//Payload'ı AItemObject'e cast et 
+	AItemObject* ItemObject = Cast<AItemObject>(InOperation->Payload);
+	if (ItemObject)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("NativeOnDrop - TRUE"));
+
+		APlayerController* PlayerController = GetOwningPlayer();
+		AActor* _player = PlayerController->GetPawn();
+
+		InventorySubsystem->SpawnItemFromActor(ItemObject, _player, true);
+
+		InventorySubsystem->RemoveItem(ItemObject);
+
+		return true;
+	}
 
 
-	return false;
+
+
+	UE_LOG(LogTemp, Warning, TEXT("NativeOnDrop - FALSE"))
+
+		return false;
 }

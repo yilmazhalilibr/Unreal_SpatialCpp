@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
@@ -7,7 +7,6 @@
 #include "ItemObject.generated.h"
 
 class AItem;
-
 
 UCLASS(Blueprintable)
 class UNREAL_SPATIALCPP_API AItemObject : public AActor
@@ -25,8 +24,21 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void GetIcon(UMaterialInterface*& _icon);
 
-protected:
+	UFUNCTION(BlueprintCallable)
+	void SetAllSettings(FIntPoint _dimensions, UMaterialInterface* _icon, UMaterialInterface* _iconRotated, TSubclassOf<AItem> _itemClass, bool _rotated);
 
+	UFUNCTION(BlueprintCallable)
+	void GetAllSettings(FIntPoint& _dimensions, UMaterialInterface*& _icon, UMaterialInterface*& _iconRotated, TSubclassOf<AItem>& _itemClass, bool& _rotated);
+
+	// Getter for ItemClass
+	UFUNCTION(BlueprintCallable, Category = "Item Properties")
+	TSubclassOf<AItem> GetItemClass() const;
+
+	// Setter for ItemClass
+	UFUNCTION(BlueprintCallable, Category = "Item Properties")
+	void SetItemClass(TSubclassOf<AItem> NewItemClass);
+
+protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ExposeOnSpawn = "true"), Category = "Item Properties")
 	FIntPoint Dimensions;
 
@@ -41,6 +53,4 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item Properties")
 	bool Rotated;
-
-
 };
