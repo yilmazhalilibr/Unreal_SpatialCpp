@@ -8,9 +8,9 @@
 #include "ItemWidget.h"
 #include "Components/CanvasPanelSlot.h"
 #include "InventoryWidget.h"
-
 #include "ItemObject.h"
 
+//#include "DragDropOperation.h" BURADA KALDIM
 
 void UInventoryGridWidget::NativeConstruct()
 {
@@ -32,6 +32,12 @@ void UInventoryGridWidget::NativeDestruct()
 
 	GridBorder->OnMouseButtonDownEvent.Unbind();
 
+}
+
+bool UInventoryGridWidget::NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation)
+{
+
+	return false;
 }
 
 void UInventoryGridWidget::InitializeGrids(UInventoryWidget* _inventoryWidget)
@@ -117,6 +123,15 @@ void UInventoryGridWidget::CreateLineSegments()
 
 
 }
+
+AItemObject* UInventoryGridWidget::GetPayload(UDragDropOperation* _dragDropOperation)
+{
+
+	return nullptr;
+}
+
+
+
 
 void UInventoryGridWidget::Refresh()
 {

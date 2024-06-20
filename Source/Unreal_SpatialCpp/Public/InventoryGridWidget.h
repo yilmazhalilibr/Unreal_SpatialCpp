@@ -19,6 +19,7 @@ class UItemObject;
 class UItem;
 class UInventoryWidget;
 class AItemObject;
+class UDragDropOperation;
 
 
 
@@ -36,6 +37,9 @@ protected:
 	//Descructor
 	virtual void NativeDestruct() override;
 
+	virtual bool NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation) override;
+
+
 	UPROPERTY()
 	TSubclassOf<UItemWidget> BPItemWidget;
 
@@ -48,8 +52,11 @@ public:
 	UFUNCTION()
 	void CreateLineSegments();
 
+
 private:
 
+	UFUNCTION()
+	AItemObject* GetPayload(UDragDropOperation* _dragDropOperation);
 
 	//bind canvas panel
 	UPROPERTY(meta = (BindWidget))
@@ -98,6 +105,7 @@ public:
 	//OnMouseButtonDownEvent for GridBorder
 	UFUNCTION()
 	void OnGridBorderMouseDown(FGeometry MyGeometry, const FPointerEvent& MouseEvent);
+
 
 
 };
