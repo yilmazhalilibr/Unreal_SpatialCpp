@@ -117,6 +117,7 @@ void UInventorySubsystem::RemoveItem(AItemObject* _itemObject)
 			if (Items[i] == _itemObject)
 			{
 				Items[i] = nullptr;
+				IsDirty = true;
 			}
 		}
 
