@@ -30,7 +30,7 @@ class UNREAL_SPATIALCPP_API UInventoryWidget : public UUserWidget
 public:
 	virtual void NativeConstruct() override;
 
-	
+
 
 
 
@@ -58,6 +58,10 @@ public:
 protected:
 
 	virtual FReply NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) override;
+
+	// Override OnDrop event
+	virtual bool NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation) override;
+
 
 
 	//Bind Canvas panel

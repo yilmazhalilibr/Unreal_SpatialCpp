@@ -9,6 +9,7 @@
 #include "Input/Events.h"
 #include "Input/Reply.h"
 #include "Blueprint/WidgetBlueprintLibrary.h"
+#include "Blueprint/DragDropOperation.h"
 
 
 
@@ -52,4 +53,11 @@ FReply UInventoryWidget::NativeOnMouseButtonDown(const FGeometry& InGeometry, co
 	}
 
 	return FReply::Unhandled();
+}
+
+bool UInventoryWidget::NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation)
+{
+
+
+	return false;
 }
