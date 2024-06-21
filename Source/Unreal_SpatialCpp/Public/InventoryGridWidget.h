@@ -57,6 +57,8 @@ public:
 	UFUNCTION()
 	bool IsRoomAvailableForPayload(AItemObject* _payload);
 
+	UFUNCTION()
+	void Refresh();
 
 private:
 
@@ -72,9 +74,6 @@ private:
 
 	UPROPERTY(meta = (BindWidget))
 	UCanvasPanel* GridCanvasPanel;
-
-	UFUNCTION()
-	void Refresh();
 
 	UFUNCTION()
 	void OnItemRemoved(AItemObject* _itemObject);

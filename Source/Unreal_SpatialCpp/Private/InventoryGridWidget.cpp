@@ -1,7 +1,4 @@
-﻿// Fill out your copyright notice in the Description page of Project Settings.
-
-
-#include "InventoryGridWidget.h"
+﻿#include "InventoryGridWidget.h"
 #include "InventorySubsystem.h"
 #include "Components/CanvasPanel.h"
 #include "Components/Border.h"
@@ -14,322 +11,281 @@
 #include "Input/Events.h"
 #include "Blueprint/UserWidget.h"
 
-
 void UInventoryGridWidget::NativeConstruct()
 {
-	Super::NativeConstruct();
+    Super::NativeConstruct();
 
-	//Inventorysubsystem'i gameInstance dan çekmek için kullanýlýr
-	InventorySubsystem = GetGameInstance()->GetSubsystem<UInventorySubsystem>();
+    // Inventorysubsystem'i gameInstance dan çekmek için kullanılır
+    InventorySubsystem = GetGameInstance()->GetSubsystem<UInventorySubsystem>();
 
-	GridBorder->OnMouseButtonDownEvent.BindUFunction(this, FName("OnGridBorderMouseDown"));
-
+    GridBorder->OnMouseButtonDownEvent.BindUFunction(this, FName("OnGridBorderMouseDown"));
 }
 
 void UInventoryGridWidget::NativeDestruct()
 {
+    Super::NativeDestruct();
 
-	Super::NativeDestruct();
-
-	InventorySubsystem->OnInventoryChanged.RemoveDynamic(this, &UInventoryGridWidget::Refresh);
-
-	GridBorder->OnMouseButtonDownEvent.Unbind();
-
+    InventorySubsystem->OnInventoryChanged.RemoveDynamic(this, &UInventoryGridWidget::Refresh);
+    GridBorder->OnMouseButtonDownEvent.Unbind();
 }
-
 
 bool UInventoryGridWidget::NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation)
 {
-	AItemObject* _payload = GetPayload(InOperation);
+    AItemObject* _payload = GetPayload(InOperation);
 
-	if (_payload && IsRoomAvailableForPayload(_payload))
-	{
-		//_payload = GetPayload(InOperation);
+    if (_payload && IsRoomAvailableForPayload(_payload))
+    {
+        FTile _draggedItemTopLeftTile = FTile(DraggedItemTopLeftTile.X, DraggedItemTopLeftTile.Y);
+        int _index;
 
-		FTile _draggedItemTopLeftTile = FTile(DraggedItemTopLeftTile.X, DraggedItemTopLeftTile.Y);
-		int _index;
+        InventorySubsystem->TileToIndex(_draggedItemTopLeftTile, _index);
+        InventorySubsystem->RemoveItem(_payload);
+        InventorySubsystem->AddItemAt(_payload, _index);
+        Refresh();
 
-		InventorySubsystem->TileToIndex(_draggedItemTopLeftTile, _index);
+        return true;
+    }
+    else
+    {
+        _payload = GetPayload(InOperation);
 
-		InventorySubsystem->RemoveItem(_payload);
+        bool _isSuccess;
+        InventorySubsystem->TryAddItem(_payload, _isSuccess);
 
-		InventorySubsystem->AddItemAt(_payload, _index);
+        if (!_isSuccess)
+        {
+            // InventorySubsystem->SpawnItemFromActor(_payload, GetOwningPlayer()->GetPawn(), true);
+        }
+    }
 
-		Refresh();
-
-		return true;
-	}
-	else
-	{
-		bool _isSuccess;
-		InventorySubsystem->TryAddItem(_payload, _isSuccess);
-		if (!_isSuccess)
-		{
-			InventorySubsystem->SpawnItemFromActor(_payload, GetOwningPlayer()->GetPawn(), true);
-		}
-		else
-		{
-
-		}
-
-	}
-
-
-	return false; // Indicate that we did not handle the drop
+    Refresh();
+    return false; // Indicate that we did not handle the drop
 }
 
 bool UInventoryGridWidget::NativeOnDragOver(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation)
 {
-	FVector2D MouseLocalPosition = InGeometry.AbsoluteToLocal(InDragDropEvent.GetLastScreenSpacePosition());
+    FVector2D MouseLocalPosition = InGeometry.AbsoluteToLocal(InDragDropEvent.GetLastScreenSpacePosition());
 
-	bool Right, Down;
-	MousePositionInTile(MouseLocalPosition, Right, Down);
+    bool Right, Down;
+    MousePositionInTile(MouseLocalPosition, Right, Down);
 
-	AItemObject* ItemObject = Cast<AItemObject>(InOperation->Payload);
-	if (!ItemObject)
-	{
-		return false;
-	}
+    AItemObject* ItemObject = Cast<AItemObject>(InOperation->Payload);
+    if (!ItemObject)
+    {
+        return false;
+    }
 
-	FIntPoint Dimension = ItemObject->GetDimensions();
-	if (Right)
-	{
-		Dimension.X = FMath::Max(0, Dimension.X - 1);
-	}
-	if (Down)
-	{
-		Dimension.Y = FMath::Max(0, Dimension.Y - 1);
-	}
+    FIntPoint Dimension = ItemObject->GetDimensions();
+    if (Right)
+    {
+        Dimension.X = FMath::Max(0, Dimension.X - 1);
+    }
+    if (Down)
+    {
+        Dimension.Y = FMath::Max(0, Dimension.Y - 1);
+    }
 
-	FVector2D MousePosInTile = MouseLocalPosition / TileSize;
-	FTile TopLeftTile = FTile(FMath::TruncToInt(MousePosInTile.X - Dimension.X / 2), FMath::TruncToInt(MousePosInTile.Y - Dimension.Y / 2));
+    FVector2D MousePosInTile = MouseLocalPosition / TileSize;
+    FTile TopLeftTile = FTile(FMath::TruncToInt(MousePosInTile.X - Dimension.X / 2), FMath::TruncToInt(MousePosInTile.Y - Dimension.Y / 2));
 
-	DraggedItemTopLeftTile = FIntPoint(TopLeftTile.X, TopLeftTile.Y);
+    DraggedItemTopLeftTile = FIntPoint(TopLeftTile.X, TopLeftTile.Y);
 
-	return true;
+    return true;
 }
-
 
 void UInventoryGridWidget::InitializeGrids(UInventoryWidget* _inventoryWidget)
 {
-	BPItemWidget = _inventoryWidget->GetItemWidget();
+    BPItemWidget = _inventoryWidget->GetItemWidget();
 
-	// GRIDLER BASLAR VE PARAMETRELER ALINIR
-	if (InventorySubsystem)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("InventorySubsystem found."));
-	}
-	else
-	{
-		return;
-	}
+    // GRIDLER BASLAR VE PARAMETRELER ALINIR
+    if (InventorySubsystem)
+    {
+        UE_LOG(LogTemp, Warning, TEXT("InventorySubsystem found."));
+    }
+    else
+    {
+        return;
+    }
 
-	TileSize = InventorySubsystem->GetTileSize();
-	LineColor = InventorySubsystem->GetLineColor();
-	LineThickness = InventorySubsystem->GetLineThickness();
+    TileSize = InventorySubsystem->GetTileSize();
+    LineColor = InventorySubsystem->GetLineColor();
+    LineThickness = InventorySubsystem->GetLineThickness();
 
-	if (GridBorder)
-	{
+    if (GridBorder)
+    {
+        // GRID'İN BÜYÜKLÜĞÜ BELİRLENİR
+        UCanvasPanelSlot* GridBorderSlot = Cast<UCanvasPanelSlot>(GridBorder->Slot);
+        GridBorderSlot->SetSize(FVector2D(InventorySubsystem->GetColumns() * TileSize, InventorySubsystem->GetRows() * TileSize));
 
-		//GRÝD'ÝN BÜYÜKLÜÐÜ BELÝRLENÝR
-		UCanvasPanelSlot* GridBorderSlot = Cast<UCanvasPanelSlot>(GridBorder->Slot);
-		GridBorderSlot->SetSize(FVector2D(InventorySubsystem->GetColumns() * TileSize, InventorySubsystem->GetRows() * TileSize));
+        // GRID'İN KENARLARI ÇİZİLİR
+        CreateLineSegments();
+        // GRID'İN İÇİNİ DOLDURMAK İÇİN REFRESH FONKSİYONU ÇAĞIRILIR
+        Refresh();
 
-		//GRID'ÝN KENARLARI ÇÝZÝLÝR
-		CreateLineSegments();
-		//GRID'ÝN ÝÇÝNÝ DOLDURMAK ÝÇÝN REFRESH FONKSÝYONU ÇAÐIRILIR
-		Refresh();
-
-
-		//Bind event OnInventoryChanged
-		InventorySubsystem->OnInventoryChanged.AddDynamic(this, &UInventoryGridWidget::Refresh);
-
-	}
-	else
-	{
-		UE_LOG(LogTemp, Error, TEXT("GridBorder is not bound.(GRID-WIDGET)"));
-
-	}
+        // Bind event OnInventoryChanged
+        InventorySubsystem->OnInventoryChanged.AddDynamic(this, &UInventoryGridWidget::Refresh);
+    }
+    else
+    {
+        UE_LOG(LogTemp, Error, TEXT("GridBorder is not bound.(GRID-WIDGET)"));
+    }
 }
 
 void UInventoryGridWidget::CreateLineSegments()
 {
-	//GRID'ÝN KENARLARI ÇÝZÝLÝR VE LÝNES ARRAYINE EKLENÝR
-	// 
-	// DÝKEY ÇÝZGÝLER ÇÝZÝLÝR VE LÝNES ARRAYINE EKLENÝR
-	Lines.Empty();
+    // GRID'İN KENARLARI ÇİZİLİR VE LİNES ARRAYINE EKLENİR
+    Lines.Empty();
 
-	FVector2D TopLeft = FVector2D::ZeroVector;
+    FVector2D TopLeft = FVector2D::ZeroVector;
 
-	int32 Columns = InventorySubsystem->GetColumns();
-	int32 Rows = InventorySubsystem->GetRows();
+    int32 Columns = InventorySubsystem->GetColumns();
+    int32 Rows = InventorySubsystem->GetRows();
 
-	UE_LOG(LogTemp, Warning, TEXT("Columns: %d, Rows: %d"), Columns, Rows);
+    UE_LOG(LogTemp, Warning, TEXT("Columns: %d, Rows: %d"), Columns, Rows);
 
-	if (GridBorder)
-	{
-		if (UCanvasPanelSlot* CanvasSlot = Cast<UCanvasPanelSlot>(GridBorder->Slot))
-		{
-			TopLeft = CanvasSlot->GetPosition();
-		}
-	}
+    if (GridBorder)
+    {
+        if (UCanvasPanelSlot* CanvasSlot = Cast<UCanvasPanelSlot>(GridBorder->Slot))
+        {
+            TopLeft = CanvasSlot->GetPosition();
+        }
+    }
 
+    for (int32 i = 0; i <= Columns; ++i)
+    {
+        UE_LOG(LogTemp, Warning, TEXT("Topleft: %f"), TopLeft.X);
+        float X = TopLeft.X + i * TileSize;
+        Lines.Add(FLine(FVector2D(X, (float)TopLeft.Y), FVector2D(X, TopLeft.Y + Rows * TileSize)));
+    }
 
-	for (int32 i = 0; i <= Columns; ++i)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Topleft: %f"), TopLeft.X);
-		float X = TopLeft.X + i * TileSize;
-		Lines.Add(FLine(FVector2D(X, (float)TopLeft.Y), FVector2D(X, TopLeft.Y + Rows * TileSize)));
-	}
+    for (int32 j = 0; j <= Rows; ++j)
+    {
+        float Y = TopLeft.Y + j * TileSize;
+        Lines.Add(FLine(FVector2D((float)TopLeft.X, Y), FVector2D(TopLeft.X + Columns * TileSize, Y)));
+    }
 
-	for (int32 j = 0; j <= Rows; ++j)
-	{
-		float Y = TopLeft.Y + j * TileSize;
-		Lines.Add(FLine(FVector2D((float)TopLeft.X, Y), FVector2D(TopLeft.X + Columns * TileSize, Y)));
-	}
-
-	// Trigger a repaint
-	Invalidate(EInvalidateWidgetReason::Paint);
-
-
+    // Trigger a repaint
+    Invalidate(EInvalidateWidgetReason::Paint);
 }
 
 bool UInventoryGridWidget::IsRoomAvailableForPayload(AItemObject* _payload)
 {
-	if (_payload)
-	{
-		FTile _draggedItemTopLeftTile = FTile(DraggedItemTopLeftTile.X, DraggedItemTopLeftTile.Y);
-		int _index;
-		bool _isRoomAvailable;
+    if (_payload)
+    {
+        FTile _draggedItemTopLeftTile = FTile(DraggedItemTopLeftTile.X, DraggedItemTopLeftTile.Y);
+        int _index;
+        bool _isRoomAvailable;
 
-		InventorySubsystem->TileToIndex(_draggedItemTopLeftTile, _index);
-		InventorySubsystem->IsRoomAvailable(_payload, _index, _isRoomAvailable);
+        InventorySubsystem->TileToIndex(_draggedItemTopLeftTile, _index);
+        InventorySubsystem->IsRoomAvailable(_payload, _index, _isRoomAvailable);
 
-		return _isRoomAvailable;
+        return _isRoomAvailable;
+    }
 
-	}
-
-	return false;
+    return false;
 }
 
 AItemObject* UInventoryGridWidget::GetPayload(UDragDropOperation* _dragDropOperation)
 {
-	//_dragdropOperation is valid
-	if (_dragDropOperation && _dragDropOperation->Payload)
-	{
-		return Cast<AItemObject>(_dragDropOperation->Payload);
-	}
+    // _dragdropOperation is valid
+    if (_dragDropOperation && _dragDropOperation->Payload)
+    {
+        return Cast<AItemObject>(_dragDropOperation->Payload);
+    }
 
-	return nullptr;
+    return nullptr;
 }
-
-
-
 
 void UInventoryGridWidget::Refresh()
 {
-	//GRID TEMÝZLENÝR
-	GridCanvasPanel->ClearChildren();
+    // GRID TEMİZLENİR
+    GridCanvasPanel->ClearChildren();
 
-	if (!InventorySubsystem)
-	{
-		InventorySubsystem = GetGameInstance()->GetSubsystem<UInventorySubsystem>();
-	}
+    if (!InventorySubsystem)
+    {
+        InventorySubsystem = GetGameInstance()->GetSubsystem<UInventorySubsystem>();
+    }
 
-	//TÜM ÝTEMLAR ALINIR
-	TMap<AItemObject*, FTile> _items;
-	InventorySubsystem->GetAllItems(_items);
+    // TÜM İTEMLAR ALINIR
+    TMap<AItemObject*, FTile> _items;
+    InventorySubsystem->GetAllItems(_items);
 
-	//Her bir item'i ve tile'i bir for loop ile çizilir
-	for (auto& Item : _items)
-	{
-		//Item ve tile alýnýr
-		AItemObject* _itemObject = Item.Key;
-		FTile _topLeftTile = Item.Value;
+    // Her bir item'i ve tile'i bir for loop ile çizilir
+    for (auto& Item : _items)
+    {
+        // Item ve tile alınır
+        AItemObject* _itemObject = Item.Key;
+        FTile _topLeftTile = Item.Value;
 
-		//Create a new item widget
+        // Create a new item widget
+        auto _itemWidget = Cast<UItemWidget>(CreateWidget(GetWorld(), BPItemWidget));
 
-		auto _itemWidget = Cast<UItemWidget>(CreateWidget(GetWorld(), BPItemWidget));
+        _itemWidget->InitializeWidget(_itemObject, TileSize);
 
-		/*UMaterialInterface* _icon;
-		_itemObject->GetIcon(_icon);*/
+        // Bind event FRemoved
+        _itemWidget->OnRemoved.AddDynamic(this, &UInventoryGridWidget::OnItemRemoved);
 
-		_itemWidget->InitializeWidget(_itemObject, TileSize);
+        // Set the size of the item widget
+        auto slot = GridCanvasPanel->AddChild(_itemWidget);
 
-
-		//Bind event FRemoved
-		_itemWidget->OnRemoved.AddDynamic(this, &UInventoryGridWidget::OnItemRemoved);
-
-		//Set the size of the item widget
-		auto slot = GridCanvasPanel->AddChild(_itemWidget);
-
-		//cast to canvaspanelslot to slot
-		if (UCanvasPanelSlot* _canvasSlotCast = Cast<UCanvasPanelSlot>(slot))
-		{
-			_canvasSlotCast->SetAutoSize(true);
-			_canvasSlotCast->SetPosition(FVector2D(_topLeftTile.X * TileSize, _topLeftTile.Y * TileSize));
-
-
-		}
-		else
-		{
-			UE_LOG(LogTemp, Warning, TEXT("CanvasSlot is not casted"));
-		}
-
-	}
-
-
+        // Cast to canvaspanelslot to slot
+        if (UCanvasPanelSlot* _canvasSlotCast = Cast<UCanvasPanelSlot>(slot))
+        {
+            _canvasSlotCast->SetAutoSize(true);
+            _canvasSlotCast->SetPosition(FVector2D(_topLeftTile.X * TileSize, _topLeftTile.Y * TileSize));
+        }
+        else
+        {
+            UE_LOG(LogTemp, Warning, TEXT("CanvasSlot is not casted"));
+        }
+    }
 }
 
 void UInventoryGridWidget::OnItemRemoved(AItemObject* _itemObject)
 {
-	//Item silinir
-	InventorySubsystem->RemoveItem(_itemObject);
-	//Refresh();
+    // Item silinir
+    InventorySubsystem->RemoveItem(_itemObject);
+    Refresh();
 }
-
-
 
 int32 UInventoryGridWidget::NativePaint(const FPaintArgs& Args, const FGeometry& AllottedGeometry, const FSlateRect& MyCullingRect, FSlateWindowElementList& OutDrawElements, int32 LayerId, const FWidgetStyle& InWidgetStyle, bool bParentEnabled) const
 {
-	//FOR loop ile Lines arrayindeki her bir eleman çizilir
+    // FOR loop ile Lines arrayindeki her bir eleman çizilir
+    int32 CurrentLayer = LayerId;
 
-	int32 CurrentLayer = LayerId;
+    for (int32 i = 0; i < Lines.Num(); i++)
+    {
+        FVector2D Start = Lines[i].Start;
+        FVector2D End = Lines[i].End;
 
-	for (int32 i = 0; i < Lines.Num(); i++)
-	{
-		FVector2D Start = Lines[i].Start;
-		FVector2D End = Lines[i].End;
+        TArray<FVector2D> Points;
+        Points.Add(Start);
+        Points.Add(End);
 
-		TArray<FVector2D> Points;
-		Points.Add(Start);
-		Points.Add(End);
+        FSlateDrawElement::MakeLines(
+            OutDrawElements,
+            CurrentLayer,
+            AllottedGeometry.ToPaintGeometry(),
+            Points,
+            ESlateDrawEffect::None,
+            LineColor,
+            true,
+            LineThickness
+        );
+    }
 
-		FSlateDrawElement::MakeLines(
-			OutDrawElements,
-			CurrentLayer,
-			AllottedGeometry.ToPaintGeometry(),
-			Points,
-			ESlateDrawEffect::None,
-			LineColor,
-			true,
-			LineThickness
-		);
-	}
-
-	return Super::NativePaint(Args, AllottedGeometry, MyCullingRect, OutDrawElements, CurrentLayer, InWidgetStyle, bParentEnabled);
+    return Super::NativePaint(Args, AllottedGeometry, MyCullingRect, OutDrawElements, CurrentLayer, InWidgetStyle, bParentEnabled);
 }
 
 void UInventoryGridWidget::OnGridBorderMouseDown(FGeometry MyGeometry, const FPointerEvent& MouseEvent)
 {
-	//GRID BORDER'A TIKLANDIÐINDA ÇALIÞACAK FONKSÝYON
-	UE_LOG(LogTemp, Warning, TEXT("Grid Border Mouse Down"));
+    // GRID BORDER'A TIKLANDIĞINDA ÇALIŞACAK FONKSİYON
+    UE_LOG(LogTemp, Warning, TEXT("Grid Border Mouse Down"));
 }
 
 void UInventoryGridWidget::MousePositionInTile(FVector2D _mousePosition, bool& _right, bool& _down) const
 {
-	//MousePsition'un X değerini TileSize ile modunu alarak right ve down bool değerlerini döndürür
-	_right = FMath::Fmod(_mousePosition.X, TileSize) > TileSize / 2;
-	_down = FMath::Fmod(_mousePosition.Y, TileSize) > TileSize / 2;
-
+    // MousePsition'un X değerini TileSize ile modunu alarak right ve down bool değerlerini döndürür
+    _right = FMath::Fmod(_mousePosition.X, TileSize) > TileSize / 2;
+    _down = FMath::Fmod(_mousePosition.Y, TileSize) > TileSize / 2;
 }
