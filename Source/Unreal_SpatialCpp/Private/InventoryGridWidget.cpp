@@ -59,6 +59,20 @@ bool UInventoryGridWidget::NativeOnDrop(const FGeometry& InGeometry, const FDrag
 
 		return true;
 	}
+	else
+	{
+		bool _isSuccess;
+		InventorySubsystem->TryAddItem(_payload, _isSuccess);
+		if (!_isSuccess)
+		{
+			InventorySubsystem->SpawnItemFromActor(_payload, GetOwningPlayer()->GetPawn(), true);
+		}
+		else
+		{
+
+		}
+
+	}
 
 
 	return false; // Indicate that we did not handle the drop

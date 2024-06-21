@@ -1,51 +1,40 @@
 ﻿// Fill out your copyright notice in the Description page of Project Settings.
 
-
 #include "InventorySubsystem.h"
 #include "ItemObject.h"
 #include "Item.h"
 #include "InventoryStructures.h"
 
-
-
-
 void UInventorySubsystem::Initialize(FSubsystemCollectionBase& Collection)
 {
 	//Items array make Resize with Columns and Rows
-	//Items.SetNum(Columns * Rows);
-
+	Items.SetNum(Columns * Rows);
 
 	//Timer for testing and use lambda function
 	GetWorld()->GetTimerManager().SetTimer(TimerHandleTick, [this]()
 		{
 			CustomTick(0.05);
 		}, 0.05f, true);
-
-
 }
 
 void UInventorySubsystem::Deinitialize()
 {
 	//Clear Timer
 	GetWorld()->GetTimerManager().ClearTimer(TimerHandleTick);
-
 }
 
 void UInventorySubsystem::CustomTick(float DeltaTime)
 {
 	//UE_LOG(LogTemp, Warning, TEXT("CustomTick"));
-
 	if (IsDirty)
 	{
 		IsDirty = false;
 		OnInventoryChanged.Broadcast();
 	}
-
 }
 
 void UInventorySubsystem::TryAddItem(AItemObject* _itemObject, bool& _success)
 {
-
 	if (_itemObject)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Items Num: %d"), Items.Num());
@@ -60,27 +49,18 @@ void UInventorySubsystem::TryAddItem(AItemObject* _itemObject, bool& _success)
 				if (_isRoomAvailableBool)
 				{
 					AddItemAt(_itemObject, i);
-
 					_success = true;
 					return;
 				}
-				else
-				{
-					_success = false;
-				}
-
 			}
-
 		}
-
-
+		_success = false;
 	}
 	else
 	{
-		UE_LOG(LogTemp, Warning, TEXT("ItemObject is null(InventorySubSystem::TryAddItem fail)"));
+		UE_LOG(LogTemp, Warning, TEXT("ItemObject is null (InventorySubSystem::TryAddItem fail)"));
 		_success = false;
 	}
-
 }
 
 void UInventorySubsystem::GetAllItems(TMap<AItemObject*, FTile>& _allItems)
@@ -98,41 +78,36 @@ void UInventorySubsystem::GetAllItems(TMap<AItemObject*, FTile>& _allItems)
 				_currentItemObject = Items[i];
 				IndexToTile(i, _currentTile);
 				_allItems.Add(_currentItemObject, _currentTile);
-
 			}
-
 		}
 	}
-
 }
 
 void UInventorySubsystem::RemoveItem(AItemObject* _itemObject)
 {
 	//Items.Remove(_itemObject);
-	if (Items.Contains(_itemObject))
+	for (int i = 0; i < Items.Num(); i++)
 	{
-
-		for (int i = 0; i < Items.Num(); i++)
+		if (Items[i] == _itemObject)
 		{
-			if (Items[i] == _itemObject)
-			{
-				Items[i] = nullptr;
-				IsDirty = true;
-			}
+			Items[i] = nullptr;
+			IsDirty = true;
 		}
-
 	}
-
 }
 
 void UInventorySubsystem::SpawnItemFromActor(AItemObject* _itemObject, AActor* _actor, bool _groundClamp)
 {
+	if (!_itemObject)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("ItemObject is null (InventorySubsystem::SpawnItemFromActor)"));
+		return;
+	}
 
 	auto _location = (_actor->GetActorForwardVector() * 150) + _actor->GetActorLocation();
 
 	if (_groundClamp)
 	{
-
 		FHitResult _hitResult;
 		FVector _start = _location;
 		FVector _end = _location - FVector(0, 0, 1000);
@@ -148,17 +123,11 @@ void UInventorySubsystem::SpawnItemFromActor(AItemObject* _itemObject, AActor* _
 		{
 			_location = _location - FVector(0, 0, 1000);
 		}
-
-	}
-	else
-	{
-
 	}
 
 	//ItemObject'i _location'a spawn et
 	FActorSpawnParameters _spawnParameters;
 	_spawnParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
-	//AItemObject* _spawnedItemObject = GetWorld()->SpawnActor<AItemObject>(_itemObject->GetClass(), _location, FRotator::ZeroRotator, _spawnParameters);
 	AItem* _spawnedItem = GetWorld()->SpawnActor<AItem>(_itemObject->GetItemClass(), _location, FRotator::ZeroRotator, _spawnParameters);
 
 	FIntPoint _dimensions;
@@ -168,16 +137,10 @@ void UInventorySubsystem::SpawnItemFromActor(AItemObject* _itemObject, AActor* _
 	bool _rotated;
 
 	_itemObject->GetAllSettings(_dimensions, _icon, _iconRotated, _itemClass, _rotated);
-
-
-
-
-
 }
 
 void UInventorySubsystem::IsRoomAvailable(AItemObject*& _itemObject, int& _topleftIndex, bool& _roomEmpty)
 {
-	//ForEachIndex
 	FTile _tile;
 	IndexToTile(_topleftIndex, _tile);
 	FIntPoint _dimensions = _itemObject->GetDimensions();
@@ -224,26 +187,23 @@ void UInventorySubsystem::IsRoomAvailable(AItemObject*& _itemObject, int& _tople
 	_roomEmpty = true;
 }
 
-
 void UInventorySubsystem::IndexToTile(int& _index, FTile& _tile)
 {
 	_tile.X = _index % Columns;
 	_tile.Y = _index / Columns;
-
 }
 
 void UInventorySubsystem::GetItemAtIndex(int _index, AItemObject*& _itemObject, bool& _isValid)
 {
 	if (Items.IsValidIndex(_index))
 	{
-		Items[_index] = _itemObject;
+		_itemObject = Items[_index]; // Bu satırdaki hata düzeltildi
 		_isValid = true;
 	}
 	else
 	{
 		_isValid = false;
 	}
-
 }
 
 void UInventorySubsystem::TileToIndex(FTile& _tile, int& _index)
@@ -258,14 +218,14 @@ void UInventorySubsystem::AddItemAt(AItemObject*& _itemObject, int& _topleftInde
 	FIntPoint _dimensions = _itemObject->GetDimensions();
 
 	int _startIndexJ = _tile.X;
-	int _lastIndexJ = _tile.X + (_dimensions.X - 1); // Düzeltildi: - yerine + kullanýldý
+	int _lastIndexJ = _tile.X + (_dimensions.X - 1);
 
-	for (int j = _startIndexJ; j <= _lastIndexJ; j++) // Döngü koþulu <= olarak güncellendi
+	for (int j = _startIndexJ; j <= _lastIndexJ; j++)
 	{
 		int _startIndexK = _tile.Y;
-		int _lastIndexK = _tile.Y + (_dimensions.Y - 1); // Düzeltildi: - yerine + kullanýldý
+		int _lastIndexK = _tile.Y + (_dimensions.Y - 1);
 
-		for (int k = _startIndexK; k <= _lastIndexK; k++) // Döngü koþulu <= olarak güncellendi
+		for (int k = _startIndexK; k <= _lastIndexK; k++)
 		{
 			FTile _currentTile;
 			_currentTile.X = j;
@@ -283,4 +243,3 @@ void UInventorySubsystem::AddItemAt(AItemObject*& _itemObject, int& _topleftInde
 	}
 	IsDirty = true;
 }
-

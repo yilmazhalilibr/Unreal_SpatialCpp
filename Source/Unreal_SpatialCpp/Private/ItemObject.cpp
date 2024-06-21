@@ -5,6 +5,7 @@ AItemObject::AItemObject()
 {
 	// Set this actor to call Tick() every frame.  
 	PrimaryActorTick.bCanEverTick = true;
+	ItemClass = nullptr; // Initialize ItemClass to nullptr
 }
 
 // Getter for ItemClass
