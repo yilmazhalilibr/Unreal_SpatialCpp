@@ -97,6 +97,22 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void SpawnItemFromActor(AItemObject* _itemObject, AActor* _actor, bool _groundClamp);
 
+	//Function IsRoomAvailable
+	UFUNCTION(BlueprintCallable)
+	void IsRoomAvailable(AItemObject*& _itemObject, int& _topleftIndex, bool& _roomEmpty);
+
+	UFUNCTION(BlueprintCallable)
+	void IndexToTile(int& _index, FTile& _tile);
+
+	UFUNCTION(BlueprintCallable)
+	void GetItemAtIndex(int _index, AItemObject*& _itemObject, bool& _isValid);
+
+	UFUNCTION(BlueprintCallable)
+	void TileToIndex(FTile& _tile, int& _index);
+
+	UFUNCTION(BlueprintCallable)
+	void AddItemAt(AItemObject*& _itemObject, int& _topleftIndex);
+
 protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ExposeOnSpawn = "true"), Category = "Widget Initialize")
@@ -121,21 +137,7 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Inventory")
 	TArray<AItemObject*> Items;
 
-	//Function IsRoomAvailable
-	UFUNCTION(BlueprintCallable)
-	void IsRoomAvailable(AItemObject*& _itemObject, int& _topleftIndex, bool& _roomEmpty);
-
-	UFUNCTION(BlueprintCallable)
-	void IndexToTile(int& _index, FTile& _tile);
-
-	UFUNCTION(BlueprintCallable)
-	void GetItemAtIndex(int _index, AItemObject*& _itemObject, bool& _isValid);
-
-	UFUNCTION(BlueprintCallable)
-	void TileToIndex(FTile& _tile, int& _index);
-
-	UFUNCTION(BlueprintCallable)
-	void AddItemAt(AItemObject*& _itemObject, int& _topleftIndex);
+	
 
 
 };

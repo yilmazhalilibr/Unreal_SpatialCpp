@@ -38,6 +38,8 @@ protected:
 	virtual void NativeDestruct() override;
 
 	virtual bool NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation) override;
+	//OnDragOver
+	virtual bool NativeOnDragOver(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation) override;
 
 
 	UPROPERTY()
@@ -51,6 +53,9 @@ public:
 
 	UFUNCTION()
 	void CreateLineSegments();
+
+	UFUNCTION()
+	bool IsRoomAvailableForPayload(AItemObject* _payload);
 
 
 private:
@@ -70,8 +75,6 @@ private:
 
 	UFUNCTION()
 	void Refresh();
-
-
 
 	UFUNCTION()
 	void OnItemRemoved(AItemObject* _itemObject);
@@ -106,6 +109,12 @@ public:
 	UFUNCTION()
 	void OnGridBorderMouseDown(FGeometry MyGeometry, const FPointerEvent& MouseEvent);
 
+	UPROPERTY()
+	FIntPoint DraggedItemTopLeftTile;
+	UPROPERTY()
+	bool DrawDropLocation;
 
+	UFUNCTION()
+	void MousePositionInTile(FVector2D _mousePosition, bool& _right, bool& _down) const;
 
 };
