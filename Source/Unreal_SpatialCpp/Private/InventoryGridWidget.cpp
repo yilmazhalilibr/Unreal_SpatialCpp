@@ -10,6 +10,9 @@
 #include "Input/DragAndDrop.h"
 #include "Input/Events.h"
 #include "Blueprint/UserWidget.h"
+#include "DragAndDrop/DecoratedDragDropOp.h" // FDragDropOperation için gerekli kütüphane
+
+
 
 void UInventoryGridWidget::NativeConstruct()
 {
@@ -90,6 +93,16 @@ bool UInventoryGridWidget::NativeOnDragOver(const FGeometry& InGeometry, const F
 	DraggedItemTopLeftTile = FIntPoint(TopLeftTile.X, TopLeftTile.Y);
 
 	return true;
+}
+
+void UInventoryGridWidget::NativeOnDragEnter(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation)
+{
+	DrawDropLocation = true;
+}
+
+void UInventoryGridWidget::NativeOnDragLeave(const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation)
+{
+	DrawDropLocation = false;
 }
 
 void UInventoryGridWidget::InitializeGrids(UInventoryWidget* _inventoryWidget)
@@ -272,6 +285,16 @@ int32 UInventoryGridWidget::NativePaint(const FPaintArgs& Args, const FGeometry&
 			LineThickness
 		);
 	}
+
+	bool bIsDragDropping = FSlateApplication::Get().IsDragDropping();
+
+	if (bIsDragDropping && DrawDropLocation)
+	{
+		
+
+	}
+
+
 
 	return Super::NativePaint(Args, AllottedGeometry, MyCullingRect, OutDrawElements, CurrentLayer, InWidgetStyle, bParentEnabled);
 }
