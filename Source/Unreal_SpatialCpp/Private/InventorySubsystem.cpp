@@ -35,6 +35,33 @@ void UInventorySubsystem::CustomTick(float DeltaTime)
 
 void UInventorySubsystem::TryAddItem(AItemObject* _itemObject, bool& _success)
 {
+	if (_itemObject && DoOnceTryAddItem)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Items Num: %d"), Items.Num());
+
+		for (int i = 0; i < Items.Num(); i++)
+		{
+			if (Items[i] == nullptr)
+			{
+				bool _isRoomAvailableBool;
+				IsRoomAvailable(_itemObject, i, _isRoomAvailableBool);
+
+				if (_isRoomAvailableBool)
+				{
+					AddItemAt(_itemObject, i);
+					_success = true;
+					return;
+				}
+			}
+		}
+		_success = false;
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("ItemObject is null (InventorySubSystem::TryAddItem fail)"));
+		_success = false;
+	}
+
 	if (_itemObject)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Items Num: %d"), Items.Num());
@@ -61,6 +88,19 @@ void UInventorySubsystem::TryAddItem(AItemObject* _itemObject, bool& _success)
 		UE_LOG(LogTemp, Warning, TEXT("ItemObject is null (InventorySubSystem::TryAddItem fail)"));
 		_success = false;
 	}
+
+	if (!DoOnceTryAddItem)
+	{
+
+		_itemObject->Rotate();
+		DoOnceTryAddItem = true;
+		TryAddItem(_itemObject, _success);
+		return;
+	}
+
+	
+
+
 }
 
 void UInventorySubsystem::GetAllItems(TMap<AItemObject*, FTile>& _allItems)
@@ -143,7 +183,7 @@ void UInventorySubsystem::IsRoomAvailable(const AItemObject* _itemObject, int& _
 {
 	FTile _tile;
 	IndexToTile(_topleftIndex, _tile);
-	FIntPoint _dimensions = _itemObject->Dimensions;
+	FIntPoint _dimensions = _itemObject->GetDimensions();
 
 	int _startIndexJ = _tile.X;
 	int _lastIndexJ = _tile.X + (_dimensions.X - 1);

@@ -20,6 +20,19 @@ void AItemObject::SetItemClass(TSubclassOf<AItem> NewItemClass)
 	ItemClass = NewItemClass;
 }
 
+FIntPoint AItemObject::GetDimensions() const
+{
+	if (Rotated)
+	{
+		return FIntPoint(Dimensions.Y, Dimensions.X);
+	}
+	else
+	{
+		return Dimensions;
+	}
+
+}
+
 // GetIcon implementation
 void AItemObject::GetIcon(UMaterialInterface*& _icon)
 {

@@ -106,6 +106,44 @@ void UInventoryGridWidget::NativeOnDragLeave(const FDragDropEvent& InDragDropEve
 	DrawDropLocation = false;
 }
 
+FReply UInventoryGridWidget::NativeOnPreviewKeyDown(const FGeometry& InGeometry, const FKeyEvent& InKeyEvent)
+{
+	//Get Key pressed R
+	if (InKeyEvent.GetKey() == EKeys::R)
+	{
+		UDragDropOperation* _dragDroppingContent = UWidgetBlueprintLibrary::GetDragDroppingContent();
+
+		if (_dragDroppingContent)
+		{
+			AItemObject* _payload = Cast<AItemObject>(_dragDroppingContent->Payload);
+			if (_payload)
+			{
+				_payload->Rotate();
+				auto _visual = _dragDroppingContent->DefaultDragVisual;
+
+				//Cast to UItemWidget visual
+				if (UItemWidget* _itemWidget = Cast<UItemWidget>(_visual))
+				{
+					_itemWidget->OnRefreshHandle();
+
+					//return handled
+					return FReply::Handled();
+
+
+				}
+
+
+			}
+
+		}
+
+	}
+
+
+
+	return FReply::Unhandled();
+}
+
 void UInventoryGridWidget::InitializeGrids(UInventoryWidget* _inventoryWidget)
 {
 	BPItemWidget = _inventoryWidget->GetItemWidget();

@@ -17,9 +17,7 @@ public:
 	// Sets default values for this actor's properties
 	AItemObject();
 
-	//Get dimensions of the item
-	UFUNCTION(BlueprintCallable)
-	FIntPoint GetDimensions() { return Dimensions; }
+	
 
 	UFUNCTION(BlueprintCallable)
 	void GetIcon(UMaterialInterface*& _icon);
@@ -41,8 +39,20 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ExposeOnSpawn = "true"), Category = "Item Properties")
 	FIntPoint Dimensions;
 
+	UFUNCTION(BlueprintCallable, Category = "Item Properties")
+	void Rotate()
+	{
+		Rotated = !Rotated;
+	};
+
+	UFUNCTION(BlueprintCallable, Category = "Item Properties")
+	bool IsRotated() { return Rotated; };
+
+	UFUNCTION(BlueprintCallable)
+	FIntPoint GetDimensions() const;
+
 protected:
-	
+
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ExposeOnSpawn = "true"), Category = "Item Properties")
 	UMaterialInterface* Icon;

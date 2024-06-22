@@ -47,6 +47,10 @@ protected:
 	//NativeOnDragLeave
 	virtual void NativeOnDragLeave(const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation) override;
 
+	//NativeOnPreviewKeyDown
+	virtual FReply NativeOnPreviewKeyDown(const FGeometry& InGeometry, const FKeyEvent& InKeyEvent) override;	
+
+
 	UPROPERTY()
 	TSubclassOf<UItemWidget> BPItemWidget;
 
