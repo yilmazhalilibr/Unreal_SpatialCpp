@@ -38,9 +38,11 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Item Properties")
 	void SetItemClass(TSubclassOf<AItem> NewItemClass);
 
-protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ExposeOnSpawn = "true"), Category = "Item Properties")
 	FIntPoint Dimensions;
+
+protected:
+	
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ExposeOnSpawn = "true"), Category = "Item Properties")
 	UMaterialInterface* Icon;

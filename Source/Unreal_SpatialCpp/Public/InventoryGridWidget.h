@@ -20,7 +20,7 @@ class UItem;
 class UInventoryWidget;
 class AItemObject;
 class UDragDropOperation;
-
+class USlateBrushAsset;
 
 
 
@@ -60,7 +60,7 @@ public:
 	void CreateLineSegments();
 
 	UFUNCTION()
-	bool IsRoomAvailableForPayload(AItemObject* _payload);
+	bool IsRoomAvailableForPayload(const AItemObject* _payload);
 
 	UFUNCTION()
 	void Refresh();
@@ -103,6 +103,8 @@ public:
 	UPROPERTY()
 	TSubclassOf<AItemObject> BP_ItemObject;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "InventoryGrid", meta = (DisplayName = "SlateBrush"))
+	USlateBrushAsset* SlateBrush;
 
 	//crea Refresh Implementation function
 	UFUNCTION(BlueprintImplementableEvent, Category = "InventoryGridWidget", meta = (DisplayName = "Refresh"))

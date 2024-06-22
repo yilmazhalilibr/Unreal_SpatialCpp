@@ -139,11 +139,11 @@ void UInventorySubsystem::SpawnItemFromActor(AItemObject* _itemObject, AActor* _
 	_itemObject->GetAllSettings(_dimensions, _icon, _iconRotated, _itemClass, _rotated);
 }
 
-void UInventorySubsystem::IsRoomAvailable(AItemObject*& _itemObject, int& _topleftIndex, bool& _roomEmpty)
+void UInventorySubsystem::IsRoomAvailable(const AItemObject* _itemObject, int& _topleftIndex, bool& _roomEmpty)
 {
 	FTile _tile;
 	IndexToTile(_topleftIndex, _tile);
-	FIntPoint _dimensions = _itemObject->GetDimensions();
+	FIntPoint _dimensions = _itemObject->Dimensions;
 
 	int _startIndexJ = _tile.X;
 	int _lastIndexJ = _tile.X + (_dimensions.X - 1);

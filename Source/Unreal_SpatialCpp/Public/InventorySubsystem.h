@@ -99,7 +99,7 @@ public:
 
 	//Function IsRoomAvailable
 	UFUNCTION(BlueprintCallable)
-	void IsRoomAvailable(AItemObject*& _itemObject, int& _topleftIndex, bool& _roomEmpty);
+	void IsRoomAvailable(const AItemObject* _itemObject, int& _topleftIndex, bool& _roomEmpty);
 
 	UFUNCTION(BlueprintCallable)
 	void IndexToTile(int& _index, FTile& _tile);

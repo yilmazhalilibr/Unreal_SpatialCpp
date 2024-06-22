@@ -11,8 +11,9 @@
 #include "Input/Events.h"
 #include "Blueprint/UserWidget.h"
 #include "DragAndDrop/DecoratedDragDropOp.h" // FDragDropOperation için gerekli kütüphane
-
-
+#include "Blueprint/WidgetBlueprintLibrary.h"
+#include "Engine/Texture2D.h"
+#include "Runtime/CoreUObject/Public/UObject/ConstructorHelpers.h"
 
 void UInventoryGridWidget::NativeConstruct()
 {
@@ -180,7 +181,7 @@ void UInventoryGridWidget::CreateLineSegments()
 	Invalidate(EInvalidateWidgetReason::Paint);
 }
 
-bool UInventoryGridWidget::IsRoomAvailableForPayload(AItemObject* _payload)
+bool UInventoryGridWidget::IsRoomAvailableForPayload(const AItemObject* _payload)
 {
 	if (_payload)
 	{
@@ -196,6 +197,7 @@ bool UInventoryGridWidget::IsRoomAvailableForPayload(AItemObject* _payload)
 
 	return false;
 }
+
 
 AItemObject* UInventoryGridWidget::GetPayload(UDragDropOperation* _dragDropOperation)
 {
@@ -290,9 +292,63 @@ int32 UInventoryGridWidget::NativePaint(const FPaintArgs& Args, const FGeometry&
 
 	if (bIsDragDropping && DrawDropLocation)
 	{
-		
+		UDragDropOperation* _dragDroppingContent = UWidgetBlueprintLibrary::GetDragDroppingContent();
 
+		if (_dragDroppingContent)
+		{
+			AItemObject* _payload = Cast<AItemObject>(_dragDroppingContent->Payload);
+
+			FTile _draggedItemTopLeftTile = FTile(DraggedItemTopLeftTile.X, DraggedItemTopLeftTile.Y);
+			int _index;
+			bool _isRoomAvailable;
+
+			InventorySubsystem->TileToIndex(_draggedItemTopLeftTile, _index);
+			InventorySubsystem->IsRoomAvailable(_payload, _index, _isRoomAvailable);
+
+			//FPaintContext Context = FPaintContext(AllottedGeometry, MyCullingRect, OutDrawElements, CurrentLayer, InWidgetStyle, bParentEnabled);
+			 // FPaintContext nesnesini oluşturun
+
+
+
+			  // FPaintContext nesnesini oluşturun
+			FPaintContext Context(AllottedGeometry, MyCullingRect, OutDrawElements, LayerId, InWidgetStyle, bParentEnabled);
+
+			if (_isRoomAvailable)
+			{
+				//DraggedItemTopLeftTile ile TileSize'i çarp ve Position'ı al
+				FVector2D Position(DraggedItemTopLeftTile.X * TileSize, DraggedItemTopLeftTile.Y * TileSize);
+
+				//Dimension'ı al ve TileSize ile çarp ve Size'ı al
+				FVector2D Size(_payload->GetDimensions().X * TileSize, _payload->GetDimensions().Y * TileSize);
+
+				// Tint rengi ayarla
+				FLinearColor Tint = FLinearColor(0, 1.0f, 0, 0.25f);  // Örnek olarak yeşil renk
+
+				// DrawBox fonksiyonunu çağır
+				UWidgetBlueprintLibrary::DrawBox(Context, Position, Size, SlateBrush, Tint);
+			}
+			else
+			{
+				//DraggedItemTopLeftTile ile TileSize'i çarp ve Position'ı al
+				FVector2D Position(DraggedItemTopLeftTile.X * TileSize, DraggedItemTopLeftTile.Y * TileSize);
+
+				//Dimension'ı al ve TileSize ile çarp ve Size'ı al
+				FVector2D Size(_payload->GetDimensions().X * TileSize, _payload->GetDimensions().Y * TileSize);
+
+				// Tint rengi ayarla
+				FLinearColor Tint = FLinearColor(1.f, 0, 0, 0.25f);  // Örnek olarak kırmızı renk
+
+				// DrawBox fonksiyonunu çağır
+				UWidgetBlueprintLibrary::DrawBox(Context, Position, Size, SlateBrush, Tint);
+			}
+
+
+
+		}
 	}
+
+
+
 
 
 
