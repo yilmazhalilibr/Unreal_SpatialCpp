@@ -4,32 +4,30 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
-#include "DataStructures.h"
-#include "InventoryWidget.generated.h"
+#include "ItemWidget.generated.h"
 
 /**
  *
  */
 
 
-class UInventoryGridWidget;
-
 UCLASS()
-class UNREAL_SPATIALCPP_API UInventoryWidget : public UUserWidget
+class UNREAL_SPATIALCPP_API UItemWidget : public UUserWidget
 {
 	GENERATED_BODY()
 
+
 public:
+
 	UPROPERTY(meta = (BindWidget))
 	class UCanvasPanel* CanvasPanel;
+
+	UPROPERTY(meta = (BindWidget))
+	class USizeBox* BackgroundSB;
 
 	UPROPERTY(meta = (BindWidget))
 	class UBorder* BackgroundBorder;
 
 	UPROPERTY(meta = (BindWidget))
-	class UBackgroundBlur* BackgroundBlur;
-
-	UPROPERTY(meta = (BindWidget))
-	class UInventoryGridWidget* InventoryGrid;
-
+	class UImage* ItemImage;
 };
