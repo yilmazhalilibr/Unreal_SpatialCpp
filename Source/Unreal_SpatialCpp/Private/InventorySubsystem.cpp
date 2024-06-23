@@ -1,6 +1,4 @@
-﻿// Fill out your copyright notice in the Description page of Project Settings.
-
-#include "InventorySubsystem.h"
+﻿#include "InventorySubsystem.h"
 #include "ItemObject.h"
 #include "Item.h"
 #include "InventoryStructures.h"
@@ -13,8 +11,8 @@ void UInventorySubsystem::Initialize(FSubsystemCollectionBase& Collection)
 	//Timer for testing and use lambda function
 	GetWorld()->GetTimerManager().SetTimer(TimerHandleTick, [this]()
 		{
-			CustomTick(0.05);
-		}, 0.05f, true);
+			CustomTick(0.03);
+		}, 0.03f, true);
 }
 
 void UInventorySubsystem::Deinitialize()
@@ -32,75 +30,49 @@ void UInventorySubsystem::CustomTick(float DeltaTime)
 		OnInventoryChanged.Broadcast();
 	}
 }
-
 void UInventorySubsystem::TryAddItem(AItemObject* _itemObject, bool& _success)
 {
-	if (_itemObject && DoOnceTryAddItem)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Items Num: %d"), Items.Num());
-
-		for (int i = 0; i < Items.Num(); i++)
-		{
-			if (Items[i] == nullptr)
-			{
-				bool _isRoomAvailableBool;
-				IsRoomAvailable(_itemObject, i, _isRoomAvailableBool);
-
-				if (_isRoomAvailableBool)
-				{
-					AddItemAt(_itemObject, i);
-					_success = true;
-					return;
-				}
-			}
-		}
-		_success = false;
-	}
-	else
+	if (!_itemObject)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("ItemObject is null (InventorySubSystem::TryAddItem fail)"));
 		_success = false;
-	}
-
-	if (_itemObject)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Items Num: %d"), Items.Num());
-
-		for (int i = 0; i < Items.Num(); i++)
-		{
-			if (Items[i] == nullptr)
-			{
-				bool _isRoomAvailableBool;
-				IsRoomAvailable(_itemObject, i, _isRoomAvailableBool);
-
-				if (_isRoomAvailableBool)
-				{
-					AddItemAt(_itemObject, i);
-					_success = true;
-					return;
-				}
-			}
-		}
-		_success = false;
-	}
-	else
-	{
-		UE_LOG(LogTemp, Warning, TEXT("ItemObject is null (InventorySubSystem::TryAddItem fail)"));
-		_success = false;
-	}
-
-	if (!DoOnceTryAddItem)
-	{
-
-		_itemObject->Rotate();
-		DoOnceTryAddItem = true;
-		TryAddItem(_itemObject, _success);
 		return;
 	}
 
-	
 
+	for (int attempt = 0; attempt < 2; ++attempt)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Items Num: %d"), Items.Num());
 
+		for (int i = 0; i < Items.Num(); i++)
+		{
+			if (Items[i] == nullptr)
+			{
+				bool _isRoomAvailableBool;
+				IsRoomAvailable(_itemObject, i, _isRoomAvailableBool);
+
+				if (_isRoomAvailableBool)
+				{
+					AddItemAt(_itemObject, i);
+					_success = true;
+					return;
+				}
+			}
+		}
+
+		if (!DoOnceTryAddItem)
+		{
+			// İtemi döndürme işlemi
+			_itemObject->Rotate();
+			DoOnceTryAddItem = true;
+		}
+		else
+		{
+			break;
+		}
+	}
+
+	_success = false;
 }
 
 void UInventorySubsystem::GetAllItems(TMap<AItemObject*, FTile>& _allItems)
@@ -125,7 +97,6 @@ void UInventorySubsystem::GetAllItems(TMap<AItemObject*, FTile>& _allItems)
 
 void UInventorySubsystem::RemoveItem(AItemObject* _itemObject)
 {
-	//Items.Remove(_itemObject);
 	for (int i = 0; i < Items.Num(); i++)
 	{
 		if (Items[i] == _itemObject)
@@ -153,7 +124,6 @@ void UInventorySubsystem::SpawnItemFromActor(AItemObject* _itemObject, AActor* _
 		FVector _end = _location - FVector(0, 0, 1000);
 
 		FCollisionQueryParams _collisionQueryParams;
-		//_collisionQueryParams.AddIgnoredActor(nullptr);
 
 		if (GetWorld()->LineTraceSingleByChannel(_hitResult, _start, _end, ECollisionChannel::ECC_Visibility, _collisionQueryParams))
 		{
@@ -178,9 +148,10 @@ void UInventorySubsystem::SpawnItemFromActor(AItemObject* _itemObject, AActor* _
 
 	_itemObject->GetAllSettings(_dimensions, _icon, _iconRotated, _itemClass, _rotated);
 }
-
 void UInventorySubsystem::IsRoomAvailable(const AItemObject* _itemObject, int& _topleftIndex, bool& _roomEmpty)
 {
+	_roomEmpty = true;  // Varsayılan olarak boş olduğunu varsayıyoruz
+
 	FTile _tile;
 	IndexToTile(_topleftIndex, _tile);
 	FIntPoint _dimensions = _itemObject->GetDimensions();
@@ -199,17 +170,12 @@ void UInventorySubsystem::IsRoomAvailable(const AItemObject* _itemObject, int& _
 			_currentTile.X = j;
 			_currentTile.Y = k;
 
-			// IS TILE VALID
 			if (_currentTile.X >= 0 && _currentTile.Y >= 0 && _currentTile.X < GetColumns() && _currentTile.Y < GetRows())
 			{
-				bool _isValid = false;
-				int _tileToIndex = -1;
-
+				int _tileToIndex;
 				TileToIndex(_currentTile, _tileToIndex);
-				AItemObject* _tempItemObject = nullptr;
-				GetItemAtIndex(_tileToIndex, _tempItemObject, _isValid);
 
-				if (!_isValid || _tempItemObject)
+				if (!Items.IsValidIndex(_tileToIndex) || Items[_tileToIndex] != nullptr)
 				{
 					_roomEmpty = false;
 					return;
@@ -223,8 +189,48 @@ void UInventorySubsystem::IsRoomAvailable(const AItemObject* _itemObject, int& _
 		}
 	}
 
-	// If we exit the loops without finding an invalid tile or an occupied one, the room is empty
 	_roomEmpty = true;
+}
+
+void UInventorySubsystem::AddItemAt(AItemObject*& _itemObject, int& _topleftIndex)
+{
+	if (!_itemObject)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("ItemObject is null (InventorySubSystem::AddItemAt fail)"));
+		return;
+	}
+	FTile _tile;
+	IndexToTile(_topleftIndex, _tile);
+	FIntPoint _dimensions = _itemObject->GetDimensions();
+
+	int _startIndexJ = _tile.X;
+	int _lastIndexJ = _tile.X + (_dimensions.X - 1);
+
+	for (int j = _startIndexJ; j <= _lastIndexJ; j++)
+	{
+		int _startIndexK = _tile.Y;
+		int _lastIndexK = _tile.Y + (_dimensions.Y - 1);
+
+		for (int k = _startIndexK; k <= _lastIndexK; k++)
+		{
+			FTile _currentTile;
+			_currentTile.X = j;
+			_currentTile.Y = k;
+
+			int _tileToIndex;
+			TileToIndex(_currentTile, _tileToIndex);
+
+			if (Items.IsValidIndex(_tileToIndex))
+			{
+				Items[_tileToIndex] = _itemObject;
+			}
+			else
+			{
+				UE_LOG(LogTemp, Error, TEXT("Invalid index: %d (InventorySubSystem::AddItemAt)"), _tileToIndex);
+			}
+		}
+	}
+	IsDirty = true;
 }
 
 void UInventorySubsystem::IndexToTile(int& _index, FTile& _tile)
@@ -249,37 +255,4 @@ void UInventorySubsystem::GetItemAtIndex(int _index, AItemObject*& _itemObject, 
 void UInventorySubsystem::TileToIndex(FTile& _tile, int& _index)
 {
 	_index = _tile.X + (_tile.Y * Columns);
-}
-
-void UInventorySubsystem::AddItemAt(AItemObject*& _itemObject, int& _topleftIndex)
-{
-	FTile _tile;
-	IndexToTile(_topleftIndex, _tile);
-	FIntPoint _dimensions = _itemObject->GetDimensions();
-
-	int _startIndexJ = _tile.X;
-	int _lastIndexJ = _tile.X + (_dimensions.X - 1);
-
-	for (int j = _startIndexJ; j <= _lastIndexJ; j++)
-	{
-		int _startIndexK = _tile.Y;
-		int _lastIndexK = _tile.Y + (_dimensions.Y - 1);
-
-		for (int k = _startIndexK; k <= _lastIndexK; k++)
-		{
-			FTile _currentTile;
-			_currentTile.X = j;
-			_currentTile.Y = k;
-
-			int _tileToIndex;
-			TileToIndex(_currentTile, _tileToIndex);
-
-			// Items set array elements 
-			if (Items.IsValidIndex(_tileToIndex))
-			{
-				Items[_tileToIndex] = _itemObject;
-			}
-		}
-	}
-	IsDirty = true;
 }

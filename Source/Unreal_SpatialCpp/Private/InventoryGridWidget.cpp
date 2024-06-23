@@ -19,11 +19,23 @@ void UInventoryGridWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
 
-	// Inventorysubsystem'i gameInstance dan çekmek için kullanılır
 	InventorySubsystem = GetGameInstance()->GetSubsystem<UInventorySubsystem>();
+	if (!InventorySubsystem)
+	{
+		UE_LOG(LogTemp, Error, TEXT("Failed to get InventorySubsystem"));
+		return;
+	}
 
-	GridBorder->OnMouseButtonDownEvent.BindUFunction(this, FName("OnGridBorderMouseDown"));
+	if (GridBorder)
+	{
+		GridBorder->OnMouseButtonDownEvent.BindUFunction(this, FName("OnGridBorderMouseDown"));
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("GridBorder is not bound."));
+	}
 }
+
 
 void UInventoryGridWidget::NativeDestruct()
 {
@@ -32,12 +44,16 @@ void UInventoryGridWidget::NativeDestruct()
 	InventorySubsystem->OnInventoryChanged.RemoveDynamic(this, &UInventoryGridWidget::Refresh);
 	GridBorder->OnMouseButtonDownEvent.Unbind();
 }
-
 bool UInventoryGridWidget::NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation)
 {
 	AItemObject* _payload = GetPayload(InOperation);
+	if (!_payload)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Payload is null (InventoryGridWidget::NativeOnDrop fail)"));
+		return false;
+	}
 
-	if (_payload && IsRoomAvailableForPayload(_payload))
+	if (IsRoomAvailableForPayload(_payload))
 	{
 		FTile _draggedItemTopLeftTile = FTile(DraggedItemTopLeftTile.X, DraggedItemTopLeftTile.Y);
 		int _index;
@@ -51,8 +67,6 @@ bool UInventoryGridWidget::NativeOnDrop(const FGeometry& InGeometry, const FDrag
 	}
 	else
 	{
-		_payload = GetPayload(InOperation);
-
 		bool _isSuccess;
 		InventorySubsystem->TryAddItem(_payload, _isSuccess);
 
@@ -62,7 +76,7 @@ bool UInventoryGridWidget::NativeOnDrop(const FGeometry& InGeometry, const FDrag
 		}
 	}
 
-	return true; // Indicate that we did not handle the drop
+	return true;
 }
 
 bool UInventoryGridWidget::NativeOnDragOver(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation)
@@ -247,40 +261,39 @@ AItemObject* UInventoryGridWidget::GetPayload(UDragDropOperation* _dragDropOpera
 
 	return nullptr;
 }
-
 void UInventoryGridWidget::Refresh()
 {
-	// GRID TEMİZLENİR
-	GridCanvasPanel->ClearChildren();
-
 	if (!InventorySubsystem)
 	{
 		InventorySubsystem = GetGameInstance()->GetSubsystem<UInventorySubsystem>();
+		if (!InventorySubsystem)
+		{
+			UE_LOG(LogTemp, Error, TEXT("Failed to get InventorySubsystem in Refresh"));
+			return;
+		}
 	}
 
-	// TÜM İTEMLAR ALINIR
+	GridCanvasPanel->ClearChildren();
+
 	TMap<AItemObject*, FTile> _items;
 	InventorySubsystem->GetAllItems(_items);
 
-	// Her bir item'i ve tile'i bir for loop ile çizilir
 	for (auto& Item : _items)
 	{
-		// Item ve tile alınır
 		AItemObject* _itemObject = Item.Key;
 		FTile _topLeftTile = Item.Value;
 
-		// Create a new item widget
 		auto _itemWidget = Cast<UItemWidget>(CreateWidget(GetWorld(), BPItemWidget));
+		if (!_itemWidget)
+		{
+			UE_LOG(LogTemp, Error, TEXT("Failed to create item widget"));
+			continue;
+		}
 
 		_itemWidget->InitializeWidget(_itemObject, TileSize);
-
-		// Bind event FRemoved
 		_itemWidget->OnRemoved.AddDynamic(this, &UInventoryGridWidget::OnItemRemoved);
 
-		// Set the size of the item widget
 		auto slot = GridCanvasPanel->AddChild(_itemWidget);
-
-		// Cast to canvaspanelslot to slot
 		if (UCanvasPanelSlot* _canvasSlotCast = Cast<UCanvasPanelSlot>(slot))
 		{
 			_canvasSlotCast->SetAutoSize(true);
@@ -299,7 +312,6 @@ void UInventoryGridWidget::OnItemRemoved(AItemObject* _itemObject)
 	InventorySubsystem->RemoveItem(_itemObject);
 	Refresh();
 }
-
 int32 UInventoryGridWidget::NativePaint(const FPaintArgs& Args, const FGeometry& AllottedGeometry, const FSlateRect& MyCullingRect, FSlateWindowElementList& OutDrawElements, int32 LayerId, const FWidgetStyle& InWidgetStyle, bool bParentEnabled) const
 {
 	// FOR loop ile Lines arrayindeki her bir eleman çizilir
@@ -330,65 +342,49 @@ int32 UInventoryGridWidget::NativePaint(const FPaintArgs& Args, const FGeometry&
 
 	if (bIsDragDropping && DrawDropLocation)
 	{
-		UDragDropOperation* _dragDroppingContent = UWidgetBlueprintLibrary::GetDragDroppingContent();
+		UDragDropOperation* DragDroppingContent = UWidgetBlueprintLibrary::GetDragDroppingContent();
 
-		if (_dragDroppingContent)
+		if (DragDroppingContent)
 		{
-			AItemObject* _payload = Cast<AItemObject>(_dragDroppingContent->Payload);
-
-			FTile _draggedItemTopLeftTile = FTile(DraggedItemTopLeftTile.X, DraggedItemTopLeftTile.Y);
-			int _index;
-			bool _isRoomAvailable;
-
-			InventorySubsystem->TileToIndex(_draggedItemTopLeftTile, _index);
-			InventorySubsystem->IsRoomAvailable(_payload, _index, _isRoomAvailable);
-
-			//FPaintContext Context = FPaintContext(AllottedGeometry, MyCullingRect, OutDrawElements, CurrentLayer, InWidgetStyle, bParentEnabled);
-			 // FPaintContext nesnesini oluşturun
-
-
-
-			  // FPaintContext nesnesini oluşturun
-			FPaintContext Context(AllottedGeometry, MyCullingRect, OutDrawElements, LayerId, InWidgetStyle, bParentEnabled);
-
-			if (_isRoomAvailable)
+			AItemObject* Payload = Cast<AItemObject>(DragDroppingContent->Payload);
+			if (Payload)
 			{
-				//DraggedItemTopLeftTile ile TileSize'i çarp ve Position'ı al
-				FVector2D Position(DraggedItemTopLeftTile.X * TileSize, DraggedItemTopLeftTile.Y * TileSize);
+				FTile _draggedItemTopLeftTile = FTile(DraggedItemTopLeftTile.X, DraggedItemTopLeftTile.Y);
+				int Index;
+				bool bIsRoomAvailable;
 
-				//Dimension'ı al ve TileSize ile çarp ve Size'ı al
-				FVector2D Size(_payload->GetDimensions().X * TileSize, _payload->GetDimensions().Y * TileSize);
+				if (InventorySubsystem)
+				{
+					InventorySubsystem->TileToIndex(_draggedItemTopLeftTile, Index);
+					InventorySubsystem->IsRoomAvailable(Payload, Index, bIsRoomAvailable);
 
-				// Tint rengi ayarla
-				FLinearColor Tint = FLinearColor(0, 1.0f, 0, 0.25f);  // Örnek olarak yeşil renk
+					// FPaintContext nesnesini oluşturun
+					FPaintContext Context(AllottedGeometry, MyCullingRect, OutDrawElements, LayerId, InWidgetStyle, bParentEnabled);
 
-				// DrawBox fonksiyonunu çağır
-				UWidgetBlueprintLibrary::DrawBox(Context, Position, Size, SlateBrush, Tint);
+					FVector2D Position(_draggedItemTopLeftTile.X * TileSize, _draggedItemTopLeftTile.Y * TileSize);
+					FVector2D Size(Payload->GetDimensions().X * TileSize, Payload->GetDimensions().Y * TileSize);
+					FLinearColor Tint = bIsRoomAvailable ? FLinearColor(0, 1.0f, 0, 0.25f) : FLinearColor(1.f, 0, 0, 0.25f);
+
+					if (SlateBrush)
+					{
+						UWidgetBlueprintLibrary::DrawBox(Context, Position, Size, SlateBrush, Tint);
+					}
+					else
+					{
+						UE_LOG(LogTemp, Warning, TEXT("SlateBrush is null in NativePaint"));
+					}
+				}
+				else
+				{
+					UE_LOG(LogTemp, Warning, TEXT("InventorySubsystem is null in NativePaint"));
+				}
 			}
 			else
 			{
-				//DraggedItemTopLeftTile ile TileSize'i çarp ve Position'ı al
-				FVector2D Position(DraggedItemTopLeftTile.X * TileSize, DraggedItemTopLeftTile.Y * TileSize);
-
-				//Dimension'ı al ve TileSize ile çarp ve Size'ı al
-				FVector2D Size(_payload->GetDimensions().X * TileSize, _payload->GetDimensions().Y * TileSize);
-
-				// Tint rengi ayarla
-				FLinearColor Tint = FLinearColor(1.f, 0, 0, 0.25f);  // Örnek olarak kırmızı renk
-
-				// DrawBox fonksiyonunu çağır
-				UWidgetBlueprintLibrary::DrawBox(Context, Position, Size, SlateBrush, Tint);
+				UE_LOG(LogTemp, Warning, TEXT("Payload is null in NativePaint"));
 			}
-
-
-
 		}
 	}
-
-
-
-
-
 
 	return Super::NativePaint(Args, AllottedGeometry, MyCullingRect, OutDrawElements, CurrentLayer, InWidgetStyle, bParentEnabled);
 }

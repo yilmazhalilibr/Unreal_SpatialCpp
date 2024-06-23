@@ -51,6 +51,8 @@ public:
 	UFUNCTION(BlueprintCallable)
 	FIntPoint GetDimensions() const;
 
+
+
 protected:
 
 

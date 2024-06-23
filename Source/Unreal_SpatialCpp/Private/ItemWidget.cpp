@@ -230,6 +230,13 @@ void UItemWidget::GetIconImage()
 		UMaterialInterface* _icon;
 		ItemObject->GetIcon(_icon);
 
+		/*if (ItemObject->IsRotated())
+		{
+			double _temp = Size.X;
+			Size.X = Size.Y;
+			Size.Y = _temp;
+		}*/
+
 		if (_icon)
 		{
 			// Material kullanarak FSlateBrush olu�turma

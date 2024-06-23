@@ -36,7 +36,15 @@ FIntPoint AItemObject::GetDimensions() const
 // GetIcon implementation
 void AItemObject::GetIcon(UMaterialInterface*& _icon)
 {
-	_icon = Icon;
+	if (Rotated)
+	{
+		_icon = IconRotated;
+	}
+	else
+	{
+		_icon = Icon;
+	}
+	
 }
 
 // SetAllSettings implementation
