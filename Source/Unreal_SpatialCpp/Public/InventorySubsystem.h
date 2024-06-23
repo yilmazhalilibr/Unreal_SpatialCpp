@@ -117,6 +117,8 @@ public:
 	UPROPERTY()
 	bool DoOnceTryAddItem = false;
 
+
+
 protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ExposeOnSpawn = "true"), Category = "Widget Initialize")
