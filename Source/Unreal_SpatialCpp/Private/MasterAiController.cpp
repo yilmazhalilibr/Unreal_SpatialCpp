@@ -3,6 +3,7 @@
 
 #include "MasterAiController.h"
 #include "MasterAiShooter.h"
+#include "Perception/AIPerceptionComponent.h"
 
 
 
@@ -51,6 +52,7 @@ void AMasterAiController::BeginPlay()
 {
 	Super::BeginPlay();
 
+	
 
 }
 
