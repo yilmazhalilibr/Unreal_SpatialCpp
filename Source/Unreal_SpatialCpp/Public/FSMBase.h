@@ -23,12 +23,6 @@ public:
 	virtual void Update(float DeltaTime) PURE_VIRTUAL(UFSMBase::Update, );
 	virtual void Exit() PURE_VIRTUAL(UFSMBase::Exit, );
 
-	UFUNCTION()
-	void SetParameters(AMasterAiShooter* _shooterAI);
 
-
-private:
-
-	AMasterAiShooter* ShooterAI;
 
 };

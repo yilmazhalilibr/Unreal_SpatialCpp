@@ -7,14 +7,17 @@
 #include "FSMStateIdle.generated.h"
 
 /**
- * 
+ *
  */
 UCLASS()
 class UNREAL_SPATIALCPP_API UFSMStateIdle : public UFSMBase
 {
 	GENERATED_BODY()
-	
+
 public:
+
+	UFSMStateIdle();
+
 	virtual void Enter() override;
 	virtual void Update(float DeltaTime) override;
 	virtual void Exit() override;

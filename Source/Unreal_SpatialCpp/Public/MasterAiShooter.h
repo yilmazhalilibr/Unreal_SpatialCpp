@@ -4,14 +4,33 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "TimerManager.h"
 #include "MasterAiShooter.generated.h"
 
 
+
+
+
+
+
+class AMasterAiController;
 class UFSMBase;
 class UFSMStateIdle;
 class UFSMStateWalk;
 class UFSMStateRun;
 class UFSMStateAttack;
+class UFSMStateChase;
+
+
+UENUM(BlueprintType)
+enum class EState : uint8
+{
+	Idle,
+	Walk,
+	Run,
+	Attack,
+	Chase
+};
 
 
 UCLASS()
@@ -43,7 +62,7 @@ private:
 	void ChangeState(UFSMBase* NewState);
 
 	UFUNCTION(BlueprintCallable)
-	void ChangeStateBP(FString _state);
+	void ChangeStateBP(EState _state);
 
 	UPROPERTY()
 	UFSMStateIdle* IdleState;
@@ -56,5 +75,40 @@ private:
 
 	UPROPERTY()
 	UFSMStateAttack* AttackState;
+
+	UPROPERTY()
+	UFSMStateChase* ChaseState;
+
+
+	// AI Properties
+public:
+	UFUNCTION(BlueprintCallable)
+	float GetChaseDistance() const { return ChaseDistance; }
+
+	UFUNCTION()
+	void SetPerceptionProperties(float& _sightRadius, float& _sightLoseRadius, float& _peripheralVisionAngleDegrees);
+
+private:
+	UPROPERTY()
+	AMasterAiController* MasterAiController;
+
+public:
+	UPROPERTY()
+	FTimerHandle TimerHandle;
+
+	/**AI Controller Properties*/
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI Properties")
+	float SightRadius = 3500.0f;
+
+	/**AI Controller Properties (SightRadius + LoseRadius(Example:500.0f))*/
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI Properties")
+	float SightLoseRadius = 500.0f;
+
+	/**AI Controller Properties*/
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI Properties")
+	float PeripheralVisionAngleDegrees = 120.0f;
+
+	UPROPERTY(EditAnywhere, Category = "AI Properties")
+	float ChaseDistance = 150.f;
 
 };

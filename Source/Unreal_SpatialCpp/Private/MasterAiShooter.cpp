@@ -2,11 +2,13 @@
 
 
 #include "MasterAiShooter.h"
+#include "MasterAiController.h"
 #include "FSMBase.h"
 #include "FSMStateIdle.h"
 #include "FSMStateWalk.h"
 #include "FSMStateRun.h"
 #include "FSMStateAttack.h"
+#include "FSMStateChase.h"
 
 
 // Sets default values
@@ -15,13 +17,10 @@ AMasterAiShooter::AMasterAiShooter()
 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
-	CurrentState = CreateDefaultSubobject<UFSMBase>(TEXT("CurrentState"));
-	CurrentState->SetParameters(this);
+	AIControllerClass = AMasterAiController::StaticClass();
 
-	IdleState = CreateDefaultSubobject<UFSMStateIdle>(TEXT("IdleState"));
-	WalkState = CreateDefaultSubobject<UFSMStateWalk>(TEXT("WalkState"));
-	RunState = CreateDefaultSubobject<UFSMStateRun>(TEXT("RunState"));
-	AttackState = CreateDefaultSubobject<UFSMStateAttack>(TEXT("AttackState"));
+
+
 
 
 }
@@ -31,8 +30,26 @@ void AMasterAiShooter::BeginPlay()
 {
 	Super::BeginPlay();
 
+
+	//Set default controller
+	//MasterAiController = CreateDefaultSubobject<AMasterAiController>(TEXT("MasterAiController"));
+
+	MasterAiController = NewObject<AMasterAiController>(this);
+
+	CurrentState = NewObject<UFSMBase>(this);
+	IdleState = NewObject<UFSMStateIdle>(this);
+	WalkState = NewObject<UFSMStateWalk>(this);
+	RunState = NewObject<UFSMStateRun>(this);
+	AttackState = NewObject<UFSMStateAttack>(this);
+	ChaseState = NewObject<UFSMStateChase>(this);
+
+	//Set default controller
+
+
+
 	CurrentState = IdleState;
 	CurrentState->Enter();
+
 
 }
 
@@ -69,27 +86,38 @@ void AMasterAiShooter::ChangeState(UFSMBase* NewState)
 	}
 }
 
-void AMasterAiShooter::ChangeStateBP(FString _state)
+void AMasterAiShooter::ChangeStateBP(EState _state)
 {
-	if (_state == "Idle")
+	switch (_state)
 	{
+	case EState::Idle:
 		ChangeState(IdleState);
-
-	}
-	else if (_state == "Walk")
-	{
+		break;
+	case EState::Walk:
 		ChangeState(WalkState);
-	}
-	else if (_state == "Run")
-	{
+		break;
+	case EState::Run:
 		ChangeState(RunState);
-	}
-	else if (_state == "Attack")
-	{
+		break;
+	case EState::Attack:
 		ChangeState(AttackState);
+		break;
+	case EState::Chase:
+		ChangeState(ChaseState);
+		break;
+
+	default:
+		break;
 	}
 
+}
 
+void AMasterAiShooter::SetPerceptionProperties(float& _sightRadius, float& _sightLoseRadius, float& _peripheralVisionAngleDegrees)
+{
+	_sightRadius = SightRadius;
+	_sightLoseRadius = SightLoseRadius;
+	_peripheralVisionAngleDegrees = PeripheralVisionAngleDegrees;
+	//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, FString::Printf(TEXT("Perception  : %f "), SightRadius));
 
 }
 

@@ -7,7 +7,7 @@
 #include "FSMStateChase.generated.h"
 
 /**
- * 
+ *
  */
 
 
@@ -16,9 +16,14 @@ class UNREAL_SPATIALCPP_API UFSMStateChase : public UFSMBase
 {
 	GENERATED_BODY()
 public:
-    virtual void Enter() override;
-    virtual void Update(float DeltaTime) override;
-    virtual void Exit() override;
+	virtual void Enter() override;
+	virtual void Update(float DeltaTime) override;
+	virtual void Exit() override;
 
+	AMasterAiShooter* GetOwner() const;
+
+private:
+
+	AMasterAiShooter* Owner;
 
 };

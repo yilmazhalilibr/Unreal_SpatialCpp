@@ -3,7 +3,3 @@
 
 #include "FSMBase.h"
 
-void UFSMBase::SetParameters(AMasterAiShooter* _shooterAI)
-{
-	ShooterAI = _shooterAI;
-}

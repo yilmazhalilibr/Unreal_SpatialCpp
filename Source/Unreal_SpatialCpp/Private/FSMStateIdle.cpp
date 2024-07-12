@@ -5,6 +5,11 @@
 #include "GameFramework/Actor.h"
 #include "Engine/Engine.h"
 
+UFSMStateIdle::UFSMStateIdle()
+{
+
+}
+
 void UFSMStateIdle::Enter()
 {
     UE_LOG(LogTemp, Warning, TEXT("Entering Idle State"));
