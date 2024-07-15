@@ -4,28 +4,23 @@
 
 #include "CoreMinimal.h"
 #include "FSMBase.h"
-#include "FSMStateIdle.generated.h"
+#include "FSMStateCover.generated.h"
 
 /**
- *
+ * 
  */
 UCLASS()
-class UNREAL_SPATIALCPP_API UFSMStateIdle : public UFSMBase
+class UNREAL_SPATIALCPP_API UFSMStateCover : public UFSMBase
 {
 	GENERATED_BODY()
 
+	UFSMStateCover();
+
 public:
-
-	UFSMStateIdle();
-
 	virtual void Enter() override;
 	virtual void Update(float DeltaTime) override;
 	virtual void Exit() override;
 
-private:
-
-	UPROPERTY()
-	float IdleTime = 0.0f;
 
 
 };

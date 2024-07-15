@@ -9,6 +9,7 @@
 #include "FSMStateRun.h"
 #include "FSMStateAttack.h"
 #include "FSMStateChase.h"
+#include "FSMStateCover.h"
 
 
 // Sets default values
@@ -18,10 +19,6 @@ AMasterAiShooter::AMasterAiShooter()
 	PrimaryActorTick.bCanEverTick = true;
 
 	AIControllerClass = AMasterAiController::StaticClass();
-
-
-
-
 
 }
 
@@ -58,9 +55,9 @@ void AMasterAiShooter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	if (CurrentState)
+	if (MasterAiController)
 	{
-		CurrentState->Update(DeltaTime);
+		MasterAiController->AILogicTick(DeltaTime);
 	}
 }
 
@@ -84,34 +81,44 @@ void AMasterAiShooter::ChangeState(UFSMBase* NewState)
 	{
 		CurrentState->Enter();
 	}
+
+
+
 }
 
-void AMasterAiShooter::ChangeStateBP(EState _state)
+
+void AMasterAiShooter::ChangeStateAI(EState _state)
 {
 	switch (_state)
 	{
 	case EState::Idle:
 		ChangeState(IdleState);
+		CurrentStateEnum = EState::Idle;
 		break;
 	case EState::Walk:
 		ChangeState(WalkState);
+		CurrentStateEnum = EState::Walk;
 		break;
 	case EState::Run:
 		ChangeState(RunState);
+		CurrentStateEnum = EState::Run;
 		break;
 	case EState::Attack:
 		ChangeState(AttackState);
+		CurrentStateEnum = EState::Attack;
 		break;
 	case EState::Chase:
 		ChangeState(ChaseState);
+		CurrentStateEnum = EState::Chase;
 		break;
-
+	case EState::Cover:
+		ChangeState(CoverState);
+		CurrentStateEnum = EState::Cover;
+		break;
 	default:
 		break;
 	}
-
 }
-
 void AMasterAiShooter::SetPerceptionProperties(float& _sightRadius, float& _sightLoseRadius, float& _peripheralVisionAngleDegrees)
 {
 	_sightRadius = SightRadius;

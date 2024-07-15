@@ -20,6 +20,7 @@ class UFSMStateWalk;
 class UFSMStateRun;
 class UFSMStateAttack;
 class UFSMStateChase;
+class UFSMStateCover;
 
 
 UENUM(BlueprintType)
@@ -29,7 +30,8 @@ enum class EState : uint8
 	Walk,
 	Run,
 	Attack,
-	Chase
+	Chase,
+	Cover
 };
 
 
@@ -53,16 +55,19 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+	UFUNCTION()
+	UFSMBase* GetCurrentState() const { return CurrentState; }
+
+	UFUNCTION()
+	EState GetCurrentStateEnum() const { return CurrentStateEnum; }
 
 private:
 	UFSMBase* CurrentState;
 
+	EState CurrentStateEnum;
 
 	UFUNCTION()
 	void ChangeState(UFSMBase* NewState);
-
-	UFUNCTION(BlueprintCallable)
-	void ChangeStateBP(EState _state);
 
 	UPROPERTY()
 	UFSMStateIdle* IdleState;
@@ -79,6 +84,9 @@ private:
 	UPROPERTY()
 	UFSMStateChase* ChaseState;
 
+	UPROPERTY()
+	UFSMStateCover* CoverState;
+
 
 	// AI Properties
 public:
@@ -88,6 +96,18 @@ public:
 	UFUNCTION()
 	void SetPerceptionProperties(float& _sightRadius, float& _sightLoseRadius, float& _peripheralVisionAngleDegrees);
 
+	UFUNCTION(BlueprintCallable)
+	void ChangeStateAI(EState _state);
+
+	UFUNCTION()
+	float GetAttackDistance() const { return AttackDistance; }
+
+	UFUNCTION()
+	float GetMaxHP() const { return MaxHP; }
+
+	UFUNCTION()
+	float GetCurrentHP() const { return CurrentHP; }
+
 private:
 	UPROPERTY()
 	AMasterAiController* MasterAiController;
@@ -96,6 +116,9 @@ public:
 	UPROPERTY()
 	FTimerHandle TimerHandle;
 
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "AI Properties")
+	FText The_features_below_are_for_AI_Perception;
 	/**AI Controller Properties*/
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI Properties")
 	float SightRadius = 3500.0f;
@@ -107,8 +130,20 @@ public:
 	/**AI Controller Properties*/
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI Properties")
 	float PeripheralVisionAngleDegrees = 120.0f;
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "AI Properties")
+	FText The_following_features_are_the_features_of_AI;
 
-	UPROPERTY(EditAnywhere, Category = "AI Properties")
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI Properties")
 	float ChaseDistance = 150.f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI Properties")
+	float AttackDistance = 1000.f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI Properties")
+	float MaxHP = 100.f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI Properties")
+	float CurrentHP = 100.f;
 
 };

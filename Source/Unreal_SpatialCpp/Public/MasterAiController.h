@@ -27,8 +27,22 @@ protected:
 
 	virtual void BeginPlay() override;
 
-public:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "AI", meta = (AllowPrivateAccess = "true"))
+	bool bIsPlayerDetected = false;
 
+	UPROPERTY()
+	bool bPawnLowHasLowHp = false;
+
+	UPROPERTY()
+	bool bIsPlayerInAttackRange = false;
+
+	UFUNCTION()
+	EState HandleChangeLogic();
+
+
+public:
+	UFUNCTION()
+	void AILogicTick(float DeltaTime);
 
 private:
 	UPROPERTY()

@@ -4,7 +4,8 @@
 #include "MasterAiController.h"
 #include "MasterAiShooter.h"
 #include "Perception/AIPerceptionComponent.h"
-
+#include "MasterAiShooter.h"
+#include "FSMBase.h"
 
 
 
@@ -57,7 +58,10 @@ void AMasterAiController::BeginPlay()
 {
 	Super::BeginPlay();
 
-
+	if (!AiShooter)
+	{
+		AiShooter = Cast<AMasterAiShooter>(GetOuter());
+	}
 
 }
 
@@ -68,13 +72,105 @@ void AMasterAiController::OnTargetPerceptionUpdated(AActor* Actor, FAIStimulus S
 		if (Stimulus.WasSuccessfullySensed())
 		{
 			UE_LOG(LogTemp, Warning, TEXT("Target Seen: %s"), *Actor->GetName());
+			bIsPlayerDetected = true;
+			//UE_LOG(LogTemp, Warning, TEXT("Target Distance: %s"), bIsPlayerDetected ? TEXT("true") : TEXT("false"));
+
 		}
 		else
 		{
 			UE_LOG(LogTemp, Warning, TEXT("Target Lost: %s"), *Actor->GetName());
+			bIsPlayerDetected = false;
+			//UE_LOG(LogTemp, Warning, TEXT("Target Distance: %s"), bIsPlayerDetected ? TEXT("true") : TEXT("false"));
+
 		}
 
 	}
 }
 
 
+
+void AMasterAiController::AILogicTick(float DeltaTime)
+{
+	//Bool conditions and checks valid to AI Logic
+	if (!AiShooter)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("AI Shooter is not valid"));
+		return;
+	}
+	else
+	{
+		//Check distance to player
+		if (AiShooter->GetDistanceTo(GetWorld()->GetFirstPlayerController()->GetPawn()) < AiShooter->GetAttackDistance())
+		{
+			bIsPlayerInAttackRange = true;
+			//UE_LOG(LogTemp, Warning, TEXT("Player is in attack range"));
+		}
+		else
+		{
+			bIsPlayerInAttackRange = false;
+
+
+		}
+		if (AiShooter->GetCurrentHP() < AiShooter->GetMaxHP() / 2.0f)
+		{
+			bPawnLowHasLowHp = true;
+			//UE_LOG(LogTemp, Warning, TEXT("Pawn has low hp"));
+		}
+		else
+		{
+			bPawnLowHasLowHp = false;
+
+		}
+
+	}
+
+	//Check conditions to AI Logic
+	if (HandleChangeLogic() != AiShooter->GetCurrentStateEnum())
+	{
+		AiShooter->ChangeStateAI(HandleChangeLogic());
+	}
+
+
+	//Classic FSM
+	if (AiShooter->GetCurrentState())
+	{
+		AiShooter->GetCurrentState()->Update(DeltaTime);
+		//UE_LOG(LogTemp, Warning, TEXT("Current State is valid"));
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Current State is not valid"));
+	}
+
+
+}
+
+EState AMasterAiController::HandleChangeLogic()
+{
+	if (bIsPlayerDetected)
+	{
+		if (bIsPlayerInAttackRange)
+		{
+			if (bPawnLowHasLowHp)
+			{
+				UE_LOG(LogTemp, Warning, TEXT("Cover"));
+				return EState::Cover;
+			}
+			else
+			{
+				UE_LOG(LogTemp, Warning, TEXT("Attack"));
+				return EState::Attack;
+			}
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Chase"));
+			return EState::Chase;
+		}
+	}
+	else
+	{
+		return EState::Idle;
+	}
+
+}
