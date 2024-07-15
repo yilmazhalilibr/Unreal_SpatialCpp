@@ -41,10 +41,15 @@ AMasterAiController::AMasterAiController()
 		SightConfig->DetectionByAffiliation.bDetectFriendlies = true;
 		SightConfig->DetectionByAffiliation.bDetectNeutrals = true;
 		AIPerceptionComponent->ConfigureSense(*SightConfig);
+		AIPerceptionComponent->SetDominantSense(*SightConfig->GetSenseImplementation());
+
 	}
 
 	// Algýlama olayýný baðla
-	AIPerceptionComponent->OnPerceptionUpdated.AddDynamic(this, &AMasterAiController::OnPerceptionUpdated);
+	/*AIPerceptionComponent->OnPerceptionUpdated.AddDynamic(this, &AMasterAiController::OnPerceptionUpdated);
+	AIPerceptionComponent->OnTargetPerceptionForgotten.AddDynamic(this, &AMasterAiController::OnTargetPerceptionForgotten);*/
+
+	AIPerceptionComponent->OnTargetPerceptionUpdated.AddDynamic(this, &AMasterAiController::OnTargetPerceptionUpdated);
 
 }
 
@@ -52,14 +57,24 @@ void AMasterAiController::BeginPlay()
 {
 	Super::BeginPlay();
 
-	
+
 
 }
 
-
-
-void AMasterAiController::OnPerceptionUpdated(const TArray<AActor*>& UpdatedActors)
+void AMasterAiController::OnTargetPerceptionUpdated(AActor* Actor, FAIStimulus Stimulus)
 {
+	if (Actor)
+	{
+		if (Stimulus.WasSuccessfullySensed())
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Target Seen: %s"), *Actor->GetName());
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Target Lost: %s"), *Actor->GetName());
+		}
 
+	}
 }
+
 

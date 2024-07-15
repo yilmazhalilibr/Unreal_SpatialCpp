@@ -18,7 +18,7 @@ void UFSMStateIdle::Enter()
 void UFSMStateIdle::Update(float DeltaTime)
 {
     // Idle state logic
-    UE_LOG(LogTemp, Warning, TEXT("Updating Idle State"));
+    //UE_LOG(LogTemp, Warning, TEXT("Updating Idle State"));
 }
 
 void UFSMStateIdle::Exit()
