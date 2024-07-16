@@ -1,46 +1,49 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
-
 #include "FSMStateChase.h"
 #include "MasterAiShooter.h"
+#include "MasterAiController.h"
+#include "GameFramework/Character.h"
 #include "AIController.h"
 
-
+UFSMStateChase::UFSMStateChase()
+{
+}
 
 void UFSMStateChase::Enter()
 {
+	MasterAiController = Cast<AMasterAiController>(GetOuter());
+	if (MasterAiController)
+	{
+		Owner = Cast<AMasterAiShooter>(MasterAiController->GetPawn());
+	}
+
 	UE_LOG(LogTemp, Warning, TEXT("Entering Chase State"));
-
-
 }
 
 void UFSMStateChase::Update(float DeltaTime)
 {
-	// Run state logic
 	UE_LOG(LogTemp, Warning, TEXT("Updating Chase State"));
 
-	if (GetOwner())
+	if (MasterAiController && Owner)
 	{
-		//UE_LOG(LogTemp, Warning, TEXT("GetOwner State"));
-
-		auto* _controller = Cast<AAIController>(GetOwner()->GetController());
-		if (_controller)
+		FVector PlayerLocation = GetWorld()->GetFirstPlayerController()->GetPawn()->GetActorLocation();
+		if (MasterAiController->MoveToLocation(PlayerLocation, Owner->GetChaseDistance()))
 		{
-			//UE_LOG(LogTemp, Warning, TEXT("Chase"));
-
-			if (_controller->MoveToLocation(GetWorld()->GetFirstPlayerController()->GetPawn()->GetActorLocation(), GetOwner()->GetChaseDistance()))
-			{
-				UE_LOG(LogTemp, Warning, TEXT("Chase"));
-			}
-			else
-			{
-				UE_LOG(LogTemp, Warning, TEXT("Stop Chase"));
-			}
-
+			UE_LOG(LogTemp, Warning, TEXT("Chasing the player"));
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Failed to move to player location"));
 		}
 	}
-
-
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Owner or MasterAiController is not valid"));
+		MasterAiController = Cast<AMasterAiController>(GetOuter());
+		if (MasterAiController)
+		{
+			Owner = Cast<AMasterAiShooter>(MasterAiController->GetPawn());
+		}
+	}
 }
 
 void UFSMStateChase::Exit()
@@ -50,6 +53,10 @@ void UFSMStateChase::Exit()
 
 AMasterAiShooter* UFSMStateChase::GetOwner() const
 {
-	return Cast<AMasterAiShooter>(GetOuter());
+	return Owner;
+}
 
+AMasterAiController* UFSMStateChase::GetController() const
+{
+	return MasterAiController;
 }
