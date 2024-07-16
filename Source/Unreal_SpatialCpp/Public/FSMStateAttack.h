@@ -9,6 +9,11 @@
 /**
  * 
  */
+
+class AMasterAiShooter;
+class AMasterAiController;
+
+
 UCLASS()
 class UNREAL_SPATIALCPP_API UFSMStateAttack : public UFSMBase
 {
@@ -19,5 +24,15 @@ public:
 	virtual void Update(float DeltaTime) override;
 	virtual void Exit() override;
 
+	AMasterAiShooter* GetOwner() const;
 
+	AMasterAiController* GetController() const;
+
+	void SetController(AMasterAiController* _controller) { MasterAiController = _controller; }
+
+private:
+
+	AMasterAiShooter* Owner;
+
+	AMasterAiController* MasterAiController;
 };

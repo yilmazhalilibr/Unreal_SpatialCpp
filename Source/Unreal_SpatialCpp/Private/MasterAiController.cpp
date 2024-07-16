@@ -69,7 +69,8 @@ void AMasterAiController::OnPossess(APawn* InPawn)
 	AttackState = NewObject<UFSMStateAttack>(this);
 	ChaseState = NewObject<UFSMStateChase>(this);
 
-	CurrentState = IdleState;
+	CurrentState = CoverState;
+	//CurrentState = IdleState;
 	CurrentState->Enter();
 
 	OnPossesDone = true;
