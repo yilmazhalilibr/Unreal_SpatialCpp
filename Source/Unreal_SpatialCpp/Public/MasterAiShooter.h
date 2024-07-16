@@ -55,37 +55,6 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
-	UFUNCTION()
-	UFSMBase* GetCurrentState() const { return CurrentState; }
-
-	UFUNCTION()
-	EState GetCurrentStateEnum() const { return CurrentStateEnum; }
-
-private:
-	UFSMBase* CurrentState;
-
-	EState CurrentStateEnum;
-
-	UFUNCTION()
-	void ChangeState(UFSMBase* NewState);
-
-	UPROPERTY()
-	UFSMStateIdle* IdleState;
-
-	UPROPERTY()
-	UFSMStateWalk* WalkState;
-
-	UPROPERTY()
-	UFSMStateRun* RunState;
-
-	UPROPERTY()
-	UFSMStateAttack* AttackState;
-
-	UPROPERTY()
-	UFSMStateChase* ChaseState;
-
-	UPROPERTY()
-	UFSMStateCover* CoverState;
 
 
 	// AI Properties
@@ -96,9 +65,6 @@ public:
 	UFUNCTION()
 	void SetPerceptionProperties(float& _sightRadius, float& _sightLoseRadius, float& _peripheralVisionAngleDegrees);
 
-	UFUNCTION(BlueprintCallable)
-	void ChangeStateAI(EState _state);
-
 	UFUNCTION()
 	float GetAttackDistance() const { return AttackDistance; }
 
@@ -107,10 +73,6 @@ public:
 
 	UFUNCTION()
 	float GetCurrentHP() const { return CurrentHP; }
-
-private:
-	UPROPERTY()
-	AMasterAiController* MasterAiController;
 
 public:
 	UPROPERTY()

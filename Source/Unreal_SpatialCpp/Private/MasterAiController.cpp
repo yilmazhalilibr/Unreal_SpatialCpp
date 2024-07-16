@@ -3,9 +3,14 @@
 
 #include "MasterAiController.h"
 #include "MasterAiShooter.h"
-#include "Perception/AIPerceptionComponent.h"
 #include "MasterAiShooter.h"
 #include "FSMBase.h"
+#include "FSMStateIdle.h"
+#include "FSMStateWalk.h"
+#include "FSMStateRun.h"
+#include "FSMStateAttack.h"
+#include "FSMStateChase.h"
+#include "FSMStateCover.h"
 
 
 
@@ -21,20 +26,10 @@ AMasterAiController::AMasterAiController()
 	if (SightConfig)
 	{
 
-		AiShooter = Cast<AMasterAiShooter>(GetOuter());
+		SightConfig->SightRadius = SightRadius;
+		SightConfig->LoseSightRadius = SightLoseRadius;
+		SightConfig->PeripheralVisionAngleDegrees = PeripheralVisionAngleDegrees;
 
-		if (AiShooter)
-		{
-			AiShooter->SetPerceptionProperties(SightRadius, SightLoseRadius, PeripheralVisionAngleDegrees);
-			SightConfig->SightRadius = SightRadius;
-			SightConfig->LoseSightRadius = SightLoseRadius;
-			SightConfig->PeripheralVisionAngleDegrees = PeripheralVisionAngleDegrees;
-			UE_LOG(LogTemp, Warning, TEXT("Perception Success : %f "), SightRadius);
-		}
-		else
-		{
-			UE_LOG(LogTemp, Warning, TEXT("Perception Failed"));
-		}
 
 
 
@@ -43,6 +38,8 @@ AMasterAiController::AMasterAiController()
 		SightConfig->DetectionByAffiliation.bDetectNeutrals = true;
 		AIPerceptionComponent->ConfigureSense(*SightConfig);
 		AIPerceptionComponent->SetDominantSense(*SightConfig->GetSenseImplementation());
+		UE_LOG(LogTemp, Warning, TEXT("Perception Success : %f "), SightRadius);
+
 
 	}
 
@@ -58,10 +55,38 @@ void AMasterAiController::BeginPlay()
 {
 	Super::BeginPlay();
 
-	if (!AiShooter)
+	AiShooter = Cast<AMasterAiShooter>(GetPawn());
+	if (AiShooter)
 	{
 		AiShooter = Cast<AMasterAiShooter>(GetOuter());
+
+		if (AiShooter)
+		{
+			AiShooter->SetPerceptionProperties(SightRadius, SightLoseRadius, PeripheralVisionAngleDegrees);
+		}
+
 	}
+
+
+
+	CurrentState = NewObject<UFSMBase>(this);
+	IdleState = NewObject<UFSMStateIdle>(this);
+	WalkState = NewObject<UFSMStateWalk>(this);
+	RunState = NewObject<UFSMStateRun>(this);
+	AttackState = NewObject<UFSMStateAttack>(this);
+	ChaseState = NewObject<UFSMStateChase>(this);
+
+	//Set default controller
+
+	CurrentState = IdleState;
+	CurrentState->Enter();
+
+
+}
+
+void AMasterAiController::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
 
 }
 
@@ -125,16 +150,16 @@ void AMasterAiController::AILogicTick(float DeltaTime)
 	}
 
 	//Check conditions to AI Logic
-	if (HandleChangeLogic() != AiShooter->GetCurrentStateEnum())
+	if (HandleChangeLogic() != CurrentState)
 	{
-		AiShooter->ChangeStateAI(HandleChangeLogic());
+		ChangeStateAI(HandleChangeLogic());
 	}
 
 
 	//Classic FSM
-	if (AiShooter->GetCurrentState())
+	if (GetCurrentState())
 	{
-		AiShooter->GetCurrentState()->Update(DeltaTime);
+		GetCurrentState()->Update(DeltaTime);
 		//UE_LOG(LogTemp, Warning, TEXT("Current State is valid"));
 	}
 	else
@@ -145,7 +170,7 @@ void AMasterAiController::AILogicTick(float DeltaTime)
 
 }
 
-EState AMasterAiController::HandleChangeLogic()
+UFSMBase* AMasterAiController::HandleChangeLogic()
 {
 	if (bIsPlayerDetected)
 	{
@@ -154,23 +179,41 @@ EState AMasterAiController::HandleChangeLogic()
 			if (bPawnLowHasLowHp)
 			{
 				UE_LOG(LogTemp, Warning, TEXT("Cover"));
-				return EState::Cover;
+				return CoverState;
 			}
 			else
 			{
 				UE_LOG(LogTemp, Warning, TEXT("Attack"));
-				return EState::Attack;
+				return AttackState;
 			}
 		}
 		else
 		{
 			UE_LOG(LogTemp, Warning, TEXT("Chase"));
-			return EState::Chase;
+			return ChaseState;
 		}
 	}
 	else
 	{
-		return EState::Idle;
+		return IdleState;
 	}
+
+}
+
+void AMasterAiController::ChangeStateAI(UFSMBase* NewState)
+{
+	if (CurrentState)
+	{
+		CurrentState->Exit();
+	}
+
+	CurrentState = NewState;
+
+	if (CurrentState)
+	{
+		CurrentState->Enter();
+	}
+
+
 
 }

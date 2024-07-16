@@ -7,6 +7,7 @@
 #include "Perception/AIPerceptionComponent.h"
 #include "Perception/AISenseConfig_Sight.h"
 #include "Perception/AISense_Sight.h"
+#include "GameFramework/Character.h"
 #include "MasterAiController.generated.h"
 
 /**
@@ -14,6 +15,14 @@
  */
 
 class AMasterAiShooter;
+class UFSMBase;
+class UFSMStateIdle;
+class UFSMStateWalk;
+class UFSMStateRun;
+class UFSMStateAttack;
+class UFSMStateChase;
+class UFSMStateCover;
+
 
 UCLASS()
 class UNREAL_SPATIALCPP_API AMasterAiController : public AAIController
@@ -26,6 +35,8 @@ protected:
 	AMasterAiController();
 
 	virtual void BeginPlay() override;
+	//tick
+	virtual void Tick(float DeltaTime) override;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "AI", meta = (AllowPrivateAccess = "true"))
 	bool bIsPlayerDetected = false;
@@ -37,12 +48,40 @@ protected:
 	bool bIsPlayerInAttackRange = false;
 
 	UFUNCTION()
-	EState HandleChangeLogic();
+	UFSMBase* HandleChangeLogic();
 
+
+	UFUNCTION()
+	UFSMBase* GetCurrentState() const { return CurrentState; }
 
 public:
 	UFUNCTION()
 	void AILogicTick(float DeltaTime);
+
+	UPROPERTY()
+	UFSMBase* CurrentState;
+
+	UFUNCTION()
+	void ChangeStateAI(UFSMBase* NewState);
+
+	UPROPERTY()
+	UFSMStateIdle* IdleState;
+
+	UPROPERTY()
+	UFSMStateWalk* WalkState;
+
+	UPROPERTY()
+	UFSMStateRun* RunState;
+
+	UPROPERTY()
+	UFSMStateAttack* AttackState;
+
+	UPROPERTY()
+	UFSMStateChase* ChaseState;
+
+	UPROPERTY()
+	UFSMStateCover* CoverState;
+
 
 private:
 	UPROPERTY()
@@ -59,11 +98,12 @@ private:
 	void OnTargetPerceptionUpdated(AActor* Actor, FAIStimulus Stimulus);
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "AI", meta = (AllowPrivateAccess = "true"))
-	float SightRadius = 2500.0f;
+	float SightRadius = 3500;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "AI", meta = (AllowPrivateAccess = "true"))
 	float SightLoseRadius = 500.0f;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "AI", meta = (AllowPrivateAccess = "true"))
 	float PeripheralVisionAngleDegrees = 120.0f;
+
 };
