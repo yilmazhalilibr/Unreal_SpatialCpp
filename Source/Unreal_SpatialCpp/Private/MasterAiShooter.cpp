@@ -37,10 +37,3 @@ void AMasterAiShooter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 
 
 
-void AMasterAiShooter::SetPerceptionProperties(float& _sightRadius, float& _sightLoseRadius, float& _peripheralVisionAngleDegrees)
-{
-	_sightRadius = SightRadius;
-	_sightLoseRadius = SightLoseRadius;
-	_peripheralVisionAngleDegrees = PeripheralVisionAngleDegrees;
-}
-

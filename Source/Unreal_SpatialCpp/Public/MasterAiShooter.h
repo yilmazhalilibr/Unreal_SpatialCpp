@@ -63,9 +63,6 @@ public:
 	float GetChaseDistance() const { return ChaseDistance; }
 
 	UFUNCTION()
-	void SetPerceptionProperties(float& _sightRadius, float& _sightLoseRadius, float& _peripheralVisionAngleDegrees);
-
-	UFUNCTION()
 	float GetAttackDistance() const { return AttackDistance; }
 
 	UFUNCTION()
@@ -73,6 +70,18 @@ public:
 
 	UFUNCTION()
 	float GetCurrentHP() const { return CurrentHP; }
+
+	// AI Properties Getters
+	UFUNCTION()
+	float GetSightRadius() const { return SightRadius; }
+
+	UFUNCTION()
+	float GetSightLoseRadius() const { return SightLoseRadius; }
+
+	UFUNCTION()
+	float GetPeripheralVisionAngleDegrees() const { return PeripheralVisionAngleDegrees; }
+
+
 
 public:
 	UPROPERTY()

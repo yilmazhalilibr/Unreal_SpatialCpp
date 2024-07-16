@@ -38,6 +38,9 @@ protected:
 	//tick
 	virtual void Tick(float DeltaTime) override;
 
+	//OnPosses override
+	virtual void OnPossess(APawn* InPawn) override;
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "AI", meta = (AllowPrivateAccess = "true"))
 	bool bIsPlayerDetected = false;
 
@@ -55,6 +58,10 @@ protected:
 	UFSMBase* GetCurrentState() const { return CurrentState; }
 
 public:
+
+	UPROPERTY()
+	bool OnPossesDone = false;
+
 	UFUNCTION()
 	void AILogicTick(float DeltaTime);
 
@@ -97,13 +104,5 @@ private:
 	UFUNCTION()
 	void OnTargetPerceptionUpdated(AActor* Actor, FAIStimulus Stimulus);
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "AI", meta = (AllowPrivateAccess = "true"))
-	float SightRadius = 3500;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "AI", meta = (AllowPrivateAccess = "true"))
-	float SightLoseRadius = 500.0f;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "AI", meta = (AllowPrivateAccess = "true"))
-	float PeripheralVisionAngleDegrees = 120.0f;
 
 };
