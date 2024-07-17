@@ -22,6 +22,7 @@ class UFSMStateRun;
 class UFSMStateAttack;
 class UFSMStateChase;
 class UFSMStateCover;
+class UFSMStatePatrol;
 
 
 UCLASS()
@@ -62,6 +63,9 @@ public:
 	UPROPERTY()
 	bool OnPossesDone = false;
 
+	UPROPERTY()
+	bool OnWarMode = false;
+
 	UFUNCTION()
 	void AILogicTick(float DeltaTime);
 
@@ -88,6 +92,9 @@ public:
 
 	UPROPERTY()
 	UFSMStateCover* CoverState;
+
+	UPROPERTY()
+	UFSMStatePatrol* PatrolState;
 
 
 private:

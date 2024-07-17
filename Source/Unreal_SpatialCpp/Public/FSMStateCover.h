@@ -6,7 +6,6 @@
 #include "EnvironmentQuery/EnvQueryTypes.h"
 #include "EnvironmentQuery/EnvQueryManager.h"
 #include "EnvironmentQuery/EnvQuery.h"
-#include "EnvironmentQuery/EnvQueryTypes.h"
 #include "FSMStateCover.generated.h"
 
 /**
@@ -25,17 +24,10 @@ public:
 	virtual void Exit() override;
 
 private:
-	void RunEQS();
-
-	UPROPERTY()
-	UEnvQuery* MyQuery; // set the query in editor
-	FEnvQueryRequest* MyQueryRequest;
-
-	UFUNCTION()
-	void OnQueryFinished(TSharedPtr<FEnvQueryResult> Result);
-
-	class AMasterAiController* MasterAiController;
+	void ExecuteEQS();
 
 	UPROPERTY()
 	UEnvQuery* CoverQuery;
+
+	class AMasterAiController* MasterAiController;
 };

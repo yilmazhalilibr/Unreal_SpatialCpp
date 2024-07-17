@@ -3,13 +3,7 @@
 
 #include "MasterAiShooter.h"
 #include "MasterAiController.h"
-#include "FSMBase.h"
-#include "FSMStateIdle.h"
-#include "FSMStateWalk.h"
-#include "FSMStateRun.h"
-#include "FSMStateAttack.h"
-#include "FSMStateChase.h"
-#include "FSMStateCover.h"
+
 
 
 AMasterAiShooter::AMasterAiShooter()
@@ -21,6 +15,8 @@ AMasterAiShooter::AMasterAiShooter()
 void AMasterAiShooter::BeginPlay()
 {
 	Super::BeginPlay();
+
+	SpawnLocation = GetActorLocation();
 }
 
 // Called every frame

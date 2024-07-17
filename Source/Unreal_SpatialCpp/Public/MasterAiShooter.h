@@ -31,7 +31,8 @@ enum class EState : uint8
 	Run,
 	Attack,
 	Chase,
-	Cover
+	Cover,
+	Patrol
 };
 
 
@@ -81,7 +82,14 @@ public:
 	UFUNCTION()
 	float GetPeripheralVisionAngleDegrees() const { return PeripheralVisionAngleDegrees; }
 
+	UFUNCTION()
+	float GetPatrolRadius() const { return PatrolRadius; }
 
+	UFUNCTION()
+	FVector GetSpawnLocation() const { return SpawnLocation; }
+
+	UFUNCTION()
+	float GetPatrolTime() const { return PatrolTime; }
 
 public:
 	UPROPERTY()
@@ -101,10 +109,9 @@ public:
 	/**AI Controller Properties*/
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI Properties")
 	float PeripheralVisionAngleDegrees = 120.0f;
-	
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "AI Properties")
 	FText The_following_features_are_the_features_of_AI;
-
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI Properties")
 	float ChaseDistance = 150.f;
@@ -114,7 +121,17 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI Properties")
 	float MaxHP = 100.f;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI Properties")
 	float CurrentHP = 100.f;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI Properties")
+	float PatrolRadius = 1000.f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI Properties")
+	float PatrolTime = 2.0f;
+
+private:
+	UPROPERTY()
+	FVector SpawnLocation;
 };
