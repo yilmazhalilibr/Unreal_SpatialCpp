@@ -21,6 +21,8 @@ class UFSMStateRun;
 class UFSMStateAttack;
 class UFSMStateChase;
 class UFSMStateCover;
+class UFSMStatePatrol;
+class UFSMStateDead;
 
 
 UENUM(BlueprintType)
@@ -32,7 +34,8 @@ enum class EState : uint8
 	Attack,
 	Chase,
 	Cover,
-	Patrol
+	Patrol,
+	Dead
 };
 
 
@@ -91,6 +94,9 @@ public:
 	UFUNCTION()
 	float GetPatrolTime() const { return PatrolTime; }
 
+	UFUNCTION()
+	float GetDeadDestroyTime() const { return DeadDestroyTime; }
+
 public:
 	UPROPERTY()
 	FTimerHandle TimerHandle;
@@ -130,6 +136,9 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI Properties")
 	float PatrolTime = 2.0f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI Properties")
+	float DeadDestroyTime = 5.0f;
 
 private:
 	UPROPERTY()

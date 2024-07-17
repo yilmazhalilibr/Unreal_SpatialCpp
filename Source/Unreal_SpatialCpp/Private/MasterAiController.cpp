@@ -8,6 +8,8 @@
 #include "FSMStateChase.h"
 #include "FSMStateCover.h"
 #include "FSMStatePatrol.h"
+#include "FSMStateDead.h"
+
 
 AMasterAiController::AMasterAiController()
 {
@@ -71,9 +73,10 @@ void AMasterAiController::OnPossess(APawn* InPawn)
 	ChaseState = NewObject<UFSMStateChase>(this);
 	CoverState = NewObject<UFSMStateCover>(this);
 	PatrolState = NewObject<UFSMStatePatrol>(this);
+	DeadState = NewObject<UFSMStateDead>(this);
 
 
-	CurrentState = PatrolState;
+	CurrentState = DeadState;
 	//CurrentState = IdleState;
 	CurrentState->Enter();
 
@@ -140,7 +143,7 @@ void AMasterAiController::AILogicTick(float DeltaTime)
 
 UFSMBase* AMasterAiController::HandleChangeLogic()
 {
-	return PatrolState;
+	return DeadState;
 	/*if (bIsPlayerDetected)
 	{
 		if (bIsPlayerInAttackRange)

@@ -23,6 +23,7 @@ class UFSMStateAttack;
 class UFSMStateChase;
 class UFSMStateCover;
 class UFSMStatePatrol;
+class UFSMStateDead;
 
 
 UCLASS()
@@ -95,6 +96,9 @@ public:
 
 	UPROPERTY()
 	UFSMStatePatrol* PatrolState;
+
+	UPROPERTY()
+	UFSMStateDead* DeadState;
 
 
 private:
