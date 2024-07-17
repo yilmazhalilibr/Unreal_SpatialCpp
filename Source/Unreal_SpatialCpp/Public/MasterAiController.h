@@ -24,6 +24,7 @@ class UFSMStateChase;
 class UFSMStateCover;
 class UFSMStatePatrol;
 class UFSMStateDead;
+class UFSMStateSearch;
 
 
 UCLASS()
@@ -52,6 +53,9 @@ protected:
 	UPROPERTY()
 	bool bIsPlayerInAttackRange = false;
 
+	UPROPERTY()
+	FVector PlayerLastLocation;
+
 	UFUNCTION()
 	UFSMBase* HandleChangeLogic();
 
@@ -76,6 +80,9 @@ public:
 	UFUNCTION()
 	void ChangeStateAI(UFSMBase* NewState);
 
+	UFUNCTION()
+	FVector GetPlayerLastLocation() const { return PlayerLastLocation; }
+
 	UPROPERTY()
 	UFSMStateIdle* IdleState;
 
@@ -99,6 +106,9 @@ public:
 
 	UPROPERTY()
 	UFSMStateDead* DeadState;
+
+	UPROPERTY()
+	UFSMStateSearch* SearchState;
 
 
 private:

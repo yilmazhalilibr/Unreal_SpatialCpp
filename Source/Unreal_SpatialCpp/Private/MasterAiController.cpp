@@ -9,6 +9,7 @@
 #include "FSMStateCover.h"
 #include "FSMStatePatrol.h"
 #include "FSMStateDead.h"
+#include "FSMStateSearch.h"
 
 
 AMasterAiController::AMasterAiController()
@@ -74,9 +75,10 @@ void AMasterAiController::OnPossess(APawn* InPawn)
 	CoverState = NewObject<UFSMStateCover>(this);
 	PatrolState = NewObject<UFSMStatePatrol>(this);
 	DeadState = NewObject<UFSMStateDead>(this);
+	SearchState = NewObject<UFSMStateSearch>(this);
 
 
-	CurrentState = DeadState;
+	CurrentState = SearchState;
 	//CurrentState = IdleState;
 	CurrentState->Enter();
 
@@ -91,6 +93,7 @@ void AMasterAiController::OnTargetPerceptionUpdated(AActor* Actor, FAIStimulus S
 		{
 			UE_LOG(LogTemp, Warning, TEXT("Target Seen: %s"), *Actor->GetName());
 			bIsPlayerDetected = true;
+			PlayerLastLocation = Stimulus.StimulusLocation;
 		}
 		else
 		{
@@ -143,7 +146,7 @@ void AMasterAiController::AILogicTick(float DeltaTime)
 
 UFSMBase* AMasterAiController::HandleChangeLogic()
 {
-	return DeadState;
+	return SearchState;
 	/*if (bIsPlayerDetected)
 	{
 		if (bIsPlayerInAttackRange)

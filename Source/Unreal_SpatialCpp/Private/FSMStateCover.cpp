@@ -52,7 +52,7 @@ void UFSMStateCover::ExecuteEQS()
 		QueryRequest.Execute(EEnvQueryRunMode::SingleResult, FQueryFinishedSignature::CreateLambda(
 			[this](TSharedPtr<FEnvQueryResult> Result)
 			{
-				if (Result->IsSuccsessful() && Result->GetItemScore(0) > 0.0f)
+				if (Result->IsSuccessful() && Result->GetItemScore(0) > 0.0f)
 				{
 					FVector BestLocation = Result->GetItemAsLocation(0);
 					UE_LOG(LogTemp, Warning, TEXT("Best cover location found at: %s"), *BestLocation.ToString());
@@ -70,8 +70,6 @@ void UFSMStateCover::ExecuteEQS()
 							UE_LOG(LogTemp, Warning, TEXT("Failed to move to cover location"));
 
 						}
-
-
 					}
 				}
 				else
