@@ -101,6 +101,15 @@ public:
 	UFUNCTION()
 	float GetDeadDestroyTime() const { return DeadDestroyTime; }
 
+	UFUNCTION()
+	float GetSuspicionTime() const { return SuspicionTime; }
+
+	UFUNCTION()
+	float GetPlayerLostTime() const { return PlayerLostTime; }
+
+	UFUNCTION()
+	bool GetAIDead() const { return AIDead; }
+
 public:
 	UPROPERTY()
 	FTimerHandle TimerHandle;
@@ -143,6 +152,16 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI Properties")
 	float DeadDestroyTime = 5.0f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI Properties")
+	float SuspicionTime = 5.0f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI Properties")
+	float PlayerLostTime = 10.0f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI Properties")
+	bool AIDead = false;
+
 
 private:
 	UPROPERTY()

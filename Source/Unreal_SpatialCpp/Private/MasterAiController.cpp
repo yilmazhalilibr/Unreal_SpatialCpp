@@ -41,6 +41,19 @@ void AMasterAiController::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	if (bIsPlayerDetected)
+	{
+		bSuspicionTimer += DeltaTime;
+		bMissingPlayerTimer = 0.0f;
+
+	}
+	else
+	{
+		bMissingPlayerTimer += DeltaTime;
+		bSuspicionTimer = 0.0f;
+
+	}
+
 	if (OnPossesDone && AiShooter && CurrentState)
 	{
 		AILogicTick(DeltaTime);
@@ -80,7 +93,7 @@ void AMasterAiController::OnPossess(APawn* InPawn)
 	ResetAIState = NewObject<UFSMStateResetAI>(this);
 
 
-	CurrentState = ResetAIState;
+	CurrentState = IdleState;
 	//CurrentState = IdleState;
 	CurrentState->Enter();
 
@@ -96,6 +109,7 @@ void AMasterAiController::OnTargetPerceptionUpdated(AActor* Actor, FAIStimulus S
 			UE_LOG(LogTemp, Warning, TEXT("Target Seen: %s"), *Actor->GetName());
 			bIsPlayerDetected = true;
 			PlayerLastLocation = Stimulus.StimulusLocation;
+
 		}
 		else
 		{
@@ -130,12 +144,28 @@ void AMasterAiController::AILogicTick(float DeltaTime)
 	{
 		bPawnLowHasLowHp = false;
 	}
+	if (bSuspicionTimer >= AiShooter->GetSuspicionTime())
+	{
+		OnWarMode = true;
+	}
+	else
+	{
+		OnWarMode = false;
+	}
+	if (bMissingPlayerTimer >= AiShooter->GetPlayerLostTime())
+	{
+		bMissingPlayer = true;
+	}
+	else
+	{
+		bMissingPlayer = false;
+	}
 
-	
-	/*if (HandleChangeLogic() != CurrentState)
+
+	if (HandleChangeLogic() != CurrentState)
 	{
 		ChangeStateAI(HandleChangeLogic());
-	}*/
+	}
 
 	if (GetCurrentState())
 	{
@@ -149,32 +179,45 @@ void AMasterAiController::AILogicTick(float DeltaTime)
 
 UFSMBase* AMasterAiController::HandleChangeLogic()
 {
-	return ResetAIState;
-	/*if (bIsPlayerDetected)
+	if (AiShooter->GetAIDead())
 	{
-		if (bIsPlayerInAttackRange)
-		{
-			if (bPawnLowHasLowHp)
-			{
-				UE_LOG(LogTemp, Warning, TEXT("Cover"));
-				return CoverState;
-			}
-			else
-			{
-				UE_LOG(LogTemp, Warning, TEXT("Attack"));
-				return AttackState;
-			}
-		}
-		else
-		{
-			UE_LOG(LogTemp, Warning, TEXT("Chase"));
-			return ChaseState;
-		}
+		return DeadState;
 	}
-	else
+	if (!bIsPlayerDetected && !OnWarMode)
+	{
+		return PatrolState;
+	}
+	else if (!bIsPlayerDetected && OnWarMode && bMissingPlayer)
+	{
+		return ResetAIState;
+	}
+	else if (!bIsPlayerDetected && OnWarMode)
+	{
+		return SearchState;
+	}
+	else if (!bIsPlayerDetected && !OnWarMode && bMissingPlayer)
 	{
 		return IdleState;
-	}*/
+	}
+	else if (bIsPlayerDetected && !bIsPlayerInAttackRange && OnWarMode)
+	{
+		return ChaseState;
+	}
+	else if (bIsPlayerDetected && bIsPlayerInAttackRange && OnWarMode)
+	{
+		return AttackState;
+	}
+	else if (bPawnLowHasLowHp)
+	{
+		return CoverState;
+		//Belki burada can doldurma iþlemi yaptýrýrýz. Ona göre bir bool koyup Cover tamamlanýrsa yani can dolarsa tekrar bu stateden çýksýn yapabiliriz.
+	}
+
+
+
+	return IdleState;
+
+
 }
 
 void AMasterAiController::ChangeStateAI(UFSMBase* NewState)

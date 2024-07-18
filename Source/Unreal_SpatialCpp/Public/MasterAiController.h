@@ -66,11 +66,24 @@ protected:
 
 public:
 
+
 	UPROPERTY()
 	bool OnPossesDone = false;
 
 	UPROPERTY()
 	bool OnWarMode = false;
+
+	UPROPERTY()
+	bool bSuspicion = true;
+
+	UPROPERTY()
+	float bSuspicionTimer = 0.0f;
+
+	UPROPERTY()
+	bool bMissingPlayer = false;
+
+	UPROPERTY()
+	float bMissingPlayerTimer = 0.0f;
 
 	UFUNCTION()
 	void AILogicTick(float DeltaTime);
