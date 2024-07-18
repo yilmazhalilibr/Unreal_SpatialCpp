@@ -129,9 +129,16 @@ void AMasterAiController::AILogicTick(float DeltaTime)
 		bPawnLowHasLowHp = false;
 	}
 
+	//TimerLabmda use
+	FTimerHandle TimerHandle;
+	GetWorld()->GetTimerManager().SetTimer(TimerHandle, [this]()
+		{
+			ChangeStateAI(HandleChangeLogic());
+			UE_LOG(LogTemp, Warning, TEXT("State Changed"));
+		}, 10, false);
+
 	if (HandleChangeLogic() != CurrentState)
 	{
-		ChangeStateAI(HandleChangeLogic());
 	}
 
 	if (GetCurrentState())

@@ -1,6 +1,5 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-
 #include "FSMStateSearch.h"
 #include "MasterAiShooter.h"
 #include "MasterAiController.h"
@@ -9,10 +8,10 @@
 #include "Navigation/PathFollowingComponent.h"
 #include <Kismet/KismetMathLibrary.h>
 
-
 void UFSMStateSearch::Enter()
 {
 	UE_LOG(LogTemp, Warning, TEXT("Entering Search State"));
+	bRotationDone = false;
 
 	MasterAiController = Cast<AMasterAiController>(GetOuter());
 	AIShooter = Cast<AMasterAiShooter>(MasterAiController->GetPawn());
@@ -26,54 +25,42 @@ void UFSMStateSearch::Enter()
 		SetSearchLocation(MasterAiController->GetPlayerLastLocation());
 		MasterAiController->ReceiveMoveCompleted.AddDynamic(this, &UFSMStateSearch::OnMoveCompleted);
 
-		FRotator LookAtRotation = UKismetMathLibrary::FindLookAtRotation(AIShooter->GetActorLocation(), GetSearchLocation());
-		AIShooter->SetActorRotation(LookAtRotation);
-
-
-	/*	GetWorld()->GetTimerManager().SetTimer(LookAtTimerHandle, [this]()
-			{
-
-				if (AIShooter)
-				{
-					FRotator CurrentRotation = AIShooter->GetActorRotation();
-					FRotator TargetRotation = UKismetMathLibrary::FindLookAtRotation(AIShooter->GetActorLocation(), GetSearchLocation());
-					FRotator NewRotation = FMath::RInterpTo(CurrentRotation, TargetRotation, GetWorld()->GetDeltaSeconds(), 2.0f);
-
-					AIShooter->SetActorRotation(NewRotation);
-
-					if (NewRotation.Equals(TargetRotation, 1.0f))
-					{
-						GetWorld()->GetTimerManager().ClearTimer(LookAtTimerHandle);
-					}
-				}
-			}, 1, true, 0.1);*/
-
-
 		UE_LOG(LogTemp, Warning, TEXT("Search Location is %s"), *GetSearchLocation().ToString());
 	}
 	if (!AIShooter)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("AIShooter is not valid"));
 	}
-
-
 }
 
 void UFSMStateSearch::Update(float DeltaTime)
 {
-	SetSearchLocation(MasterAiController->GetPlayerLastLocation());
+	/*FVector PlayerLocation = MasterAiController->GetPlayerLastLocation();
+	MasterAiController->MoveToLocation(PlayerLocation, 5.0f);*/
 
-	if (MasterAiController && GetSearchLocation() != FVector::Zero())
+	if (!bRotationDone)
 	{
-		if (MasterAiController->MoveToLocation(GetSearchLocation(), 1.0f))
-		{
-			UE_LOG(LogTemp, Warning, TEXT("Searching for player"));
+		SmoothLookAt(GetSearchLocation(), DeltaTime, 2.0f); // 2 saniyede dönmek için 0.5 hýz
+	}
 
+	if (MasterAiController && GetSearchLocation() != FVector::Zero() && bRotationDone)
+	{
+		//UE_LOG(LogTemp, Warning, TEXT("Searching for Move To"));
+
+		if (MasterAiController->MoveToLocation(GetSearchLocation(), 5.0f))
+		{
+			//UE_LOG(LogTemp, Warning, TEXT("Searching 1111111111"));
 		}
 		else
 		{
 			UE_LOG(LogTemp, Warning, TEXT("Search Location is not valid"));
 		}
+	}
+	else
+	{
+	/*	UE_LOG(LogTemp, Warning, TEXT("Not Move To - %s"), bRotationDone ? TEXT("True") : TEXT("False"));
+		UE_LOG(LogTemp, Warning, TEXT("Search Location is not valid"), MasterAiController->IsValidLowLevel() ? TEXT("MasterAIController Valid") : TEXT("MasterAIController Not Valid"));*/
+
 	}
 
 }
@@ -84,17 +71,11 @@ void UFSMStateSearch::Exit()
 
 	if (MasterAiController)
 	{
-		//Stop Movement
-
-		MasterAiController->StopMovement();
+		//Location equals zero
+		SetSearchLocation(FVector::ZeroVector);
+		//MasterAiController->StopMovement();
 		MasterAiController->ReceiveMoveCompleted.RemoveDynamic(this, &UFSMStateSearch::OnMoveCompleted);
-
-		//Stop LookAtTimerHandle
-		GetWorld()->GetTimerManager().ClearTimer(LookAtTimerHandle);
-
 	}
-
-
 }
 
 void UFSMStateSearch::OnMoveCompleted(FAIRequestID RequestID, EPathFollowingResult::Type Result)
@@ -103,15 +84,14 @@ void UFSMStateSearch::OnMoveCompleted(FAIRequestID RequestID, EPathFollowingResu
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Search Location Reached"));
 
+		bRotationDone = false;
+
 		FTimerHandle TimerHandle;
 		GetWorld()->GetTimerManager().SetTimer(TimerHandle, [this]()
 			{
-				// ETC....
-
+				// ETC...
 
 			}, 1.0f, false);
-
-
 	}
 	else
 	{
@@ -119,4 +99,20 @@ void UFSMStateSearch::OnMoveCompleted(FAIRequestID RequestID, EPathFollowingResu
 	}
 }
 
+void UFSMStateSearch::SmoothLookAt(FVector TargetLocation, float DeltaTime, float RotationSpeed)
+{
+	if (AIShooter)
+	{
+		FRotator CurrentRotation = AIShooter->GetActorRotation();
+		FRotator TargetRotation = UKismetMathLibrary::FindLookAtRotation(AIShooter->GetActorLocation(), TargetLocation);
+		FRotator NewRotation = FMath::RInterpTo(CurrentRotation, TargetRotation, DeltaTime, RotationSpeed);
 
+		AIShooter->SetActorRotation(NewRotation);
+
+		if (FMath::Abs(CurrentRotation.Yaw - TargetRotation.Yaw) < 1.0f)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Rotation Completed"));
+			bRotationDone = true;
+		}
+	}
+}

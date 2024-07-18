@@ -7,6 +7,7 @@
 #include "AIController.h"
 #include "NavigationSystem.h"
 #include "GameFramework/Character.h"
+#include <Kismet/KismetMathLibrary.h>
 
 #include "FSMStateSearch.generated.h"
 
@@ -15,7 +16,6 @@
  */
 class AMasterAiShooter;
 class AMasterAiController;
-
 
 UCLASS()
 class UNREAL_SPATIALCPP_API UFSMStateSearch : public UFSMBase
@@ -35,8 +35,13 @@ public:
 	UFUNCTION()
 	void OnMoveCompleted(FAIRequestID RequestID, EPathFollowingResult::Type Result);
 
+	void SmoothLookAt(FVector TargetLocation, float DeltaTime, float RotationSpeed);
+
 	UPROPERTY()
 	FTimerHandle LookAtTimerHandle;
+
+	UPROPERTY()
+	bool bRotationDone;
 
 private:
 	UPROPERTY()
@@ -47,5 +52,4 @@ private:
 
 	UPROPERTY()
 	FVector SearchLocation;
-
 };
