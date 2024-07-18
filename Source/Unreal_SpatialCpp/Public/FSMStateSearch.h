@@ -35,7 +35,11 @@ public:
 	UFUNCTION()
 	void OnMoveCompleted(FAIRequestID RequestID, EPathFollowingResult::Type Result);
 
+	UFUNCTION()
 	void SmoothLookAt(FVector TargetLocation, float DeltaTime, float RotationSpeed);
+
+	UFUNCTION()
+	void MoveToSearchLocation();
 
 	UPROPERTY()
 	FTimerHandle LookAtTimerHandle;

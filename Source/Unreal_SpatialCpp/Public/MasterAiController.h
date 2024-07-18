@@ -25,6 +25,7 @@ class UFSMStateCover;
 class UFSMStatePatrol;
 class UFSMStateDead;
 class UFSMStateSearch;
+class UFSMStateResetAI;
 
 
 UCLASS()
@@ -77,39 +78,41 @@ public:
 	UPROPERTY()
 	UFSMBase* CurrentState;
 
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 	void ChangeStateAI(UFSMBase* NewState);
 
 	UFUNCTION()
 	FVector GetPlayerLastLocation() const { return PlayerLastLocation; }
 
-	UPROPERTY()
+	UPROPERTY(BlueprintReadOnly)
 	UFSMStateIdle* IdleState;
 
-	UPROPERTY()
+	UPROPERTY(BlueprintReadOnly)
 	UFSMStateWalk* WalkState;
 
-	UPROPERTY()
+	UPROPERTY(BlueprintReadOnly)
 	UFSMStateRun* RunState;
 
-	UPROPERTY()
+	UPROPERTY(BlueprintReadOnly)
 	UFSMStateAttack* AttackState;
 
-	UPROPERTY()
+	UPROPERTY(BlueprintReadOnly)
 	UFSMStateChase* ChaseState;
 
-	UPROPERTY()
+	UPROPERTY(BlueprintReadOnly)
 	UFSMStateCover* CoverState;
 
-	UPROPERTY()
+	UPROPERTY(BlueprintReadOnly)
 	UFSMStatePatrol* PatrolState;
 
-	UPROPERTY()
+	UPROPERTY(BlueprintReadOnly)
 	UFSMStateDead* DeadState;
 
-	UPROPERTY()
+	UPROPERTY(BlueprintReadOnly)
 	UFSMStateSearch* SearchState;
 
+	UPROPERTY(BlueprintReadOnly)
+	UFSMStateResetAI* ResetAIState;
 
 private:
 	UPROPERTY()

@@ -10,6 +10,7 @@
 #include "FSMStatePatrol.h"
 #include "FSMStateDead.h"
 #include "FSMStateSearch.h"
+#include "FSMStateResetAI.h"
 
 
 AMasterAiController::AMasterAiController()
@@ -76,9 +77,10 @@ void AMasterAiController::OnPossess(APawn* InPawn)
 	PatrolState = NewObject<UFSMStatePatrol>(this);
 	DeadState = NewObject<UFSMStateDead>(this);
 	SearchState = NewObject<UFSMStateSearch>(this);
+	ResetAIState = NewObject<UFSMStateResetAI>(this);
 
 
-	CurrentState = SearchState;
+	CurrentState = ResetAIState;
 	//CurrentState = IdleState;
 	CurrentState->Enter();
 
@@ -129,17 +131,11 @@ void AMasterAiController::AILogicTick(float DeltaTime)
 		bPawnLowHasLowHp = false;
 	}
 
-	//TimerLabmda use
-	FTimerHandle TimerHandle;
-	GetWorld()->GetTimerManager().SetTimer(TimerHandle, [this]()
-		{
-			ChangeStateAI(HandleChangeLogic());
-			UE_LOG(LogTemp, Warning, TEXT("State Changed"));
-		}, 10, false);
-
-	if (HandleChangeLogic() != CurrentState)
+	
+	/*if (HandleChangeLogic() != CurrentState)
 	{
-	}
+		ChangeStateAI(HandleChangeLogic());
+	}*/
 
 	if (GetCurrentState())
 	{
@@ -153,7 +149,7 @@ void AMasterAiController::AILogicTick(float DeltaTime)
 
 UFSMBase* AMasterAiController::HandleChangeLogic()
 {
-	return SearchState;
+	return ResetAIState;
 	/*if (bIsPlayerDetected)
 	{
 		if (bIsPlayerInAttackRange)

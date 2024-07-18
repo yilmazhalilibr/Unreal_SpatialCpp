@@ -43,25 +43,7 @@ void UFSMStateSearch::Update(float DeltaTime)
 		SmoothLookAt(GetSearchLocation(), DeltaTime, 2.0f); // 2 saniyede dönmek için 0.5 hýz
 	}
 
-	if (MasterAiController && GetSearchLocation() != FVector::Zero() && bRotationDone)
-	{
-		//UE_LOG(LogTemp, Warning, TEXT("Searching for Move To"));
 
-		if (MasterAiController->MoveToLocation(GetSearchLocation(), 5.0f))
-		{
-			//UE_LOG(LogTemp, Warning, TEXT("Searching 1111111111"));
-		}
-		else
-		{
-			UE_LOG(LogTemp, Warning, TEXT("Search Location is not valid"));
-		}
-	}
-	else
-	{
-	/*	UE_LOG(LogTemp, Warning, TEXT("Not Move To - %s"), bRotationDone ? TEXT("True") : TEXT("False"));
-		UE_LOG(LogTemp, Warning, TEXT("Search Location is not valid"), MasterAiController->IsValidLowLevel() ? TEXT("MasterAIController Valid") : TEXT("MasterAIController Not Valid"));*/
-
-	}
 
 }
 
@@ -73,7 +55,7 @@ void UFSMStateSearch::Exit()
 	{
 		//Location equals zero
 		SetSearchLocation(FVector::ZeroVector);
-		//MasterAiController->StopMovement();
+		MasterAiController->StopMovement();
 		MasterAiController->ReceiveMoveCompleted.RemoveDynamic(this, &UFSMStateSearch::OnMoveCompleted);
 	}
 }
@@ -113,6 +95,33 @@ void UFSMStateSearch::SmoothLookAt(FVector TargetLocation, float DeltaTime, floa
 		{
 			UE_LOG(LogTemp, Warning, TEXT("Rotation Completed"));
 			bRotationDone = true;
+			MoveToSearchLocation();
 		}
 	}
+}
+
+void UFSMStateSearch::MoveToSearchLocation()
+{
+
+	if (MasterAiController && GetSearchLocation() != FVector::Zero())
+	{
+		//UE_LOG(LogTemp, Warning, TEXT("Searching for Move To"));
+
+		if (MasterAiController->MoveToLocation(GetSearchLocation(), 5.0f))
+		{
+			//UE_LOG(LogTemp, Warning, TEXT("Searching 1111111111"));
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Search Location is not valid"));
+		}
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Not Move To - %s"), bRotationDone ? TEXT("True") : TEXT("False"));
+		UE_LOG(LogTemp, Warning, TEXT("Search Location is not valid"), MasterAiController->IsValidLowLevel() ? TEXT("MasterAIController Valid") : TEXT("MasterAIController Not Valid"));
+
+	}
+
+
 }
