@@ -9,6 +9,7 @@
 #include <Kismet/KismetMathLibrary.h>
 
 
+
 void UFSMStateSearch::Enter()
 {
 	UE_LOG(LogTemp, Warning, TEXT("Entering Search State"));
@@ -43,7 +44,7 @@ void UFSMStateSearch::Update(float DeltaTime)
 
 	if (!bRotationDone)
 	{
-		SmoothLookAt(GetSearchLocation(), DeltaTime, 2.0f); // 2 saniyede dönmek için 0.5 hýz
+		SmoothLookAt(MasterAiController->GetPlayerLastLocation(), DeltaTime, 2.0f); // 2 saniyede dönmek için 0.5 hýz
 	}
 
 
@@ -71,13 +72,6 @@ void UFSMStateSearch::OnMoveCompleted(FAIRequestID RequestID, EPathFollowingResu
 		UE_LOG(LogTemp, Warning, TEXT("Search Location Reached"));
 
 		bRotationDone = false;
-
-		FTimerHandle TimerHandle;
-		GetWorld()->GetTimerManager().SetTimer(TimerHandle, [this]()
-			{
-				// ETC...
-
-			}, 1.0f, false);
 	}
 	else
 	{

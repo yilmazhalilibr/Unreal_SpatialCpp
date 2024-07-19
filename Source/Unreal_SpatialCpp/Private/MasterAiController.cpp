@@ -109,15 +109,18 @@ void AMasterAiController::OnTargetPerceptionUpdated(AActor* Actor, FAIStimulus S
 		if (Stimulus.WasSuccessfullySensed())
 		{
 			UE_LOG(LogTemp, Warning, TEXT("Target Seen: %s"), *Actor->GetName());
+			PlayerLastLocation = Stimulus.StimulusLocation;
 			bIsPlayerDetected = true;
 			bSearchDoOnce = false;
-			PlayerLastLocation = Stimulus.StimulusLocation;
 
 		}
 		else
 		{
-			UE_LOG(LogTemp, Warning, TEXT("Target Lost: %s"), *Actor->GetName());
+			PlayerLastLocation = Stimulus.StimulusLocation;
 			bIsPlayerDetected = false;
+
+			UE_LOG(LogTemp, Warning, TEXT("Target Lost: %s"), *Actor->GetName());
+
 		}
 	}
 }
@@ -150,11 +153,12 @@ void AMasterAiController::AILogicTick(float DeltaTime)
 	if (bSuspicionTimer >= AiShooter->GetSuspicionTime())
 	{
 		OnWarMode = true;
+
 	}
-	else
+	/*else
 	{
 		OnWarMode = false;
-	}
+	}*/
 	if (bMissingPlayerTimer >= AiShooter->GetPlayerLostTime())
 	{
 		bMissingPlayer = true;
@@ -179,58 +183,143 @@ void AMasterAiController::AILogicTick(float DeltaTime)
 		UE_LOG(LogTemp, Warning, TEXT("Current State is not valid"));
 	}
 }
-
+//
+//UFSMBase* AMasterAiController::HandleChangeLogic()
+//{
+//	if (AiShooter->GetAIDead())
+//	{
+//		return DeadState;
+//	}
+//
+//
+//	if (!bIsPlayerDetected && !OnWarMode && !bAiInSearch)
+//	{
+//		return PatrolState;
+//	}
+//	else if (!bIsPlayerDetected && OnWarMode && bMissingPlayer)
+//	{
+//		return SearchState;
+//	}
+//	else if (!OnWarMode && bSuspicion || !OnWarMode && bSuspicion)
+//	{
+//		return SearchState;
+//	}
+//	else if (!bIsPlayerDetected && !bIsPlayerInAttackRange && OnWarMode)
+//	{
+//		return ChaseState;
+//	}
+//	else if (bIsPlayerDetected && bIsPlayerInAttackRange && OnWarMode)
+//	{
+//		UE_LOG(LogTemp, Warning, TEXT("Attack State %s"), bIsPlayerDetected ? TEXT("TRUE") : TEXT("FALSE"));
+//
+//		return AttackState;
+//	}
+//	else if (!bIsPlayerDetected && OnWarMode && bMissingPlayer && !bAiInSearch)
+//	{
+//		SetOnWarMode(false);
+//		bMissingPlayer = false;
+//		return ResetAIState;
+//	}
+//	else if (!bIsPlayerDetected && !OnWarMode && bMissingPlayer)
+//	{
+//		return IdleState;
+//	}
+//	else if (bPawnLowHasLowHp)
+//	{
+//		return CoverState;
+//		//Belki burada can doldurma iþlemi yaptýrýrýz. Ona göre bir bool koyup Cover tamamlanýrsa yani can dolarsa tekrar bu stateden çýksýn yapabiliriz.
+//	}
+//
+//
+//
+//	if (CurrentState == SearchState && !bSearchDoOnce)
+//	{
+//		ChangeStateAI(SearchState);
+//		bSearchDoOnce = true;
+//	}
+//
+//	return CurrentState;
+//
+//}
 UFSMBase* AMasterAiController::HandleChangeLogic()
 {
 	if (AiShooter->GetAIDead())
 	{
 		return DeadState;
 	}
-	if (!bIsPlayerDetected && !OnWarMode && !bAiInSearch)
+
+	if (bIsPlayerDetected)
 	{
-		return PatrolState;
+		if (!OnWarMode && bSuspicion)
+		{
+			return SearchState;
+		}
+
+		if (OnWarMode)
+		{
+			if (bIsPlayerInAttackRange)
+			{
+				if (CurrentState != AttackState) // Eðer mevcut state AttackState deðilse
+				{
+					return AttackState;
+				}
+			}
+			else
+			{
+				return ChaseState;
+			}
+		}
 	}
-	else if (!bIsPlayerDetected && OnWarMode && bMissingPlayer && !bAiInSearch)
+	else
 	{
-		return ResetAIState;
+		if (!OnWarMode)
+		{
+			if (!bSuspicion)
+			{
+				return PatrolState;
+			}
+			else
+			{
+				bAiInSearch = true; // Search durumuna girdiðini belirtiyoruz.
+				return SearchState;
+			}
+
+			//if (bSuspicion && !bAiInSearch)
+			//{
+			//	bAiInSearch = true; // Search durumuna girdiðini belirtiyoruz.
+			//	return SearchState;
+			//}
+		}
+		else
+		{
+			if (bMissingPlayer)
+			{
+				SetOnWarMode(false);
+				bMissingPlayer = false;
+				bAiInSearch = false; // Reset AI durumuna geçtiðimizde Search durumu sýfýrlanýr.
+				return ResetAIState;
+			}
+			else
+			{
+				return SearchState;
+			}
+		}
 	}
-	else if (!bIsPlayerDetected && OnWarMode)
-	{
-		return SearchState;
-	}
-	else if (!bIsPlayerDetected && !OnWarMode && bMissingPlayer)
-	{
-		return IdleState;
-	}
-	else if (bIsPlayerDetected && !bIsPlayerInAttackRange && OnWarMode)
-	{
-		return ChaseState;
-	}
-	else if (bIsPlayerDetected && bIsPlayerInAttackRange && OnWarMode)
-	{
-		return AttackState;
-	}
-	else if (bIsPlayerDetected && bSuspicion)
-	{
-		return SearchState;
-	}
-	else if (bPawnLowHasLowHp)
+
+	if (bPawnLowHasLowHp && OnWarMode)
 	{
 		return CoverState;
-		//Belki burada can doldurma iþlemi yaptýrýrýz. Ona göre bir bool koyup Cover tamamlanýrsa yani can dolarsa tekrar bu stateden çýksýn yapabiliriz.
 	}
-
-
 
 	if (CurrentState == SearchState && !bSearchDoOnce)
 	{
-		ChangeStateAI(SearchState);
 		bSearchDoOnce = true;
+		return SearchState;
 	}
 
 	return CurrentState;
-
 }
+
 
 void AMasterAiController::ChangeStateAI(UFSMBase* NewState)
 {

@@ -57,8 +57,6 @@ protected:
 	UPROPERTY()
 	FVector PlayerLastLocation;
 
-	UFUNCTION()
-	UFSMBase* HandleChangeLogic();
 
 
 	UFUNCTION()
@@ -67,7 +65,6 @@ protected:
 
 
 public:
-
 
 	UPROPERTY()
 	bool OnPossesDone = false;
@@ -95,6 +92,8 @@ public:
 
 	UFUNCTION()
 	void AILogicTick(float DeltaTime);
+	UFUNCTION()
+	UFSMBase* HandleChangeLogic();
 
 	UPROPERTY()
 	UFSMBase* CurrentState;
