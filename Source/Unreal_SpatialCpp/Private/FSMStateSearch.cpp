@@ -8,6 +8,7 @@
 #include "Navigation/PathFollowingComponent.h"
 #include <Kismet/KismetMathLibrary.h>
 
+
 void UFSMStateSearch::Enter()
 {
 	UE_LOG(LogTemp, Warning, TEXT("Entering Search State"));
@@ -24,6 +25,8 @@ void UFSMStateSearch::Enter()
 	{
 		SetSearchLocation(MasterAiController->GetPlayerLastLocation());
 		MasterAiController->ReceiveMoveCompleted.AddDynamic(this, &UFSMStateSearch::OnMoveCompleted);
+		MasterAiController->StopMovement();
+		MasterAiController->SetAiInSearch(true);
 
 		UE_LOG(LogTemp, Warning, TEXT("Search Location is %s"), *GetSearchLocation().ToString());
 	}
@@ -56,6 +59,7 @@ void UFSMStateSearch::Exit()
 		//Location equals zero
 		SetSearchLocation(FVector::ZeroVector);
 		MasterAiController->StopMovement();
+		MasterAiController->SetAiInSearch(false);
 		MasterAiController->ReceiveMoveCompleted.RemoveDynamic(this, &UFSMStateSearch::OnMoveCompleted);
 	}
 }

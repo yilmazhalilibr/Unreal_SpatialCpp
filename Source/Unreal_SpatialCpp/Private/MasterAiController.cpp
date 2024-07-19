@@ -44,12 +44,14 @@ void AMasterAiController::Tick(float DeltaTime)
 	if (bIsPlayerDetected)
 	{
 		bSuspicionTimer += DeltaTime;
+		bSuspicion = true;
 		bMissingPlayerTimer = 0.0f;
 
 	}
 	else
 	{
 		bMissingPlayerTimer += DeltaTime;
+		bSuspicion = false;
 		bSuspicionTimer = 0.0f;
 
 	}
@@ -108,6 +110,7 @@ void AMasterAiController::OnTargetPerceptionUpdated(AActor* Actor, FAIStimulus S
 		{
 			UE_LOG(LogTemp, Warning, TEXT("Target Seen: %s"), *Actor->GetName());
 			bIsPlayerDetected = true;
+			bSearchDoOnce = false;
 			PlayerLastLocation = Stimulus.StimulusLocation;
 
 		}
@@ -183,11 +186,11 @@ UFSMBase* AMasterAiController::HandleChangeLogic()
 	{
 		return DeadState;
 	}
-	if (!bIsPlayerDetected && !OnWarMode)
+	if (!bIsPlayerDetected && !OnWarMode && !bAiInSearch)
 	{
 		return PatrolState;
 	}
-	else if (!bIsPlayerDetected && OnWarMode && bMissingPlayer)
+	else if (!bIsPlayerDetected && OnWarMode && bMissingPlayer && !bAiInSearch)
 	{
 		return ResetAIState;
 	}
@@ -207,6 +210,10 @@ UFSMBase* AMasterAiController::HandleChangeLogic()
 	{
 		return AttackState;
 	}
+	else if (bIsPlayerDetected && bSuspicion)
+	{
+		return SearchState;
+	}
 	else if (bPawnLowHasLowHp)
 	{
 		return CoverState;
@@ -215,8 +222,13 @@ UFSMBase* AMasterAiController::HandleChangeLogic()
 
 
 
-	return IdleState;
+	if (CurrentState == SearchState && !bSearchDoOnce)
+	{
+		ChangeStateAI(SearchState);
+		bSearchDoOnce = true;
+	}
 
+	return CurrentState;
 
 }
 

@@ -63,7 +63,11 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+	//Destruct event
+	virtual void Destroyed() override;
 
+	UFUNCTION()
+	void OnTakeAIAnyDamage(AActor* DamagedActor, float Damage, const UDamageType* DamageType, AController* InstigatedBy, AActor* DamageCauser);
 
 	// AI Properties
 public:
@@ -110,10 +114,15 @@ public:
 	UFUNCTION()
 	bool GetAIDead() const { return AIDead; }
 
+	UFUNCTION()
+	void DealDamage(float Damage);
+
 public:
 	UPROPERTY()
 	FTimerHandle TimerHandle;
 
+	UPROPERTY()
+	AMasterAiController* MasterAiController;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "AI Properties")
 	FText The_features_below_are_for_AI_Perception;

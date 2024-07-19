@@ -64,6 +64,8 @@ protected:
 	UFUNCTION()
 	UFSMBase* GetCurrentState() const { return CurrentState; }
 
+
+
 public:
 
 
@@ -85,6 +87,12 @@ public:
 	UPROPERTY()
 	float bMissingPlayerTimer = 0.0f;
 
+	UPROPERTY()
+	bool bAiInSearch = false;
+
+	UPROPERTY()
+	bool bSearchDoOnce = false;
+
 	UFUNCTION()
 	void AILogicTick(float DeltaTime);
 
@@ -96,6 +104,12 @@ public:
 
 	UFUNCTION()
 	FVector GetPlayerLastLocation() const { return PlayerLastLocation; }
+
+	UFUNCTION()
+	void SetOnWarMode(bool Value) { OnWarMode = Value; }
+
+	UFUNCTION()
+	void SetAiInSearch(bool Value) { bAiInSearch = Value; }
 
 	UPROPERTY(BlueprintReadOnly)
 	UFSMStateIdle* IdleState;
