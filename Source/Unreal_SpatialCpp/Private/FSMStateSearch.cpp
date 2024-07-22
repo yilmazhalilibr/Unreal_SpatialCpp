@@ -42,11 +42,21 @@ void UFSMStateSearch::Update(float DeltaTime)
 	/*FVector PlayerLocation = MasterAiController->GetPlayerLastLocation();
 	MasterAiController->MoveToLocation(PlayerLocation, 5.0f);*/
 
-	if (!bRotationDone)
+	//if (!bRotationDone)
+	//{
+	//	SmoothLookAt(MasterAiController->GetPlayerLastLocation(), DeltaTime, 2.0f); // 2 saniyede dönmek için 0.5 hýz
+	//}
+
+
+	if (LookTimer >= AIShooter->GetSuspicionTime())
 	{
-		SmoothLookAt(MasterAiController->GetPlayerLastLocation(), DeltaTime, 2.0f); // 2 saniyede dönmek için 0.5 hýz
+		LookTimer = 0;
+		MasterAiController->SetOnWarMode(true);
+		MasterAiController->bAiInSearch = false;
+		return;
 	}
 
+	LookTimer += DeltaTime;
 
 
 }

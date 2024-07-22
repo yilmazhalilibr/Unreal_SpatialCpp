@@ -301,7 +301,8 @@ UFSMBase* AMasterAiController::HandleChangeLogic()
 			}
 			else
 			{
-				return SearchState;
+				//return SearchState;
+				return ChaseState;
 			}
 		}
 	}

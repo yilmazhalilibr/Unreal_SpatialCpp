@@ -47,6 +47,9 @@ public:
 	UPROPERTY()
 	bool bRotationDone;
 
+	UPROPERTY()
+	float LookTimer;
+
 private:
 	UPROPERTY()
 	AMasterAiShooter* AIShooter;
