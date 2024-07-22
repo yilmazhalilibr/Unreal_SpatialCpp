@@ -106,7 +106,7 @@ void AMasterAiController::OnTargetPerceptionUpdated(AActor* Actor, FAIStimulus S
 {
 	if (Actor)
 	{
-		if (Stimulus.WasSuccessfullySensed())
+		if (Stimulus.WasSuccessfullySensed() && Actor->Tags.Contains("Player"))
 		{
 			UE_LOG(LogTemp, Warning, TEXT("Target Seen: %s"), *Actor->GetName());
 			PlayerLastLocation = Stimulus.StimulusLocation;
@@ -114,7 +114,7 @@ void AMasterAiController::OnTargetPerceptionUpdated(AActor* Actor, FAIStimulus S
 			bSearchDoOnce = false;
 
 		}
-		else
+		else if (Stimulus.WasSuccessfullySensed() && Actor->Tags.Contains("Player"))
 		{
 			PlayerLastLocation = Stimulus.StimulusLocation;
 			bIsPlayerDetected = false;

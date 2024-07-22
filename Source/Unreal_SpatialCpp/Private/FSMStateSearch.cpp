@@ -7,6 +7,8 @@
 #include "NavigationSystem.h"
 #include "Navigation/PathFollowingComponent.h"
 #include <Kismet/KismetMathLibrary.h>
+#include "GameFramework/CharacterMovementComponent.h"
+
 
 
 
@@ -18,6 +20,8 @@ void UFSMStateSearch::Enter()
 	MasterAiController = Cast<AMasterAiController>(GetOuter());
 	AIShooter = Cast<AMasterAiShooter>(MasterAiController->GetPawn());
 
+	//Character Move speed 400 adjust
+	
 	if (!MasterAiController)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("MasterAiController is not valid"));
@@ -28,6 +32,8 @@ void UFSMStateSearch::Enter()
 		MasterAiController->ReceiveMoveCompleted.AddDynamic(this, &UFSMStateSearch::OnMoveCompleted);
 		MasterAiController->StopMovement();
 		MasterAiController->SetAiInSearch(true);
+		
+		AIShooter->GetCharacterMovement()->MaxWalkSpeed = 400.0f;
 
 		UE_LOG(LogTemp, Warning, TEXT("Search Location is %s"), *GetSearchLocation().ToString());
 	}
@@ -72,6 +78,8 @@ void UFSMStateSearch::Exit()
 		MasterAiController->StopMovement();
 		MasterAiController->SetAiInSearch(false);
 		MasterAiController->ReceiveMoveCompleted.RemoveDynamic(this, &UFSMStateSearch::OnMoveCompleted);
+		AIShooter->GetCharacterMovement()->MaxWalkSpeed = 600.0f;
+
 	}
 }
 

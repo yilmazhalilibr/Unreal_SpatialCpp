@@ -7,18 +7,19 @@
 #include "FSMStateAttack.generated.h"
 
 /**
- * 
+ *
  */
 
 class AMasterAiShooter;
 class AMasterAiController;
+class UMasterAIAnimInstance;
 
 
 UCLASS()
 class UNREAL_SPATIALCPP_API UFSMStateAttack : public UFSMBase
 {
 	GENERATED_BODY()
-	
+
 public:
 	virtual void Enter() override;
 	virtual void Update(float DeltaTime) override;
@@ -28,9 +29,13 @@ public:
 
 	AMasterAiController* GetController() const;
 
+	UMasterAIAnimInstance* GetMasterAiAnimInstance() const;
+
 	void SetController(AMasterAiController* _controller) { MasterAiController = _controller; }
 
 private:
+
+	UMasterAIAnimInstance* MasterAiAnimInstance;
 
 	AMasterAiShooter* Owner;
 
