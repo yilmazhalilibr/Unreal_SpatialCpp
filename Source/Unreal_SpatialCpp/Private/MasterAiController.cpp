@@ -11,6 +11,7 @@
 #include "FSMStateDead.h"
 #include "FSMStateSearch.h"
 #include "FSMStateResetAI.h"
+#include <MasterAiSpawner.h>
 
 
 AMasterAiController::AMasterAiController()
@@ -153,7 +154,11 @@ void AMasterAiController::AILogicTick(float DeltaTime)
 	if (bSuspicionTimer >= AiShooter->GetSuspicionTime())
 	{
 		OnWarMode = true;
-
+		auto* _spawner = Cast<AMasterAiSpawner>(AiShooter->GetOwner());
+		if (_spawner)
+		{
+			_spawner->WarningPlayerDetected(true);
+		}
 	}
 	/*else
 	{
@@ -190,7 +195,6 @@ void AMasterAiController::AILogicTick(float DeltaTime)
 //	{
 //		return DeadState;
 //	}
-//
 //
 //	if (!bIsPlayerDetected && !OnWarMode && !bAiInSearch)
 //	{

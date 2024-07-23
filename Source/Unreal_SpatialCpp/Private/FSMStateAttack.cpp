@@ -4,17 +4,28 @@
 #include "MasterAiController.h"
 #include "MasterAiShooter.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "UObject/ConstructorHelpers.h"
 #include "MasterAIAnimInstance.h"
+#include "MasterAiSpawner.h"
+
+
+UFSMStateAttack::UFSMStateAttack()
+{
+
+}
 
 void UFSMStateAttack::Enter()
 {
 	UE_LOG(LogTemp, Warning, TEXT("Entering Attack State"));
 
+
 	MasterAiController = Cast<AMasterAiController>(GetOuter());
 	if (MasterAiController)
 	{
 		Owner = Cast<AMasterAiShooter>(MasterAiController->GetPawn());
-		//Owner->GetCharacterMovement()->StopMovementImmediately();
+		MasterAiSpawner = Cast<AMasterAiSpawner>(Owner->GetSpawner());
+		//Stop all movement 
+		MasterAiController->StopMovement();
 
 		//AnimInstance will be added here
 		MasterAiAnimInstance = Cast<UMasterAIAnimInstance>(Owner->GetMesh()->GetAnimInstance());
@@ -27,9 +38,30 @@ void UFSMStateAttack::Enter()
 void UFSMStateAttack::Update(float DeltaTime)
 {
 	// Attack state logic
-	UE_LOG(LogTemp, Warning, TEXT("Updating Attack State"));
+	//UE_LOG(LogTemp, Warning, TEXT("Updating Attack State"));
 
-	MasterAiController->SetFocus(GetWorld()->GetFirstPlayerController()->GetPawn());
+	EQSTimer += DeltaTime;
+	
+	if (MasterAiSpawner && EQSTimer > FMath::RandRange(7, 20))
+	{
+		EQSTimer = 0.0f;
+		FVector AttackLocation = MasterAiSpawner->GetAttackCordinate(Owner);
+		MasterAiController->MoveToLocation(AttackLocation);
+		UE_LOG(LogTemp, Warning, TEXT("Attack Location: %s"), *AttackLocation.ToString());
+	}
+
+	if (Owner)
+	{
+		//Eðer ai duruyorsa focus atsýn
+		if (Owner->GetCharacterMovement()->Velocity.Size() < 1.0f)
+		{
+			MasterAiController->SetFocus(GetWorld()->GetFirstPlayerController()->GetPawn());
+		}
+		else
+		{
+			MasterAiController->SetFocus(nullptr);
+		}
+	}
 	//Fire system will added here
 
 }

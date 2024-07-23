@@ -8,7 +8,7 @@
 
 
 
-AMasterAiShooter::AMasterAiShooter()
+AMasterAiShooter::AMasterAiShooter() : CurrentHP(MaxHP), AIDead(false)
 {
 	PrimaryActorTick.bCanEverTick = true;
 }
@@ -71,6 +71,7 @@ void AMasterAiShooter::DealDamage(float Damage)
 	if (CurrentHP <= 0)
 	{
 		AIDead = true;
+		OnAiDead.Broadcast(this, AIDead);
 	}
 }
 

@@ -5,11 +5,20 @@
 
 UFSMStateCover::UFSMStateCover()
 {
-	ConstructorHelpers::FObjectFinder<UEnvQuery> QueryAsset(TEXT("/Game/FSM/EQS_Cover"));
-	if (QueryAsset.Succeeded())
+	if (!CoverQuery)
 	{
-		CoverQuery = QueryAsset.Object;
-		UE_LOG(LogTemp, Warning, TEXT("Cover Query loaded successfully"));
+
+		ConstructorHelpers::FObjectFinder<UEnvQuery> QueryAsset(TEXT("/Game/FSM/EQS_Cover"));
+		if (QueryAsset.Succeeded())
+		{
+			CoverQuery = QueryAsset.Object;
+			UE_LOG(LogTemp, Warning, TEXT("Cover Query loaded successfully"));
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Cover Query loaded failed"));
+
+		}
 	}
 }
 

@@ -9,10 +9,10 @@
 
 
 
+DECLARE_MULTICAST_DELEGATE_TwoParams(FOnAiOnDead, AMasterAiShooter*, bool bDead);
 
 
-
-
+class AMasterAiSpawner;
 class AMasterAiController;
 class UFSMBase;
 class UFSMStateIdle;
@@ -69,6 +69,15 @@ public:
 	UFUNCTION()
 	void OnTakeAIAnyDamage(AActor* DamagedActor, float Damage, const UDamageType* DamageType, AController* InstigatedBy, AActor* DamageCauser);
 
+	FOnAiOnDead OnAiDead;
+
+	UFUNCTION(BlueprintCallable)
+	void SetSpawner(AMasterAiSpawner* _spawner) { MasterAiSpawner = _spawner; }
+
+	UFUNCTION(BlueprintCallable)
+	AMasterAiSpawner* GetSpawner() const { return MasterAiSpawner; }
+
+
 	// AI Properties
 public:
 	UFUNCTION(BlueprintCallable)
@@ -118,6 +127,9 @@ public:
 	void DealDamage(float Damage);
 
 public:
+	UPROPERTY()
+	AMasterAiSpawner* MasterAiSpawner;
+
 	UPROPERTY()
 	FTimerHandle TimerHandle;
 

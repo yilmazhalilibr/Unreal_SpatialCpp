@@ -17,11 +17,6 @@ void UFSMStateChase::Enter()
 	}
 
 	UE_LOG(LogTemp, Warning, TEXT("Entering Chase State"));
-}
-
-void UFSMStateChase::Update(float DeltaTime)
-{
-	UE_LOG(LogTemp, Warning, TEXT("Updating Chase State"));
 
 	if (MasterAiController && Owner)
 	{
@@ -42,8 +37,17 @@ void UFSMStateChase::Update(float DeltaTime)
 		if (MasterAiController)
 		{
 			Owner = Cast<AMasterAiShooter>(MasterAiController->GetPawn());
+
 		}
 	}
+
+}
+
+void UFSMStateChase::Update(float DeltaTime)
+{
+	UE_LOG(LogTemp, Warning, TEXT("Updating Chase State"));
+
+	
 }
 
 void UFSMStateChase::Exit()
