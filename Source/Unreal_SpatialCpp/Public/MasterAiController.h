@@ -141,6 +141,8 @@ public:
 	UFSMStateResetAI* ResetAIState;
 
 private:
+
+
 	UPROPERTY()
 	AMasterAiShooter* AiShooter;
 

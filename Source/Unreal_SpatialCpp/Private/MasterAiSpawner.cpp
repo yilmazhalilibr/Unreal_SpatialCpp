@@ -218,6 +218,7 @@ void AMasterAiSpawner::WarningPlayerDetected(bool _isDetected)
 				if (_aiController)
 				{
 					_aiController->SetOnWarMode(true);
+
 				}
 			}
 		}

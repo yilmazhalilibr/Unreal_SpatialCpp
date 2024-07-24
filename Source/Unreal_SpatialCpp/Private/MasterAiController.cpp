@@ -303,6 +303,10 @@ UFSMBase* AMasterAiController::HandleChangeLogic()
 				bAiInSearch = false; // Reset AI durumuna geçtiðimizde Search durumu sýfýrlanýr.
 				return ResetAIState;
 			}
+			else if (OnWarMode)
+			{
+				return ChaseState;
+			}
 			else
 			{
 				//return SearchState;

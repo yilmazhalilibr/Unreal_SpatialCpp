@@ -60,6 +60,19 @@ void UFSMStateChase::Update(float DeltaTime)
 
 	FVector PlayerLocation = GetWorld()->GetFirstPlayerController()->GetPawn()->GetActorLocation();
 
+	/*if (!MasterAiController->OnWarMode)
+	{
+		ChaseTimer += DeltaTime;
+	}
+	if (!MasterAiController->OnWarMode && ChaseTimer > Owner->GetSuspicionTime())
+	{
+		MasterAiController->SetOnWarMode(true);
+		MasterAiSpawner->WarningPlayerDetected(true);
+		ChaseTimer = 0.0f;
+	}*/
+
+
+
 	if (MasterAiSpawner && MasterAiController->MoveToLocation(PlayerLocation, Owner->GetChaseDistance()) && MasterAiController->OnWarMode)
 	{
 		FVector AttackLocation = MasterAiSpawner->GetAttackCordinate(Owner);
