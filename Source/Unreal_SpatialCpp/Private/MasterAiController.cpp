@@ -115,7 +115,7 @@ void AMasterAiController::OnTargetPerceptionUpdated(AActor* Actor, FAIStimulus S
 			bSearchDoOnce = false;
 
 		}
-		else if (Stimulus.WasSuccessfullySensed() && Actor->Tags.Contains("Player"))
+		else if (!Stimulus.WasSuccessfullySensed() && Actor->Tags.Contains("Player"))
 		{
 			PlayerLastLocation = Stimulus.StimulusLocation;
 			bIsPlayerDetected = false;
@@ -188,63 +188,7 @@ void AMasterAiController::AILogicTick(float DeltaTime)
 		UE_LOG(LogTemp, Warning, TEXT("Current State is not valid"));
 	}
 }
-//
-//UFSMBase* AMasterAiController::HandleChangeLogic()
-//{
-//	if (AiShooter->GetAIDead())
-//	{
-//		return DeadState;
-//	}
-//
-//	if (!bIsPlayerDetected && !OnWarMode && !bAiInSearch)
-//	{
-//		return PatrolState;
-//	}
-//	else if (!bIsPlayerDetected && OnWarMode && bMissingPlayer)
-//	{
-//		return SearchState;
-//	}
-//	else if (!OnWarMode && bSuspicion || !OnWarMode && bSuspicion)
-//	{
-//		return SearchState;
-//	}
-//	else if (!bIsPlayerDetected && !bIsPlayerInAttackRange && OnWarMode)
-//	{
-//		return ChaseState;
-//	}
-//	else if (bIsPlayerDetected && bIsPlayerInAttackRange && OnWarMode)
-//	{
-//		UE_LOG(LogTemp, Warning, TEXT("Attack State %s"), bIsPlayerDetected ? TEXT("TRUE") : TEXT("FALSE"));
-//
-//		return AttackState;
-//	}
-//	else if (!bIsPlayerDetected && OnWarMode && bMissingPlayer && !bAiInSearch)
-//	{
-//		SetOnWarMode(false);
-//		bMissingPlayer = false;
-//		return ResetAIState;
-//	}
-//	else if (!bIsPlayerDetected && !OnWarMode && bMissingPlayer)
-//	{
-//		return IdleState;
-//	}
-//	else if (bPawnLowHasLowHp)
-//	{
-//		return CoverState;
-//		//Belki burada can doldurma iþlemi yaptýrýrýz. Ona göre bir bool koyup Cover tamamlanýrsa yani can dolarsa tekrar bu stateden çýksýn yapabiliriz.
-//	}
-//
-//
-//
-//	if (CurrentState == SearchState && !bSearchDoOnce)
-//	{
-//		ChangeStateAI(SearchState);
-//		bSearchDoOnce = true;
-//	}
-//
-//	return CurrentState;
-//
-//}
+
 UFSMBase* AMasterAiController::HandleChangeLogic()
 {
 	if (AiShooter->GetAIDead())
@@ -296,16 +240,13 @@ UFSMBase* AMasterAiController::HandleChangeLogic()
 		}
 		else
 		{
+			
 			if (bMissingPlayer)
 			{
 				SetOnWarMode(false);
 				bMissingPlayer = false;
 				bAiInSearch = false; // Reset AI durumuna geçtiðimizde Search durumu sýfýrlanýr.
 				return ResetAIState;
-			}
-			else if (OnWarMode)
-			{
-				return ChaseState;
 			}
 			else
 			{

@@ -87,7 +87,10 @@ FVector AMasterAiSpawner::GetAttackCordinate(AMasterAiShooter* _ai)
 {
 	if (AttackCordinates.Contains(_ai))
 	{
+		WarningPlayerDetected(true);
+
 		return AttackCordinates.FindRef(_ai);
+
 	}
 	else
 	{
