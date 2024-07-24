@@ -1,4 +1,4 @@
-#include "MasterAiController.h"
+	#include "MasterAiController.h"
 #include "MasterAiShooter.h"
 #include "FSMBase.h"
 #include "FSMStateIdle.h"
@@ -240,7 +240,7 @@ UFSMBase* AMasterAiController::HandleChangeLogic()
 		}
 		else
 		{
-			
+
 			if (bMissingPlayer)
 			{
 				SetOnWarMode(false);
@@ -278,10 +278,16 @@ void AMasterAiController::ChangeStateAI(UFSMBase* NewState)
 		CurrentState->Exit();
 	}
 
-	CurrentState = NewState;
+	CurrentState = nullptr; // Şu anki durumu geçici olarak boşaltıyoruz
 
-	if (CurrentState)
-	{
-		CurrentState->Enter();
-	}
+	FTimerHandle TimerHandle;
+	GetWorldTimerManager().SetTimer(TimerHandle, [this, NewState]()
+		{
+			CurrentState = NewState;
+			if (CurrentState)
+			{
+				CurrentState->Enter();
+			}
+		}, 1.0f, false);
+
 }

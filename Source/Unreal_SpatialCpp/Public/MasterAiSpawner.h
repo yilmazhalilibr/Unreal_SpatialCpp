@@ -62,7 +62,8 @@ public:
 	UFUNCTION()
 	FVector GetCoverCordinate(AMasterAiShooter* _ai);
 
-
+	UFUNCTION()
+	void HandleAttackCordinateToCover(FName _eqsName);
 private:
 	void ExecuteEQS(FName _eqsName);
 	/**Write first EQS Name Example -> Attack  ,as second select EQS node*/

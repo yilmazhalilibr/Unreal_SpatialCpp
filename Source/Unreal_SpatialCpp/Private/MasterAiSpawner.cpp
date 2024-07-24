@@ -29,7 +29,7 @@ void AMasterAiSpawner::BeginPlay()
 			ExecuteEQS("Cover");
 			//ExecuteEQS("Chase");
 
-		}, 1.0f, true);
+		}, 5.0f, true);
 
 
 
@@ -110,6 +110,39 @@ FVector AMasterAiSpawner::GetCoverCordinate(AMasterAiShooter* _ai)
 	}
 }
 
+void AMasterAiSpawner::HandleAttackCordinateToCover(FName _eqsName)
+{
+	UEnvQuery* _eqs = QueryMap.FindRef(_eqsName);
+	if (_eqs)
+	{
+		FEnvQueryRequest QueryRequest(_eqs, GetWorld()->GetFirstPlayerController()->GetPawn());
+		QueryRequest.Execute(EEnvQueryRunMode::AllMatching, FQueryFinishedSignature::CreateLambda(
+			[this, _eqsName](TSharedPtr<FEnvQueryResult> Result)
+			{
+				if (Result->IsSuccessful() && Result->Items.Num() > 0)
+				{
+					for (int32 i = 0; i < Result->Items.Num(); i++)
+					{
+						FVector CoverLocation = Result->GetItemAsLocation(i);
+						FVector StartLocation = CoverLocation + FVector(0, 0, 100);
+						FVector EndLocation = GetWorld()->GetFirstPlayerController()->GetPawn()->GetActorLocation();
+
+						FHitResult HitResult;
+						FCollisionQueryParams CollisionParams;
+						CollisionParams.AddIgnoredActor(GetWorld()->GetFirstPlayerController()->GetPawn());
+
+						bool bHit = GetWorld()->LineTraceSingleByChannel(HitResult, StartLocation, EndLocation, ECC_Visibility, CollisionParams);
+
+						if (bHit && HitResult.GetActor() && HitResult.GetActor()->Tags.Contains("Player"))
+						{
+							AttackCordinates.Add(MasterAiSpawnedList[i % MasterAiSpawnedList.Num()], CoverLocation);
+						}
+					}
+				}
+			}
+		));
+	}
+}
 
 void AMasterAiSpawner::ExecuteEQS(FName _eqsName)
 {
@@ -131,6 +164,8 @@ void AMasterAiSpawner::ExecuteEQS(FName _eqsName)
 						if (_eqsName == "Attack")
 						{
 							AttackCordinates.Empty();
+
+							HandleAttackCordinateToCover("Cover");
 
 							for (AMasterAiShooter* Ai : MasterAiSpawnedList)
 							{
@@ -243,3 +278,5 @@ void AMasterAiSpawner::WarningPlayerDetected(bool _isDetected)
 	}
 
 }
+
+
