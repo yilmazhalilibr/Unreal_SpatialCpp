@@ -12,6 +12,7 @@
 
 class AMasterAiShooter;
 class AMasterAiController;
+class AMasterAiSpawner;
 
 
 UCLASS()
@@ -33,10 +34,16 @@ public:
 
 	void SetController(AMasterAiController* _controller) { MasterAiController = _controller; }
 
+	float ChaseTimer;
+
+
 private:
+	UPROPERTY()
+	AMasterAiSpawner* MasterAiSpawner;
 
+	UPROPERTY()
 	AMasterAiShooter* Owner;
-
+	UPROPERTY()
 	AMasterAiController* MasterAiController;
 
 };

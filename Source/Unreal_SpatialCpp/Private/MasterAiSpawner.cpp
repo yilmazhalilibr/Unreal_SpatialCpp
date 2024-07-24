@@ -27,7 +27,7 @@ void AMasterAiSpawner::BeginPlay()
 		{
 			ExecuteEQS("Attack");
 			ExecuteEQS("Cover");
-			ExecuteEQS("Chase");
+			//ExecuteEQS("Chase");
 
 		}, 1.0f, true);
 
@@ -121,16 +121,32 @@ void AMasterAiSpawner::ExecuteEQS(FName _eqsName)
 				{
 					if (Result->IsSuccessful() && Result->Items.Num() > 0)
 					{
-						// Clear the corresponding coordinates map before adding new coordinates
+						int32 ItemIndex = 0;
+						int32 NumItems = Result->Items.Num();
+						int32 HalfNumItems = NumItems / 2;
+
 						if (_eqsName == "Attack")
 						{
 							AttackCordinates.Empty();
-							int32 ItemIndex = 0;
+
 							for (AMasterAiShooter* Ai : MasterAiSpawnedList)
 							{
-								if (Ai && ItemIndex < Result->Items.Num())
+								if (Ai && ItemIndex < NumItems)
 								{
-									AttackCordinates.Add(Ai, Result->GetItemAsLocation(ItemIndex));
+									FVector Location;
+
+									if (ItemIndex % 2 == 0)
+									{
+										// Çift sayý ise baþtan ekle
+										Location = Result->GetItemAsLocation(ItemIndex / 2);
+									}
+									else
+									{
+										// Tek sayý ise ortadan sona doðru ekle
+										Location = Result->GetItemAsLocation(HalfNumItems + (ItemIndex / 2));
+									}
+
+									AttackCordinates.Add(Ai, Location);
 									ItemIndex++;
 								}
 							}
@@ -138,16 +154,30 @@ void AMasterAiSpawner::ExecuteEQS(FName _eqsName)
 						else if (_eqsName == "Cover")
 						{
 							CoverCordinates.Empty();
-							int32 ItemIndex = 0;
+
 							for (AMasterAiShooter* Ai : MasterAiSpawnedList)
 							{
-								if (Ai && ItemIndex < Result->Items.Num())
+								if (Ai && ItemIndex < NumItems)
 								{
-									CoverCordinates.Add(Ai, Result->GetItemAsLocation(ItemIndex));
+									FVector Location;
+
+									if (ItemIndex % 2 == 0)
+									{
+										// Çift sayý ise baþtan ekle
+										Location = Result->GetItemAsLocation(ItemIndex / 2);
+									}
+									else
+									{
+										// Tek sayý ise ortadan sona doðru ekle
+										Location = Result->GetItemAsLocation(HalfNumItems + (ItemIndex / 2));
+									}
+
+									CoverCordinates.Add(Ai, Location);
 									ItemIndex++;
 								}
 							}
 						}
+
 					}
 					else
 					{

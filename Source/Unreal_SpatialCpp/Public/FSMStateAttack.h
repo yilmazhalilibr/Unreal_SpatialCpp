@@ -47,10 +47,12 @@ public:
 	float EQSTimer;
 
 private:
-
+	UPROPERTY()
 	UMasterAIAnimInstance* MasterAiAnimInstance;
 
+	UPROPERTY()
 	AMasterAiShooter* Owner;
 
+	UPROPERTY()
 	AMasterAiController* MasterAiController;
 };
