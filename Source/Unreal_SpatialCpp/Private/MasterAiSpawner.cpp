@@ -122,12 +122,12 @@ void AMasterAiSpawner::HandleAttackCordinateToCover(FName _eqsName)
 			{
 				if (Result->IsSuccessful() && Result->Items.Num() > 0)
 				{
-					
+
 					for (int32 i = 0; i < Result->Items.Num(); i++)
 					{
 						FVector CoverLocation = Result->GetItemAsLocation(i);
 						FVector StartLocation = CoverLocation + FVector(0, 0, 150);
-						FVector EndLocation = GetWorld()->GetFirstPlayerController()->GetPawn()->GetActorLocation() + FVector(0,0,50);
+						FVector EndLocation = GetWorld()->GetFirstPlayerController()->GetPawn()->GetActorLocation() + FVector(0, 0, 50);
 
 						FHitResult HitResult;
 						FCollisionQueryParams CollisionParamsForEQSCover;
@@ -155,10 +155,19 @@ void AMasterAiSpawner::HandleAttackCordinateToCover(FName _eqsName)
 								if (HitResult.GetActor()->Tags.Contains("Player"))
 								{
 
-									if (FVector::Dist(CoverLocation, EndLocation) < 500)
+									//Sahneden bir ai bul ve GetAttackDistance'ý al.
+									AActor* FoundActor;
+
+									FoundActor = UGameplayStatics::GetActorOfClass(GetWorld(), AMasterAiShooter::StaticClass());
+									//MasterAiShooter'e cast et
+									AMasterAiShooter* Ai = Cast<AMasterAiShooter>(FoundActor);
+									float _attackRange = Ai ? Ai->GetAttackDistance() : 995;
+
+									if (FVector::Dist(CoverLocation, EndLocation) < _attackRange)
 									{
 										//AttackCordinates.Add(nullptr, CoverLocation);
-										DrawDebugLine(GetWorld(), StartLocation, EndLocation, FColor::Green, false, 10.0f, 0, 1.0f);
+
+										//DrawDebugLine(GetWorld(), StartLocation, EndLocation, FColor::Green, false, 10.0f, 0, 1.0f);
 										AttackCordinates.Add(MasterAiSpawnedList[i % MasterAiSpawnedList.Num()], CoverLocation);
 
 									}

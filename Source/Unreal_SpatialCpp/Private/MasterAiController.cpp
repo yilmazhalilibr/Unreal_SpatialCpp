@@ -32,6 +32,30 @@ AMasterAiController::AMasterAiController()
 	}
 
 	AIPerceptionComponent->OnTargetPerceptionUpdated.AddDynamic(this, &AMasterAiController::OnTargetPerceptionUpdated);
+
+	// Hearing Config
+	HearingConfig = CreateDefaultSubobject<UAISenseConfig_Hearing>(TEXT("HearingConfig"));
+	if (HearingConfig)
+	{
+		HearingConfig->DetectionByAffiliation.bDetectEnemies = true;
+		HearingConfig->DetectionByAffiliation.bDetectFriendlies = true;
+		HearingConfig->DetectionByAffiliation.bDetectNeutrals = true;
+
+		AIPerceptionComponent->ConfigureSense(*HearingConfig);
+	}
+
+	AIPerceptionComponent->OnTargetPerceptionUpdated.AddDynamic(this, &AMasterAiController::OnTargetPerceptionUpdated);
+
+	// Damage Config
+	DamageConfig = CreateDefaultSubobject<UAISenseConfig_Damage>(TEXT("DamageConfig"));
+	if (DamageConfig)
+	{
+		AIPerceptionComponent->ConfigureSense(*DamageConfig);
+	}
+
+	AIPerceptionComponent->OnTargetPerceptionUpdated.AddDynamic(this, &AMasterAiController::OnTargetPerceptionUpdated);
+
+
 }
 
 void AMasterAiController::BeginPlay()
@@ -53,7 +77,11 @@ void AMasterAiController::Tick(float DeltaTime)
 	else
 	{
 		bMissingPlayerTimer += DeltaTime;
-		bSuspicion = false;
+		bSuspicionTimer -= DeltaTime;
+		if (bSuspicionTimer < 0)
+		{
+			bSuspicion = false;
+		}
 		bSuspicionTimer = 0.0f;
 
 	}
@@ -106,25 +134,48 @@ void AMasterAiController::OnPossess(APawn* InPawn)
 
 void AMasterAiController::OnTargetPerceptionUpdated(AActor* Actor, FAIStimulus Stimulus)
 {
-	if (Actor)
+
+
+	if (Stimulus.Type == UAISense::GetSenseID<UAISense_Sight>())
 	{
-		if (Stimulus.WasSuccessfullySensed() && Actor->Tags.Contains("Player"))
+		if (Actor)
 		{
-			UE_LOG(LogTemp, Warning, TEXT("Target Seen: %s"), *Actor->GetName());
-			PlayerLastLocation = Stimulus.StimulusLocation;
-			bIsPlayerDetected = true;
-			bSearchDoOnce = false;
+			if (Stimulus.WasSuccessfullySensed() && Actor->Tags.Contains("Player") && Stimulus.Type == UAISense::GetSenseID<UAISense_Sight>())
+			{
+				UE_LOG(LogTemp, Warning, TEXT("Target Seen: %s"), *Actor->GetName());
+				PlayerLastLocation = Stimulus.StimulusLocation;
+				bIsPlayerDetected = true;
+				bSearchDoOnce = false;
 
-		}
-		else if (!Stimulus.WasSuccessfullySensed() && Actor->Tags.Contains("Player"))
-		{
-			PlayerLastLocation = Stimulus.StimulusLocation;
-			bIsPlayerDetected = false;
+			}
+			else if (!Stimulus.WasSuccessfullySensed() && Actor->Tags.Contains("Player") && Stimulus.Type == UAISense::GetSenseID<UAISense_Sight>())
+			{
+				PlayerLastLocation = Stimulus.StimulusLocation;
+				bIsPlayerDetected = false;
 
-			UE_LOG(LogTemp, Warning, TEXT("Target Lost: %s"), *Actor->GetName());
-
+				UE_LOG(LogTemp, Warning, TEXT("Target Lost: %s"), *Actor->GetName());
+			}
 		}
 	}
+	else if (Stimulus.Type == UAISense::GetSenseID<UAISense_Hearing>())
+	{
+		if (Stimulus.WasSuccessfullySensed())
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Heard: %s at location %s"), *Actor->GetName(), *Stimulus.StimulusLocation.ToString());
+		}
+	}
+	else if (Stimulus.Type == UAISense::GetSenseID<UAISense_Damage>())
+	{
+		if (Stimulus.WasSuccessfullySensed())
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Damage: %s at location %s"), *Actor->GetName(), *Stimulus.StimulusLocation.ToString());
+		}
+	}
+
+
+
+
+
 }
 
 void AMasterAiController::AILogicTick(float DeltaTime)
@@ -207,6 +258,10 @@ UFSMBase* AMasterAiController::HandleChangeLogic()
 
 		if (OnWarMode)
 		{
+			/*if (bPawnLowHasLowHp)
+			{
+				return CoverState; HERE WILL MAKE LATER ON
+			}*/
 			if (bIsPlayerInAttackRange)
 			{
 				if (CurrentState != AttackState) // Eðer mevcut state AttackState deðilse
@@ -262,10 +317,7 @@ UFSMBase* AMasterAiController::HandleChangeLogic()
 		}
 	}
 
-	if (bPawnLowHasLowHp && OnWarMode)
-	{
-		return CoverState;
-	}
+
 
 	if (CurrentState == SearchState && !bSearchDoOnce)
 	{

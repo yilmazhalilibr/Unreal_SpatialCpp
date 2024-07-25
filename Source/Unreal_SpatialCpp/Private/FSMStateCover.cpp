@@ -30,7 +30,6 @@ void UFSMStateCover::Enter()
 	if (MasterAiController)
 	{
 		//Set focus player 
-
 		ExecuteEQS();
 	}
 	else
@@ -42,6 +41,9 @@ void UFSMStateCover::Enter()
 void UFSMStateCover::Update(float DeltaTime)
 {
 	// Update state logic if necessary
+
+	UE_LOG(LogTemp, Warning, TEXT("Updating Cover State"));
+
 }
 
 void UFSMStateCover::Exit()
@@ -63,22 +65,22 @@ void UFSMStateCover::ExecuteEQS()
 			{
 				if (Result->IsSuccessful() && Result->GetItemScore(0) > 0.0f)
 				{
-					FVector BestLocation = Result->GetItemAsLocation(0);
-					UE_LOG(LogTemp, Warning, TEXT("Best cover location found at: %s"), *BestLocation.ToString());
+					CoverLocation = Result->GetItemAsLocation(0);
+					UE_LOG(LogTemp, Warning, TEXT("Best cover location found at: %s"), *CoverLocation.ToString());
 
 					// Move to the best location or perform any other action
 					if (MasterAiController)
 					{
-						if (MasterAiController->MoveToLocation(BestLocation))
+						if (MasterAiController->MoveToLocation(CoverLocation) && !CoverLocation.IsZero())
 						{
 							UE_LOG(LogTemp, Warning, TEXT("Moving to cover location"));
 						}
 						else
 						{
-
 							UE_LOG(LogTemp, Warning, TEXT("Failed to move to cover location"));
-
+							 
 						}
+						CoverLocation = FVector().Zero();
 					}
 				}
 				else

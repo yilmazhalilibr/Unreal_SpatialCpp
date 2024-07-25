@@ -30,4 +30,7 @@ private:
 	UEnvQuery* CoverQuery;
 
 	class AMasterAiController* MasterAiController;
+
+	UPROPERTY()
+	FVector CoverLocation;
 };
