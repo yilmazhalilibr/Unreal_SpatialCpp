@@ -1,4 +1,4 @@
-	#include "MasterAiController.h"
+#include "MasterAiController.h"
 #include "MasterAiShooter.h"
 #include "FSMBase.h"
 #include "FSMStateIdle.h"
@@ -12,6 +12,7 @@
 #include "FSMStateSearch.h"
 #include "FSMStateResetAI.h"
 #include <MasterAiSpawner.h>
+#include "GameFramework/CharacterMovementComponent.h"
 
 
 AMasterAiController::AMasterAiController()
@@ -200,6 +201,7 @@ UFSMBase* AMasterAiController::HandleChangeLogic()
 	{
 		if (!OnWarMode && bSuspicion)
 		{
+			bAiInSearch = true; // Search durumuna girdiðini belirtiyoruz.
 			return SearchState;
 		}
 
@@ -210,6 +212,10 @@ UFSMBase* AMasterAiController::HandleChangeLogic()
 				if (CurrentState != AttackState) // Eðer mevcut state AttackState deðilse
 				{
 					return AttackState;
+				}
+				else
+				{
+					return CurrentState;
 				}
 			}
 			else
@@ -279,6 +285,8 @@ void AMasterAiController::ChangeStateAI(UFSMBase* NewState)
 	}
 
 	CurrentState = nullptr; // Þu anki durumu geçici olarak boþaltýyoruz
+
+	AiShooter->GetCharacterMovement()->StopActiveMovement();
 
 	FTimerHandle TimerHandle;
 	GetWorldTimerManager().SetTimer(TimerHandle, [this, NewState]()

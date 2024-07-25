@@ -4,6 +4,7 @@
 #include "MasterAiSpawner.h"
 #include "MasterAiShooter.h"
 #include "MasterAiController.h"
+#include <Kismet/GameplayStatics.h>
 
 
 
@@ -121,21 +122,57 @@ void AMasterAiSpawner::HandleAttackCordinateToCover(FName _eqsName)
 			{
 				if (Result->IsSuccessful() && Result->Items.Num() > 0)
 				{
+					
 					for (int32 i = 0; i < Result->Items.Num(); i++)
 					{
 						FVector CoverLocation = Result->GetItemAsLocation(i);
-						FVector StartLocation = CoverLocation + FVector(0, 0, 100);
-						FVector EndLocation = GetWorld()->GetFirstPlayerController()->GetPawn()->GetActorLocation();
+						FVector StartLocation = CoverLocation + FVector(0, 0, 150);
+						FVector EndLocation = GetWorld()->GetFirstPlayerController()->GetPawn()->GetActorLocation() + FVector(0,0,50);
 
 						FHitResult HitResult;
-						FCollisionQueryParams CollisionParams;
-						CollisionParams.AddIgnoredActor(GetWorld()->GetFirstPlayerController()->GetPawn());
+						FCollisionQueryParams CollisionParamsForEQSCover;
 
-						bool bHit = GetWorld()->LineTraceSingleByChannel(HitResult, StartLocation, EndLocation, ECC_Visibility, CollisionParams);
-
-						if (bHit && HitResult.GetActor() && HitResult.GetActor()->Tags.Contains("Player"))
+						CollisionParamsForEQSCover.AddIgnoredActor(this);
+						// Belirli bir sýnýfa ait tüm aktörleri göz ardý et
+						TArray<AActor*> IgnoredActors;
+						UGameplayStatics::GetAllActorsOfClass(GetWorld(), AMasterAiShooter::StaticClass(), IgnoredActors);
+						for (AActor* Actor : IgnoredActors)
 						{
-							AttackCordinates.Add(MasterAiSpawnedList[i % MasterAiSpawnedList.Num()], CoverLocation);
+							CollisionParamsForEQSCover.AddIgnoredActor(Actor);
+						}
+
+
+						bool bHit = GetWorld()->LineTraceSingleByChannel(HitResult, StartLocation, EndLocation, ECC_Pawn, CollisionParamsForEQSCover);
+
+						// Draw Debug Line
+						//DrawDebugLine(GetWorld(), StartLocation, EndLocation, FColor::Red, false, 10.0f, 0, 1.0f);
+
+						if (bHit)
+						{
+							if (HitResult.GetActor())
+							{
+								//UE_LOG(LogTemp, Warning, TEXT("Hit Actor: %s"), *HitResult.GetActor()->GetName());
+								if (HitResult.GetActor()->Tags.Contains("Player"))
+								{
+
+									if (FVector::Dist(CoverLocation, EndLocation) < 500)
+									{
+										//AttackCordinates.Add(nullptr, CoverLocation);
+										DrawDebugLine(GetWorld(), StartLocation, EndLocation, FColor::Green, false, 10.0f, 0, 1.0f);
+										AttackCordinates.Add(MasterAiSpawnedList[i % MasterAiSpawnedList.Num()], CoverLocation);
+
+									}
+
+								}
+							}
+							else
+							{
+								UE_LOG(LogTemp, Warning, TEXT("Hit but no actor found"));
+							}
+						}
+						else
+						{
+							UE_LOG(LogTemp, Warning, TEXT("No hit detected"));
 						}
 					}
 				}

@@ -4,6 +4,7 @@
 #include "GameFramework/Character.h"
 #include "AIController.h"
 #include "MasterAiSpawner.h"
+#include "GameFramework/CharacterMovementComponent.h"
 
 
 UFSMStateChase::UFSMStateChase()
@@ -24,7 +25,6 @@ void UFSMStateChase::Enter()
 		}
 
 	}
-
 
 	UE_LOG(LogTemp, Warning, TEXT("Entering Chase State"));
 
@@ -78,11 +78,29 @@ void UFSMStateChase::Update(float DeltaTime)
 		FVector AttackLocation = MasterAiSpawner->GetAttackCordinate(Owner);
 		MasterAiController->MoveToLocation(AttackLocation);
 		UE_LOG(LogTemp, Warning, TEXT("Chase Location: %s"), *AttackLocation.ToString());
+
+
+		FTimerHandle TimerHandle;
+		GetWorld()->GetTimerManager().SetTimer(TimerHandle, [this]()
+			{
+				//Set focus player if velocity equals 0
+				if (Owner->GetCharacterMovement()->Velocity.Size() < 1.0f)
+				{
+					MasterAiController->SetFocus(GetWorld()->GetFirstPlayerController()->GetPawn());
+				}
+				else
+				{
+					MasterAiController->SetFocus(nullptr);
+				}
+				
+			}, 1.0f, false);
+
 	}
 	else
 	{
 		if (MasterAiController && Owner)
 		{
+
 			if (MasterAiController->MoveToLocation(PlayerLocation, Owner->GetChaseDistance()))
 			{
 				UE_LOG(LogTemp, Warning, TEXT("Chasing the player"));
@@ -109,6 +127,8 @@ void UFSMStateChase::Update(float DeltaTime)
 void UFSMStateChase::Exit()
 {
 	UE_LOG(LogTemp, Warning, TEXT("Exiting Chase State"));
+	//Clear focus
+
 }
 
 AMasterAiShooter* UFSMStateChase::GetOwner() const

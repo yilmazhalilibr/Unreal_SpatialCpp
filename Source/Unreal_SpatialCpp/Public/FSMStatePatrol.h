@@ -39,6 +39,9 @@ private:
 
 	FTimerHandle WaitTimerHandle;
 
+	UPROPERTY()
+	FTimerHandle MoveRetryTimerHandle;
+
 	void MoveToNextPatrolLocation();
 	void OnWaitTimerEnd();
 };

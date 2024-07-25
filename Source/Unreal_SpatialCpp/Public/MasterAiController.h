@@ -108,6 +108,9 @@ public:
 	void SetOnWarMode(bool Value) { OnWarMode = Value; }
 
 	UFUNCTION()
+	void SetInAttackRange(bool Value) { bIsPlayerInAttackRange = Value; }
+
+	UFUNCTION()
 	void SetAiInSearch(bool Value) { bAiInSearch = Value; }
 
 	UPROPERTY(BlueprintReadOnly)

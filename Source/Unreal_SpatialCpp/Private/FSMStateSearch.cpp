@@ -20,8 +20,11 @@ void UFSMStateSearch::Enter()
 	MasterAiController = Cast<AMasterAiController>(GetOuter());
 	AIShooter = Cast<AMasterAiShooter>(MasterAiController->GetPawn());
 
-	//Character Move speed 400 adjust
-	
+	if (!AIShooter)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("AIShooter is not valid"));
+	}
+
 	if (!MasterAiController)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("MasterAiController is not valid"));
@@ -33,14 +36,11 @@ void UFSMStateSearch::Enter()
 		MasterAiController->StopMovement();
 		MasterAiController->SetAiInSearch(true);
 		
-		AIShooter->GetCharacterMovement()->MaxWalkSpeed = 400.0f;
+		AIShooter->GetCharacterMovement()->MaxWalkSpeed = 300.0f;
 
 		UE_LOG(LogTemp, Warning, TEXT("Search Location is %s"), *GetSearchLocation().ToString());
 	}
-	if (!AIShooter)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("AIShooter is not valid"));
-	}
+
 }
 
 void UFSMStateSearch::Update(float DeltaTime)
@@ -48,10 +48,10 @@ void UFSMStateSearch::Update(float DeltaTime)
 	/*FVector PlayerLocation = MasterAiController->GetPlayerLastLocation();
 	MasterAiController->MoveToLocation(PlayerLocation, 5.0f);*/
 
-	//if (!bRotationDone)
-	//{
-	//	SmoothLookAt(MasterAiController->GetPlayerLastLocation(), DeltaTime, 2.0f); // 2 saniyede dönmek için 0.5 hýz
-	//}
+	if (!bRotationDone)
+	{
+		SmoothLookAt(MasterAiController->GetPlayerLastLocation(), DeltaTime, 2.0f); // 2 saniyede dönmek için 0.5 hýz
+	}
 
 
 	if (LookTimer >= AIShooter->GetSuspicionTime())
@@ -61,6 +61,7 @@ void UFSMStateSearch::Update(float DeltaTime)
 		MasterAiController->bAiInSearch = false;
 		return;
 	}
+
 
 	LookTimer += DeltaTime;
 
@@ -111,7 +112,7 @@ void UFSMStateSearch::SmoothLookAt(FVector TargetLocation, float DeltaTime, floa
 		{
 			UE_LOG(LogTemp, Warning, TEXT("Rotation Completed"));
 			bRotationDone = true;
-			MoveToSearchLocation();
+			//MoveToSearchLocation();
 		}
 	}
 }
