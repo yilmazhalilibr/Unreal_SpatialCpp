@@ -11,8 +11,10 @@
 #include "FSMStateDead.h"
 #include "FSMStateSearch.h"
 #include "FSMStateResetAI.h"
+#include "FSMStateHeard.h"
 #include <MasterAiSpawner.h>
 #include "GameFramework/CharacterMovementComponent.h"
+
 
 
 AMasterAiController::AMasterAiController()
@@ -31,7 +33,7 @@ AMasterAiController::AMasterAiController()
 		AIPerceptionComponent->SetDominantSense(*SightConfig->GetSenseImplementation());
 	}
 
-	AIPerceptionComponent->OnTargetPerceptionUpdated.AddDynamic(this, &AMasterAiController::OnTargetPerceptionUpdated);
+	//AIPerceptionComponent->OnTargetPerceptionUpdated.AddDynamic(this, &AMasterAiController::OnTargetPerceptionUpdated);
 
 	// Hearing Config
 	HearingConfig = CreateDefaultSubobject<UAISenseConfig_Hearing>(TEXT("HearingConfig"));
@@ -44,7 +46,7 @@ AMasterAiController::AMasterAiController()
 		AIPerceptionComponent->ConfigureSense(*HearingConfig);
 	}
 
-	AIPerceptionComponent->OnTargetPerceptionUpdated.AddDynamic(this, &AMasterAiController::OnTargetPerceptionUpdated);
+	//AIPerceptionComponent->OnTargetPerceptionUpdated.AddDynamic(this, &AMasterAiController::OnTargetPerceptionUpdated);
 
 	// Damage Config
 	DamageConfig = CreateDefaultSubobject<UAISenseConfig_Damage>(TEXT("DamageConfig"));
@@ -123,6 +125,7 @@ void AMasterAiController::OnPossess(APawn* InPawn)
 	DeadState = NewObject<UFSMStateDead>(this);
 	SearchState = NewObject<UFSMStateSearch>(this);
 	ResetAIState = NewObject<UFSMStateResetAI>(this);
+	HeardState = NewObject<UFSMStateHeard>(this);
 
 
 	CurrentState = IdleState;
@@ -162,6 +165,17 @@ void AMasterAiController::OnTargetPerceptionUpdated(AActor* Actor, FAIStimulus S
 		if (Stimulus.WasSuccessfullySensed())
 		{
 			UE_LOG(LogTemp, Warning, TEXT("Heard: %s at location %s"), *Actor->GetName(), *Stimulus.StimulusLocation.ToString());
+			//if instigator is player 
+			if (Actor->Tags.Contains("Player"))
+			{
+				UE_LOG(LogTemp, Warning, TEXT("Player Heard"));
+				bSearchDoOnce = false;
+				bIsPlayerHeard = true;
+				bLastHeardLocation = Stimulus.StimulusLocation;
+			}
+
+
+
 		}
 	}
 	else if (Stimulus.Type == UAISense::GetSenseID<UAISense_Damage>())
@@ -248,8 +262,24 @@ UFSMBase* AMasterAiController::HandleChangeLogic()
 		return DeadState;
 	}
 
+	//Damage State
+
+
+	//Hearing State
+	if (bIsPlayerHeard && !OnWarMode && !bSuspicion)
+	{
+		if (bIsPlayerHeard && CurrentState == HeardState)
+		{
+			return CurrentState;
+		}
+
+		//bIsPlayerHeard = false;
+		return HeardState;
+	}
+	//Sight State
 	if (bIsPlayerDetected)
 	{
+
 		if (!OnWarMode && bSuspicion)
 		{
 			bAiInSearch = true; // Search durumuna girdiðini belirtiyoruz.
@@ -281,6 +311,7 @@ UFSMBase* AMasterAiController::HandleChangeLogic()
 	}
 	else
 	{
+
 		if (!OnWarMode)
 		{
 			if (!bSuspicion)

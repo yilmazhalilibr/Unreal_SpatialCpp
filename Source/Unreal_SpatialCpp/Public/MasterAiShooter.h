@@ -25,6 +25,7 @@ class UFSMStatePatrol;
 class UFSMStateDead;
 class UFSMStateSearch;
 class UFSMStateResetAI;
+class UFSMStateHeard;
 
 
 UENUM(BlueprintType)
@@ -39,7 +40,8 @@ enum class EState : uint8
 	Patrol,
 	Dead,
 	Search,
-	ResetAI
+	ResetAI,
+	Heard
 };
 
 

@@ -30,6 +30,7 @@ class UFSMStatePatrol;
 class UFSMStateDead;
 class UFSMStateSearch;
 class UFSMStateResetAI;
+class UFSMStateHeard;
 
 
 UCLASS()
@@ -94,6 +95,12 @@ public:
 	UPROPERTY()
 	bool bSearchDoOnce = false;
 
+	UPROPERTY()
+	bool bIsPlayerHeard = false;
+
+	UPROPERTY()
+	FVector bLastHeardLocation = FVector().Zero();
+
 	UFUNCTION()
 	void AILogicTick(float DeltaTime);
 	UFUNCTION()
@@ -116,6 +123,15 @@ public:
 
 	UFUNCTION()
 	void SetAiInSearch(bool Value) { bAiInSearch = Value; }
+
+	UFUNCTION()
+	FVector GetLastHeardLocation() const { return bLastHeardLocation; }
+
+	UFUNCTION()
+	bool GetIsPlayerHeard() const { return bIsPlayerHeard; }
+
+	UFUNCTION()
+	void SetIsPlayerHeard(bool Value) { bIsPlayerHeard = Value; }
 
 	UPROPERTY(BlueprintReadOnly)
 	UFSMStateIdle* IdleState;
@@ -146,6 +162,9 @@ public:
 
 	UPROPERTY(BlueprintReadOnly)
 	UFSMStateResetAI* ResetAIState;
+
+	UPROPERTY(BlueprintReadOnly)
+	UFSMStateHeard* HeardState;
 
 private:
 
