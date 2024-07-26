@@ -22,6 +22,10 @@
 			"TargetAllowList": [
 				"Editor"
 			]
+		},
+		{
+			"Name": "ALSV4_CPP",
+			"Enabled": true
 		}
 	]
 }

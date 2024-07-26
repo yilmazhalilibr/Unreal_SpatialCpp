@@ -36,7 +36,7 @@ public:
 
 	AMasterAiController* GetController() const;
 
-	UMasterAIAnimInstance* GetMasterAiAnimInstance() const;
+	//UMasterAIAnimInstance* GetMasterAiAnimInstance() const;
 
 	void SetController(AMasterAiController* _controller) { MasterAiController = _controller; }
 

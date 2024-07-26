@@ -8,7 +8,7 @@
 
 
 
-AMasterAiShooter::AMasterAiShooter() : CurrentHP(MaxHP), AIDead(false)
+AMasterAiShooter::AMasterAiShooter(const FObjectInitializer& ObjectInitializer) : CurrentHP(MaxHP), AIDead(false), Super(ObjectInitializer)
 {
 	PrimaryActorTick.bCanEverTick = true;
 }
@@ -25,6 +25,14 @@ void AMasterAiShooter::BeginPlay()
 
 	//Anydamage event
 	OnTakeAnyDamage.AddDynamic(this, &AMasterAiShooter::OnTakeAIAnyDamage);
+	
+	//ALSV4_CPP INTEGRATION
+	if (MovementModel.DataTable)
+	{
+		SetMovementModel();
+
+	}
+	
 }
 
 void AMasterAiShooter::Destroyed()

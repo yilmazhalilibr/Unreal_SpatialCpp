@@ -5,6 +5,8 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "TimerManager.h"
+//#include "/Users/DBK Games 05/Documents/Unreal Projects/Unreal_SpatialCpp/Plugins/ALS/Source/ALSV4_CPP/Public/Character/ALSCharacter.h"
+#include "ALSV4_CPP/Public/Character/ALSCharacter.h"
 #include "MasterAiShooter.generated.h"
 
 
@@ -46,13 +48,14 @@ enum class EState : uint8
 
 
 UCLASS()
-class UNREAL_SPATIALCPP_API AMasterAiShooter : public ACharacter
+class UNREAL_SPATIALCPP_API AMasterAiShooter : public AALSCharacter
 {
 	GENERATED_BODY()
 
 public:
 	// Sets default values for this character's properties
-	AMasterAiShooter();
+	 // Sets default values for this character's properties
+	AMasterAiShooter(const FObjectInitializer& ObjectInitializer);
 
 protected:
 	// Called when the game starts or when spawned

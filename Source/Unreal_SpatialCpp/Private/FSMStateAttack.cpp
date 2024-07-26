@@ -27,9 +27,10 @@ void UFSMStateAttack::Enter()
 		//Stop all movement 
 		MasterAiController->StopMovement();
 
-		//AnimInstance will be added here
-		MasterAiAnimInstance = Cast<UMasterAIAnimInstance>(Owner->GetMesh()->GetAnimInstance());
-		MasterAiAnimInstance->SetAttack(true);
+		////AnimInstance will be added here
+		//MasterAiAnimInstance = Cast<UMasterAIAnimInstance>(Owner->GetMesh()->GetAnimInstance());
+		//MasterAiAnimInstance->SetAttack(true);
+		////BURADA HATA VAR DUZELTILCEK
 	}
 
 
@@ -71,7 +72,7 @@ void UFSMStateAttack::Exit()
 	UE_LOG(LogTemp, Warning, TEXT("Exiting Attack State"));
 	//Clear focus
 	MasterAiController->SetFocus(nullptr);
-	MasterAiAnimInstance->SetAttack(false);
+	//MasterAiAnimInstance->SetAttack(false);
 
 }
 
@@ -84,13 +85,13 @@ AMasterAiController* UFSMStateAttack::GetController() const
 {
 	return MasterAiController;
 }
-
-UMasterAIAnimInstance* UFSMStateAttack::GetMasterAiAnimInstance() const
-{
-	if (!MasterAiAnimInstance)
-	{
-		return MasterAiAnimInstance;
-	}
-
-	return nullptr;
-}
+//
+//UMasterAIAnimInstance* UFSMStateAttack::GetMasterAiAnimInstance() const
+//{
+//	if (!MasterAiAnimInstance)
+//	{
+//		return MasterAiAnimInstance;
+//	}
+//
+//	return nullptr;
+//}
