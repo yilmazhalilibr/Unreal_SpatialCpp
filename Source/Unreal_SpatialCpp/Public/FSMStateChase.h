@@ -45,5 +45,7 @@ private:
 	AMasterAiShooter* Owner;
 	UPROPERTY()
 	AMasterAiController* MasterAiController;
+	UPROPERTY()
+	AALSBaseCharacter* ALSCharacter;
 
 };

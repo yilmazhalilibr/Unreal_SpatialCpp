@@ -31,6 +31,16 @@ void UFSMStateAttack::Enter()
 		//MasterAiAnimInstance = Cast<UMasterAIAnimInstance>(Owner->GetMesh()->GetAnimInstance());
 		//MasterAiAnimInstance->SetAttack(true);
 		////BURADA HATA VAR DUZELTILCEK
+
+		OwnerAI = Cast<AALSBaseCharacter>(Owner);
+
+		if (OwnerAI)
+		{
+			OwnerAI->SetOverlayState(EALSOverlayState::Rifle);
+			OwnerAI->SetDesiredGait(EALSGait::Sprinting);
+
+		}
+
 	}
 
 
@@ -42,8 +52,8 @@ void UFSMStateAttack::Update(float DeltaTime)
 	//UE_LOG(LogTemp, Warning, TEXT("Updating Attack State"));
 
 	EQSTimer += DeltaTime;
-	
-	if (MasterAiSpawner && EQSTimer > FMath::RandRange(7, 20))
+
+	if (MasterAiSpawner && EQSTimer > FMath::RandRange(5, 6))
 	{
 		EQSTimer = 0.0f;
 		FVector AttackLocation = MasterAiSpawner->GetAttackCordinate(Owner);
@@ -57,6 +67,8 @@ void UFSMStateAttack::Update(float DeltaTime)
 		if (Owner->GetCharacterMovement()->Velocity.Size() < 1.0f)
 		{
 			MasterAiController->SetFocus(GetWorld()->GetFirstPlayerController()->GetPawn());
+			OwnerAI->SetRotationMode(EALSRotationMode::Aiming);
+
 		}
 		else
 		{
@@ -72,6 +84,17 @@ void UFSMStateAttack::Exit()
 	UE_LOG(LogTemp, Warning, TEXT("Exiting Attack State"));
 	//Clear focus
 	MasterAiController->SetFocus(nullptr);
+
+	OwnerAI = Cast<AALSBaseCharacter>(Owner);
+
+	if (OwnerAI)
+	{
+		//OwnerAI->SetOverlayState(EALSOverlayState::Rifle);
+		OwnerAI->SetRotationMode(EALSRotationMode::VelocityDirection);
+		OwnerAI->SetDesiredGait(EALSGait::Running);
+
+	}
+
 	//MasterAiAnimInstance->SetAttack(false);
 
 }

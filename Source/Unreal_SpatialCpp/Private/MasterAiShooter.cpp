@@ -30,7 +30,6 @@ void AMasterAiShooter::BeginPlay()
 	if (MovementModel.DataTable)
 	{
 		SetMovementModel();
-
 	}
 	
 }

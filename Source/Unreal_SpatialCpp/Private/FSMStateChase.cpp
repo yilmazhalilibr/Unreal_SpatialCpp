@@ -22,6 +22,9 @@ void UFSMStateChase::Enter()
 			Owner = Cast<AMasterAiShooter>(MasterAiController->GetPawn());
 			MasterAiSpawner = Cast<AMasterAiSpawner>(Owner->GetSpawner());
 
+			ALSCharacter = Cast<AALSBaseCharacter>(Owner);
+
+			ALSCharacter->SetDesiredGait(EALSGait::Sprinting);
 		}
 
 	}
@@ -56,7 +59,7 @@ void UFSMStateChase::Enter()
 
 void UFSMStateChase::Update(float DeltaTime)
 {
-	UE_LOG(LogTemp, Warning, TEXT("Updating Chase State"));
+	//UE_LOG(LogTemp, Warning, TEXT("Updating Chase State"));
 
 	FVector PlayerLocation = GetWorld()->GetFirstPlayerController()->GetPawn()->GetActorLocation();
 
@@ -77,7 +80,7 @@ void UFSMStateChase::Update(float DeltaTime)
 	{
 		FVector AttackLocation = MasterAiSpawner->GetAttackCordinate(Owner);
 		MasterAiController->MoveToLocation(AttackLocation);
-		UE_LOG(LogTemp, Warning, TEXT("Chase Location: %s"), *AttackLocation.ToString());
+		//UE_LOG(LogTemp, Warning, TEXT("Chase Location: %s"), *AttackLocation.ToString());
 
 
 		FTimerHandle TimerHandle;
@@ -92,7 +95,7 @@ void UFSMStateChase::Update(float DeltaTime)
 				{
 					MasterAiController->SetFocus(nullptr);
 				}
-				
+
 			}, 1.0f, false);
 
 	}
@@ -103,16 +106,16 @@ void UFSMStateChase::Update(float DeltaTime)
 
 			if (MasterAiController->MoveToLocation(PlayerLocation, Owner->GetChaseDistance()))
 			{
-				UE_LOG(LogTemp, Warning, TEXT("Chasing the player"));
+				//UE_LOG(LogTemp, Warning, TEXT("Chasing the player"));
 			}
 			else
 			{
-				UE_LOG(LogTemp, Warning, TEXT("Failed to move to player location"));
+				//UE_LOG(LogTemp, Warning, TEXT("Failed to move to player location"));
 			}
 		}
 		else
 		{
-			UE_LOG(LogTemp, Warning, TEXT("Owner or MasterAiController is not valid"));
+			//UE_LOG(LogTemp, Warning, TEXT("Owner or MasterAiController is not valid"));
 			MasterAiController = Cast<AMasterAiController>(GetOuter());
 			if (MasterAiController)
 			{
@@ -128,6 +131,8 @@ void UFSMStateChase::Exit()
 {
 	UE_LOG(LogTemp, Warning, TEXT("Exiting Chase State"));
 	//Clear focus
+	ALSCharacter->SetDesiredGait(EALSGait::Running);
+
 
 }
 

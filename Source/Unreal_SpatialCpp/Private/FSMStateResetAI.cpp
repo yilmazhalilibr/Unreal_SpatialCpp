@@ -24,6 +24,11 @@ void UFSMStateResetAI::Enter()
 
 		GetMasterAiController()->MoveToLocation(_spawnLoc, 1.0f);
 
+		AALSBaseCharacter* OwnerAI = Cast<AALSBaseCharacter>(GetAIShooter());
+
+		OwnerAI->SetOverlayState(EALSOverlayState::Rifle);
+
+
 	}
 	if (!AIShooter)
 	{

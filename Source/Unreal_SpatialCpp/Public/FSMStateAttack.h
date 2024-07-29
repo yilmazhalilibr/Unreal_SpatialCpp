@@ -55,4 +55,7 @@ private:
 
 	UPROPERTY()
 	AMasterAiController* MasterAiController;
+
+	UPROPERTY()
+	AALSBaseCharacter* OwnerAI;
 };

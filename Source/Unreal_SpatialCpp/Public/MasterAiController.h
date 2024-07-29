@@ -189,5 +189,7 @@ private:
 	UFUNCTION()
 	void OnTargetPerceptionUpdated(AActor* Actor, FAIStimulus Stimulus);
 
+	UFUNCTION()
+	UFSMBase* HandleFSM(UFSMBase* NewFSM);
 
 };

@@ -78,7 +78,10 @@ void AMasterAiController::Tick(float DeltaTime)
 	}
 	else
 	{
-		bMissingPlayerTimer += DeltaTime;
+		if (CurrentState == ChaseState /*and AttackState*/)
+		{
+			bMissingPlayerTimer += DeltaTime;
+		}
 		bSuspicionTimer -= DeltaTime;
 		if (bSuspicionTimer < 0)
 		{
@@ -186,10 +189,15 @@ void AMasterAiController::OnTargetPerceptionUpdated(AActor* Actor, FAIStimulus S
 		}
 	}
 
+}
 
-
-
-
+UFSMBase* AMasterAiController::HandleFSM(UFSMBase* NewFSM)
+{
+	if (CurrentState == NewFSM)
+	{
+		return CurrentState;
+	}
+	return NewFSM;
 }
 
 void AMasterAiController::AILogicTick(float DeltaTime)
@@ -240,19 +248,19 @@ void AMasterAiController::AILogicTick(float DeltaTime)
 	}
 
 
-	if (HandleChangeLogic() != CurrentState)
-	{
-		ChangeStateAI(HandleChangeLogic());
-	}
+	//if (HandleChangeLogic() != CurrentState)
+	//{
+	//	ChangeStateAI(HandleChangeLogic());
+	//}
 
-	if (GetCurrentState())
-	{
-		GetCurrentState()->Update(DeltaTime);
-	}
-	else
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Current State is not valid"));
-	}
+	//if (GetCurrentState())
+	//{
+	//	GetCurrentState()->Update(DeltaTime);
+	//}
+	//else
+	//{
+	//	UE_LOG(LogTemp, Warning, TEXT("Current State is not valid"));
+	//}
 }
 
 UFSMBase* AMasterAiController::HandleChangeLogic()
@@ -268,13 +276,13 @@ UFSMBase* AMasterAiController::HandleChangeLogic()
 	//Hearing State
 	if (bIsPlayerHeard && !OnWarMode && !bSuspicion)
 	{
-		if (bIsPlayerHeard && CurrentState == HeardState)
+		/*if (bIsPlayerHeard && CurrentState == HeardState)
 		{
 			return CurrentState;
-		}
+		}*/
 
 		//bIsPlayerHeard = false;
-		return HeardState;
+		return HandleFSM(HeardState);
 	}
 	//Sight State
 	if (bIsPlayerDetected)
@@ -283,7 +291,8 @@ UFSMBase* AMasterAiController::HandleChangeLogic()
 		if (!OnWarMode && bSuspicion)
 		{
 			bAiInSearch = true; // Search durumuna girdiðini belirtiyoruz.
-			return SearchState;
+			return HandleFSM(SearchState);
+
 		}
 
 		if (OnWarMode)
@@ -296,7 +305,7 @@ UFSMBase* AMasterAiController::HandleChangeLogic()
 			{
 				if (CurrentState != AttackState) // Eðer mevcut state AttackState deðilse
 				{
-					return AttackState;
+					return HandleFSM(AttackState);
 				}
 				else
 				{
@@ -305,7 +314,8 @@ UFSMBase* AMasterAiController::HandleChangeLogic()
 			}
 			else
 			{
-				return ChaseState;
+				//return AttackState;
+				return HandleFSM(ChaseState);
 			}
 		}
 	}
@@ -316,12 +326,12 @@ UFSMBase* AMasterAiController::HandleChangeLogic()
 		{
 			if (!bSuspicion)
 			{
-				return PatrolState;
+				return HandleFSM(PatrolState);
 			}
 			else
 			{
 				bAiInSearch = true; // Search durumuna girdiðini belirtiyoruz.
-				return SearchState;
+				return HandleFSM(SearchState);
 			}
 
 			//if (bSuspicion && !bAiInSearch)
@@ -338,12 +348,17 @@ UFSMBase* AMasterAiController::HandleChangeLogic()
 				SetOnWarMode(false);
 				bMissingPlayer = false;
 				bAiInSearch = false; // Reset AI durumuna geçtiðimizde Search durumu sýfýrlanýr.
-				return ResetAIState;
+				return HandleFSM(ResetAIState);
 			}
 			else
 			{
 				//return SearchState;
-				return ChaseState;
+				/*if (GEngine)
+				{
+					GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Chase State"));
+				}*/
+				//return ChaseState;
+				return CurrentState;
 			}
 		}
 	}
