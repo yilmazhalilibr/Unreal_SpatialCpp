@@ -5,13 +5,21 @@
 #include "CoreMinimal.h"
 #include "AIController.h"
 #include "Perception/AIPerceptionComponent.h"
-#include "Perception/AISenseConfig_Sight.h"
-#include "Perception/AISense_Sight.h"
 #include "GameFramework/Character.h"
-#include "Perception/AISenseConfig_Hearing.h"
+
+#include "Perception/AISenseConfig.h"
 #include "Perception/AISense_Hearing.h"
-#include "Perception/AISenseConfig_Damage.h"
 #include "Perception/AISense_Damage.h"
+#include "Perception/AISense_Touch.h"
+#include "Perception/AISense_Sight.h"
+#include "Perception/AISense_Prediction.h"
+
+#include "Perception/AISenseConfig_Sight.h"
+#include "Perception/AISenseConfig_Hearing.h"
+#include "Perception/AISenseConfig_Damage.h"
+#include "Perception/AISenseConfig_Touch.h"
+#include "Perception/AISenseConfig_Prediction.h"
+
 #include "MasterAiController.generated.h"
 
 /**
@@ -31,6 +39,7 @@ class UFSMStateDead;
 class UFSMStateSearch;
 class UFSMStateResetAI;
 class UFSMStateHeard;
+
 
 
 UCLASS()
@@ -62,6 +71,10 @@ protected:
 	UPROPERTY()
 	FVector PlayerLastLocation;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	AActor* StimilusActor;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FAIStimulus StimilusData;
 
 
 	UFUNCTION()
@@ -98,6 +111,9 @@ public:
 	UPROPERTY()
 	bool bIsPlayerHeard = false;
 
+	/*UFUNCTION(BlueprintCallable)
+	void AIVariables(bool& Posses, bool& WarMode, bool& Suspicion, bool& MissingPlayer, bool& InSearch, bool& IsHearedPlayer);*/
+
 	UPROPERTY()
 	FVector bLastHeardLocation = FVector().Zero();
 
@@ -106,11 +122,14 @@ public:
 	UFUNCTION()
 	UFSMBase* HandleChangeLogic();
 
-	UPROPERTY()
+	UPROPERTY(BlueprintReadOnly)
 	UFSMBase* CurrentState;
 
 	UFUNCTION(BlueprintCallable)
 	void ChangeStateAI(UFSMBase* NewState);
+
+	UFUNCTION(BlueprintCallable)
+	bool IsCurrentState(UFSMBase* State) const;
 
 	UFUNCTION()
 	FVector GetPlayerLastLocation() const { return PlayerLastLocation; }
@@ -186,10 +205,21 @@ private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "AI", meta = (AllowPrivateAccess = "true"))
 	UAISenseConfig_Damage* DamageConfig;
 
+	//Touch perception
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "AI", meta = (AllowPrivateAccess = "true"))
+	UAISenseConfig_Touch* TouchConfig;
+
+	//Prediction perception
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "AI", meta = (AllowPrivateAccess = "true"))
+	UAISenseConfig_Prediction* PredictionConfig;
+
 	UFUNCTION()
 	void OnTargetPerceptionUpdated(AActor* Actor, FAIStimulus Stimulus);
 
-	UFUNCTION()
+
+
+	UFUNCTION(BlueprintCallable)
 	UFSMBase* HandleFSM(UFSMBase* NewFSM);
+
 
 };

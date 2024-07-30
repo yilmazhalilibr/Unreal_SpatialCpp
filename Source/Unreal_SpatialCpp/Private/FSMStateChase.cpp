@@ -23,11 +23,10 @@ void UFSMStateChase::Enter()
 			MasterAiSpawner = Cast<AMasterAiSpawner>(Owner->GetSpawner());
 
 			ALSCharacter = Cast<AALSBaseCharacter>(Owner);
-
 			ALSCharacter->SetDesiredGait(EALSGait::Sprinting);
 		}
 
-	}
+	} 
 
 	UE_LOG(LogTemp, Warning, TEXT("Entering Chase State"));
 
@@ -80,7 +79,7 @@ void UFSMStateChase::Update(float DeltaTime)
 	{
 		FVector AttackLocation = MasterAiSpawner->GetAttackCordinate(Owner);
 		MasterAiController->MoveToLocation(AttackLocation);
-		//UE_LOG(LogTemp, Warning, TEXT("Chase Location: %s"), *AttackLocation.ToString());
+		UE_LOG(LogTemp, Warning, TEXT("Chase Location: %s"), *AttackLocation.ToString());
 
 
 		FTimerHandle TimerHandle;

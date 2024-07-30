@@ -12,14 +12,15 @@
 #include "FSMStateSearch.h"
 #include "FSMStateResetAI.h"
 #include "FSMStateHeard.h"
-#include <MasterAiSpawner.h>
+#include "MasterAiSpawner.h"
+
 #include "GameFramework/CharacterMovementComponent.h"
 
 
 
 AMasterAiController::AMasterAiController()
 {
-	AIPerceptionComponent = CreateDefaultSubobject<UAIPerceptionComponent>(TEXT("AIPerceptionComponent"));
+	AIPerceptionComponent = CreateDefaultSubobject<UAIPerceptionComponent>(TEXT("AI Perception Component"));
 	SetPerceptionComponent(*AIPerceptionComponent);
 
 	SightConfig = CreateDefaultSubobject<UAISenseConfig_Sight>(TEXT("SightConfig"));
@@ -30,7 +31,6 @@ AMasterAiController::AMasterAiController()
 		SightConfig->DetectionByAffiliation.bDetectNeutrals = true;
 
 		AIPerceptionComponent->ConfigureSense(*SightConfig);
-		AIPerceptionComponent->SetDominantSense(*SightConfig->GetSenseImplementation());
 	}
 
 	//AIPerceptionComponent->OnTargetPerceptionUpdated.AddDynamic(this, &AMasterAiController::OnTargetPerceptionUpdated);
@@ -55,8 +55,22 @@ AMasterAiController::AMasterAiController()
 		AIPerceptionComponent->ConfigureSense(*DamageConfig);
 	}
 
-	AIPerceptionComponent->OnTargetPerceptionUpdated.AddDynamic(this, &AMasterAiController::OnTargetPerceptionUpdated);
+	// Prediction Sense Configuration
+	PredictionConfig = CreateDefaultSubobject<UAISenseConfig_Prediction>(TEXT("Prediction Config"));
+	if (PredictionConfig)
+	{
+		AIPerceptionComponent->ConfigureSense(*PredictionConfig);
+	}
 
+	// Touch Sense Configuration
+	TouchConfig = CreateDefaultSubobject<UAISenseConfig_Touch>(TEXT("Touch Config"));
+	if (TouchConfig)
+	{
+		AIPerceptionComponent->ConfigureSense(*TouchConfig);
+	}
+
+	AIPerceptionComponent->OnTargetPerceptionUpdated.AddDynamic(this, &AMasterAiController::OnTargetPerceptionUpdated);
+	AIPerceptionComponent->SetDominantSense(*SightConfig->GetSenseImplementation());
 
 }
 
@@ -94,7 +108,9 @@ void AMasterAiController::Tick(float DeltaTime)
 	if (OnPossesDone && AiShooter && CurrentState)
 	{
 		AILogicTick(DeltaTime);
+
 	}
+
 }
 
 void AMasterAiController::OnPossess(APawn* InPawn)
@@ -167,11 +183,11 @@ void AMasterAiController::OnTargetPerceptionUpdated(AActor* Actor, FAIStimulus S
 	{
 		if (Stimulus.WasSuccessfullySensed())
 		{
-			UE_LOG(LogTemp, Warning, TEXT("Heard: %s at location %s"), *Actor->GetName(), *Stimulus.StimulusLocation.ToString());
+			//UE_LOG(LogTemp, Warning, TEXT("Heard: %s at location %s"), *Actor->GetName(), *Stimulus.StimulusLocation.ToString());
 			//if instigator is player 
 			if (Actor->Tags.Contains("Player"))
 			{
-				UE_LOG(LogTemp, Warning, TEXT("Player Heard"));
+				//UE_LOG(LogTemp, Warning, TEXT("Player Heard"));
 				bSearchDoOnce = false;
 				bIsPlayerHeard = true;
 				bLastHeardLocation = Stimulus.StimulusLocation;
@@ -183,9 +199,23 @@ void AMasterAiController::OnTargetPerceptionUpdated(AActor* Actor, FAIStimulus S
 	}
 	else if (Stimulus.Type == UAISense::GetSenseID<UAISense_Damage>())
 	{
-		if (Stimulus.WasSuccessfullySensed())
+		if (Stimulus.WasSuccessfullySensed() && Actor->Tags.Contains("Player"))
 		{
 			UE_LOG(LogTemp, Warning, TEXT("Damage: %s at location %s"), *Actor->GetName(), *Stimulus.StimulusLocation.ToString());
+		}
+	}
+	else if (Stimulus.Type == UAISense::GetSenseID<UAISense_Prediction>())
+	{
+		if (Stimulus.WasSuccessfullySensed() && Actor->Tags.Contains("Player"))
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Prediction: %s at location %s"), *Actor->GetName(), *Stimulus.StimulusLocation.ToString());
+		}
+	}
+	else if (Stimulus.Type == UAISense::GetSenseID<UAISense_Touch>())
+	{
+		if (Stimulus.WasSuccessfullySensed() && Actor->Tags.Contains("Player"))
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Touch: %s at location %s"), *Actor->GetName(), *Stimulus.StimulusLocation.ToString());
 		}
 	}
 
@@ -199,6 +229,16 @@ UFSMBase* AMasterAiController::HandleFSM(UFSMBase* NewFSM)
 	}
 	return NewFSM;
 }
+
+//void AMasterAiController::AIVariables(bool& Posses, bool& WarMode, bool& Suspicion, bool& MissingPlayer, bool& InSearch, bool& IsHearedPlayer)
+//{
+//	Posses = OnPossesDone;
+//	WarMode = OnWarMode;
+//	Suspicion = bSuspicion;
+//	MissingPlayer = bMissingPlayer;
+//	InSearch = bAiInSearch;
+//	IsHearedPlayer = bIsPlayerHeard;
+//}
 
 void AMasterAiController::AILogicTick(float DeltaTime)
 {
@@ -234,13 +274,11 @@ void AMasterAiController::AILogicTick(float DeltaTime)
 			_spawner->WarningPlayerDetected(true);
 		}
 	}
-	/*else
-	{
-		OnWarMode = false;
-	}*/
+
 	if (bMissingPlayerTimer >= AiShooter->GetPlayerLostTime())
 	{
 		bMissingPlayer = true;
+		OnWarMode = false;
 	}
 	else
 	{
@@ -253,14 +291,14 @@ void AMasterAiController::AILogicTick(float DeltaTime)
 	//	ChangeStateAI(HandleChangeLogic());
 	//}
 
-	//if (GetCurrentState())
-	//{
-	//	GetCurrentState()->Update(DeltaTime);
-	//}
-	//else
-	//{
-	//	UE_LOG(LogTemp, Warning, TEXT("Current State is not valid"));
-	//}
+	if (GetCurrentState())
+	{
+		GetCurrentState()->Update(DeltaTime);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Current State is not valid"));
+	}
 }
 
 UFSMBase* AMasterAiController::HandleChangeLogic()
@@ -385,6 +423,9 @@ void AMasterAiController::ChangeStateAI(UFSMBase* NewState)
 	CurrentState = nullptr; // Þu anki durumu geçici olarak boþaltýyoruz
 
 	AiShooter->GetCharacterMovement()->StopActiveMovement();
+	AiShooter->GetCharacterMovement()->DisableMovement();
+
+	//CurrentState->Enter();
 
 	FTimerHandle TimerHandle;
 	GetWorldTimerManager().SetTimer(TimerHandle, [this, NewState]()
@@ -392,8 +433,16 @@ void AMasterAiController::ChangeStateAI(UFSMBase* NewState)
 			CurrentState = NewState;
 			if (CurrentState)
 			{
+				AiShooter->GetCharacterMovement()->SetMovementMode(MOVE_Walking);
+
 				CurrentState->Enter();
 			}
 		}, 1.0f, false);
 
+}
+
+
+bool AMasterAiController::IsCurrentState(UFSMBase* State) const
+{
+	return CurrentState == State;
 }
